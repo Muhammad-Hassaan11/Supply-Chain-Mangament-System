@@ -1,0 +1,90 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "SCM" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e6]
+          - generic [ref=e10]: SCM
+        - button "Toggle navigation menu" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - img [ref=e18]
+        - heading "SCM Workbench" [level=1] [ref=e20]
+        - paragraph [ref=e21]: Relational Supply Chain Database Portal
+      - generic [ref=e23]:
+        - button "Sign In" [ref=e24] [cursor=pointer]
+        - button "Create Account" [ref=e25] [cursor=pointer]
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: Email Address
+          - textbox "Email Address" [ref=e29]:
+            - /placeholder: e.g. administrator@supplychain.com
+        - generic [ref=e30]:
+          - generic [ref=e31]: Password
+          - textbox "Password" [ref=e32]:
+            - /placeholder: ••••••••
+        - button "Sign Into SCM DBMS" [ref=e33] [cursor=pointer]
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - img [ref=e36]
+          - generic [ref=e39]: "University Viva Demonstrations Auto-fill:"
+        - generic [ref=e40]:
+          - button "Autofill Administrator (Full CRUD)" [ref=e41] [cursor=pointer]
+          - button "Autofill Viewer (Read Only)" [ref=e42] [cursor=pointer]
+    - contentinfo [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - link "SCM" [ref=e46] [cursor=pointer]:
+            - /url: /
+            - img [ref=e47]
+            - generic [ref=e50]: SCM
+          - paragraph [ref=e51]: Smart Supply Chain Solutions for a connected, efficient, and sustainable future.
+        - generic [ref=e52]:
+          - heading "Platform" [level=4] [ref=e53]
+          - list [ref=e54]:
+            - listitem [ref=e55]:
+              - link "Services" [ref=e56] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e57]:
+              - link "Industries" [ref=e58] [cursor=pointer]:
+                - /url: /industries
+            - listitem [ref=e59]:
+              - link "Locations" [ref=e60] [cursor=pointer]:
+                - /url: /locations
+            - listitem [ref=e61]:
+              - link "Dashboard" [ref=e62] [cursor=pointer]:
+                - /url: /dashboard
+        - generic [ref=e63]:
+          - heading "Company" [level=4] [ref=e64]
+          - list [ref=e65]:
+            - listitem [ref=e66]:
+              - link "About Us" [ref=e67] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e68]:
+              - link "Contact" [ref=e69] [cursor=pointer]:
+                - /url: /contact
+            - listitem [ref=e70]:
+              - link "Login" [ref=e71] [cursor=pointer]:
+                - /url: /login
+            - listitem [ref=e72]:
+              - link "Sign Up" [ref=e73] [cursor=pointer]:
+                - /url: /signup
+        - generic [ref=e74]:
+          - heading "Stay Connected" [level=4] [ref=e75]
+          - paragraph [ref=e76]: Subscribe for supply chain updates and insights.
+          - generic [ref=e77]:
+            - textbox "Enter your email" [ref=e78]
+            - button "Subscribe" [ref=e79] [cursor=pointer]
+      - generic [ref=e81]:
+        - generic [ref=e82]: (c) 2026 SCM. All rights reserved.
+        - generic [ref=e83]:
+          - link "Privacy Policy" [ref=e84] [cursor=pointer]:
+            - /url: /contact
+          - link "Terms of Service" [ref=e85] [cursor=pointer]:
+            - /url: /contact
+          - link "System Status" [ref=e86] [cursor=pointer]:
+            - /url: /contact
+  - button "Open Next.js Dev Tools" [ref=e92] [cursor=pointer]:
+    - img [ref=e93]

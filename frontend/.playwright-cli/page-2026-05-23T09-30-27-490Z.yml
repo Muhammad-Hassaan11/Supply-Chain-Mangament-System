@@ -1,0 +1,170 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e71] [cursor=pointer]:
+    - img [ref=e72]
+  - alert [ref=e75]
+  - complementary [ref=e76]:
+    - generic [ref=e77]:
+      - img [ref=e79]
+      - generic [ref=e82]:
+        - generic [ref=e83]: SCM
+        - generic [ref=e84]: Supply Chain Management
+      - button "Toggle sidebar" [ref=e85] [cursor=pointer]:
+        - img [ref=e86]
+    - navigation [ref=e88]:
+      - link "Dashboard" [ref=e89] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e91]
+        - generic [ref=e96]: Dashboard
+      - link "Suppliers" [ref=e98] [cursor=pointer]:
+        - /url: /suppliers
+        - img [ref=e100]
+        - generic [ref=e105]: Suppliers
+      - link "Products" [ref=e106] [cursor=pointer]:
+        - /url: /products
+        - img [ref=e108]
+        - generic [ref=e111]: Products
+      - link "Warehouses" [ref=e112] [cursor=pointer]:
+        - /url: /warehouses
+        - img [ref=e114]
+        - generic [ref=e117]: Warehouses
+      - link "Inventory" [ref=e118] [cursor=pointer]:
+        - /url: /inventory
+        - img [ref=e120]
+        - generic [ref=e124]: Inventory
+      - link "Shipments" [ref=e125] [cursor=pointer]:
+        - /url: /shipments
+        - img [ref=e127]
+        - generic [ref=e132]: Shipments
+      - link "Query Lab" [ref=e133] [cursor=pointer]:
+        - /url: /query-lab
+        - img [ref=e135]
+        - generic [ref=e138]: Query Lab
+      - link "Reports" [ref=e139] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e141]
+        - generic [ref=e142]: Reports
+    - generic [ref=e144]:
+      - generic [ref=e145]:
+        - generic [ref=e146]: A
+        - generic [ref=e147]:
+          - generic [ref=e148]: admin@supplychain.com
+          - generic [ref=e149]: Admin
+      - button "Logout" [ref=e150] [cursor=pointer]:
+        - img [ref=e151]
+        - generic [ref=e154]: Logout
+  - main [ref=e155]:
+    - generic [ref=e156]:
+      - generic [ref=e157]:
+        - generic [ref=e158]:
+          - heading "Operations Overview" [level=1] [ref=e159]
+          - paragraph [ref=e160]: Real-time supply chain performance and operational health.
+        - generic [ref=e163]: Connected to SQL Server
+      - generic [ref=e164]:
+        - generic [ref=e165]:
+          - img [ref=e167]
+          - generic [ref=e172]:
+            - generic [ref=e173]: Suppliers
+            - generic [ref=e174]: "10"
+        - generic [ref=e175]:
+          - img [ref=e177]
+          - generic [ref=e180]:
+            - generic [ref=e181]: Products
+            - generic [ref=e182]: "25"
+        - generic [ref=e183]:
+          - img [ref=e185]
+          - generic [ref=e188]:
+            - generic [ref=e189]: Warehouses
+            - generic [ref=e190]: "8"
+        - generic [ref=e191]:
+          - img [ref=e193]
+          - generic [ref=e198]:
+            - generic [ref=e199]: Shipments
+            - generic [ref=e200]: "15"
+      - generic [ref=e201]:
+        - generic [ref=e202]:
+          - generic [ref=e204]:
+            - heading "Low Stock Alerts 8 Items" [level=2] [ref=e205]:
+              - generic [ref=e206]: Low Stock Alerts
+              - generic [ref=e207]: 8 Items
+            - paragraph [ref=e208]: Products in inventory with levels below the global warning threshold (quantity < 10).
+          - table [ref=e210]:
+            - rowgroup [ref=e211]:
+              - row "Product Warehouse Bin Location Stock Level" [ref=e212]:
+                - columnheader "Product" [ref=e213]
+                - columnheader "Warehouse" [ref=e214]
+                - columnheader "Bin Location" [ref=e215]
+                - columnheader "Stock Level" [ref=e216]
+            - rowgroup [ref=e217]:
+              - row "Thermal Compound Paste Southeast Annex Atlanta Shelf 8 2" [ref=e218]:
+                - cell "Thermal Compound Paste" [ref=e219]
+                - cell "Southeast Annex Atlanta" [ref=e220]
+                - cell "Shelf 8" [ref=e221]:
+                  - code [ref=e222]: Shelf 8
+                - cell "2" [ref=e223]:
+                  - generic [ref=e224]: "2"
+              - row "Neodymium Magnet N52 Southern Logistics Houston Bin 9 3" [ref=e225]:
+                - cell "Neodymium Magnet N52" [ref=e226]
+                - cell "Southern Logistics Houston" [ref=e227]
+                - cell "Bin 9" [ref=e228]:
+                  - code [ref=e229]: Bin 9
+                - cell "3" [ref=e230]:
+                  - generic [ref=e231]: "3"
+              - row "Thermal Compound Paste East Coast Storage NY Shelf 9 4" [ref=e232]:
+                - cell "Thermal Compound Paste" [ref=e233]
+                - cell "East Coast Storage NY" [ref=e234]
+                - cell "Shelf 9" [ref=e235]:
+                  - code [ref=e236]: Shelf 9
+                - cell "4" [ref=e237]:
+                  - generic [ref=e238]: "4"
+              - row "Surgical Scalpel Pack Pac-West Fulfillment Seattle Aisle C-4 5" [ref=e239]:
+                - cell "Surgical Scalpel Pack" [ref=e240]
+                - cell "Pac-West Fulfillment Seattle" [ref=e241]
+                - cell "Aisle C-4" [ref=e242]:
+                  - code [ref=e243]: Aisle C-4
+                - cell "5" [ref=e244]:
+                  - generic [ref=e245]: "5"
+              - row "Lithium-ion Battery Pack West Coast Depot LA Rack 16 7" [ref=e246]:
+                - cell "Lithium-ion Battery Pack" [ref=e247]
+                - cell "West Coast Depot LA" [ref=e248]
+                - cell "Rack 16" [ref=e249]:
+                  - code [ref=e250]: Rack 16
+                - cell "7" [ref=e251]:
+                  - generic [ref=e252]: "7"
+              - row "Electronic Sensor module East Coast Storage NY Shelf 4 8" [ref=e253]:
+                - cell "Electronic Sensor module" [ref=e254]
+                - cell "East Coast Storage NY" [ref=e255]
+                - cell "Shelf 4" [ref=e256]:
+                  - code [ref=e257]: Shelf 4
+                - cell "8" [ref=e258]:
+                  - generic [ref=e259]: "8"
+              - row "Optical Glass Lens Rocky Mountain Silo Denver Rack H 8" [ref=e260]:
+                - cell "Optical Glass Lens" [ref=e261]
+                - cell "Rocky Mountain Silo Denver" [ref=e262]
+                - cell "Rack H" [ref=e263]:
+                  - code [ref=e264]: Rack H
+                - cell "8" [ref=e265]:
+                  - generic [ref=e266]: "8"
+              - row "Brushless DC Motor 24V West Coast Depot LA Rack 14 9" [ref=e267]:
+                - cell "Brushless DC Motor 24V" [ref=e268]
+                - cell "West Coast Depot LA" [ref=e269]
+                - cell "Rack 14" [ref=e270]:
+                  - code [ref=e271]: Rack 14
+                - cell "9" [ref=e272]:
+                  - generic [ref=e273]: "9"
+        - generic [ref=e274]:
+          - generic [ref=e275]:
+            - heading "System Health" [level=2] [ref=e276]
+            - paragraph [ref=e277]: Dynamic analytical ratio profiles derived from live data.
+          - generic [ref=e278]:
+            - generic [ref=e279]:
+              - img [ref=e280]
+              - generic [ref=e283]:
+                - generic [ref=e284]: 36%
+                - generic [ref=e285]: Stock Health
+            - generic [ref=e286]:
+              - generic [ref=e288]:
+                - generic [ref=e289]: Low Stock Alert Ratio
+                - generic [ref=e290]: 32%
+              - generic [ref=e294]:
+                - generic [ref=e295]: Warehouse Capacity Profile
+                - generic [ref=e296]: Nominal

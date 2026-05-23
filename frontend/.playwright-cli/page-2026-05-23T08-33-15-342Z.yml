@@ -1,0 +1,243 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "SCM" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e6]
+          - generic [ref=e10]: SCM
+        - navigation [ref=e11]:
+          - link "Home" [ref=e12] [cursor=pointer]:
+            - /url: /
+            - text: Home
+          - link "About" [ref=e14] [cursor=pointer]:
+            - /url: /about
+          - link "Services" [ref=e15] [cursor=pointer]:
+            - /url: /services
+          - link "Industries" [ref=e16] [cursor=pointer]:
+            - /url: /industries
+          - link "Locations" [ref=e17] [cursor=pointer]:
+            - /url: /locations
+          - link "Contact" [ref=e18] [cursor=pointer]:
+            - /url: /contact
+        - generic [ref=e19]:
+          - link "Login" [ref=e20] [cursor=pointer]:
+            - /url: /login
+          - link "Sign Up" [ref=e21] [cursor=pointer]:
+            - /url: /signup
+    - main [ref=e22]:
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - img [ref=e28]
+            - text: End-to-End Supply Chain Intelligence
+          - heading "Smart Supply Chain Solutions" [level=1] [ref=e31]
+          - paragraph [ref=e32]: Manage your entire supply chain from suppliers and products to warehouses, inventory, and shipments. Get real-time visibility and SQL-powered insights to make faster decisions.
+          - generic [ref=e33]:
+            - link "Explore Platform" [ref=e34] [cursor=pointer]:
+              - /url: /login
+              - text: Explore Platform
+              - img [ref=e35]
+            - link "Request Demo" [ref=e37] [cursor=pointer]:
+              - /url: /contact
+              - text: Request Demo
+              - img [ref=e38]
+          - generic [ref=e41]:
+            - generic [ref=e42]:
+              - img [ref=e43]
+              - text: Real-time Visibility
+            - generic [ref=e45]:
+              - img [ref=e46]
+              - text: Data-Driven Insights
+            - generic [ref=e48]:
+              - img [ref=e49]
+              - text: Secure & Reliable
+        - img "SCM prototype supply chain dashboard and logistics visual" [ref=e52]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - img [ref=e58]
+          - generic [ref=e63]:
+            - generic [ref=e64]: Suppliers
+            - generic [ref=e65]: 1,250+
+            - generic [ref=e66]: Active Partners
+        - generic [ref=e67]:
+          - img [ref=e69]
+          - generic [ref=e72]:
+            - generic [ref=e73]: Products
+            - generic [ref=e74]: 12,500+
+            - generic [ref=e75]: SKUs Managed
+        - generic [ref=e76]:
+          - img [ref=e78]
+          - generic [ref=e81]:
+            - generic [ref=e82]: Warehouses
+            - generic [ref=e83]: 85+
+            - generic [ref=e84]: Global Facilities
+        - generic [ref=e85]:
+          - img [ref=e87]
+          - generic [ref=e92]:
+            - generic [ref=e93]: Shipments
+            - generic [ref=e94]: 58,900+
+            - generic [ref=e95]: On-Time Deliveries
+      - generic [ref=e97]:
+        - generic [ref=e98]:
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - heading "Our Services" [level=2] [ref=e101]
+              - link "View all services" [ref=e102] [cursor=pointer]:
+                - /url: /services
+                - text: View all services
+                - img [ref=e103]
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - img [ref=e108]
+                - heading "Supply Chain Visibility" [level=3] [ref=e114]
+                - paragraph [ref=e115]: Real-time tracking and end-to-end visibility across your network.
+              - generic [ref=e116]:
+                - img [ref=e118]
+                - heading "Inventory Management" [level=3] [ref=e121]
+                - paragraph [ref=e122]: Optimize inventory levels and reduce holding costs.
+              - generic [ref=e123]:
+                - img [ref=e125]
+                - heading "Shipment & Logistics" [level=3] [ref=e130]
+                - paragraph [ref=e131]: Streamline shipments and ensure on-time delivery.
+              - generic [ref=e132]:
+                - img [ref=e134]
+                - heading "SQL Insights & Analytics" [level=3] [ref=e138]
+                - paragraph [ref=e139]: Run SQL queries and unlock powerful business insights.
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - heading "Industries We Serve" [level=2] [ref=e142]
+              - link "View all industries" [ref=e143] [cursor=pointer]:
+                - /url: /industries
+                - text: View all industries
+                - img [ref=e144]
+            - generic [ref=e146]:
+              - generic [ref=e147]:
+                - heading "Manufacturing" [level=3] [ref=e148]
+                - paragraph [ref=e149]: Factory-to-warehouse flow
+              - generic [ref=e150]:
+                - heading "Pharmaceuticals" [level=3] [ref=e151]
+                - paragraph [ref=e152]: Compliance-ready logistics
+              - generic [ref=e153]:
+                - heading "Automotive" [level=3] [ref=e154]
+                - paragraph [ref=e155]: Parts and assembly supply
+              - generic [ref=e156]:
+                - heading "Retail & eCommerce" [level=3] [ref=e157]
+                - paragraph [ref=e158]: Order fulfillment network
+              - generic [ref=e159]:
+                - heading "Food & Beverage" [level=3] [ref=e160]
+                - paragraph [ref=e161]: Temperature-aware routing
+              - generic [ref=e162]:
+                - heading "Chemicals" [level=3] [ref=e163]
+                - paragraph [ref=e164]: Controlled inventory handling
+          - generic [ref=e165]:
+            - generic [ref=e166]:
+              - heading "Global Locations" [level=2] [ref=e167]
+              - link "View all locations" [ref=e168] [cursor=pointer]:
+                - /url: /locations
+                - text: View all locations
+                - img [ref=e169]
+            - generic [ref=e171]:
+              - img [ref=e172]
+              - generic [ref=e190]:
+                - generic [ref=e191]:
+                  - generic [ref=e192]: North America
+                  - strong [ref=e193]: 25+
+                - generic [ref=e194]:
+                  - generic [ref=e195]: Europe
+                  - strong [ref=e196]: 20+
+                - generic [ref=e197]:
+                  - generic [ref=e198]: Asia Pacific
+                  - strong [ref=e199]: 30+
+                - generic [ref=e200]:
+                  - generic [ref=e201]: Middle East
+                  - strong [ref=e202]: 5+
+                - generic [ref=e203]:
+                  - generic [ref=e204]: South America
+                  - strong [ref=e205]: 5+
+            - paragraph [ref=e206]:
+              - text: Operating in
+              - strong [ref=e207]: 85+
+              - text: warehouses across
+              - strong [ref=e208]: 30+
+              - text: countries.
+        - generic [ref=e209]:
+          - generic [ref=e210]:
+            - heading "Track Your Shipment" [level=2] [ref=e211]
+            - paragraph [ref=e212]: Enter your tracking number to get real-time shipment updates.
+            - generic [ref=e213]:
+              - textbox "Enter tracking number" [ref=e214]
+              - button "Track Now" [ref=e215] [cursor=pointer]
+          - generic [ref=e216]:
+            - generic [ref=e217]:
+              - heading "Admin Portal" [level=2] [ref=e218]
+              - paragraph [ref=e219]: Powerful tools to manage suppliers, products, warehouses, inventory, and shipments.
+              - link "Admin Login" [ref=e220] [cursor=pointer]:
+                - /url: /login
+                - text: Admin Login
+                - img [ref=e221]
+            - img "Admin dashboard preview" [ref=e223]
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - heading "User Portal" [level=2] [ref=e226]
+              - paragraph [ref=e227]: Access orders, shipments, and real-time updates in one place.
+              - link "User Login" [ref=e228] [cursor=pointer]:
+                - /url: /signup
+                - text: User Login
+                - img [ref=e229]
+            - img "Signup portal preview" [ref=e231]
+    - contentinfo [ref=e232]:
+      - generic [ref=e233]:
+        - generic [ref=e234]:
+          - link "SCM" [ref=e235] [cursor=pointer]:
+            - /url: /
+            - img [ref=e236]
+            - generic [ref=e239]: SCM
+          - paragraph [ref=e240]: Smart Supply Chain Solutions for a connected, efficient, and sustainable future.
+        - generic [ref=e241]:
+          - heading "Platform" [level=4] [ref=e242]
+          - list [ref=e243]:
+            - listitem [ref=e244]:
+              - link "Services" [ref=e245] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e246]:
+              - link "Industries" [ref=e247] [cursor=pointer]:
+                - /url: /industries
+            - listitem [ref=e248]:
+              - link "Locations" [ref=e249] [cursor=pointer]:
+                - /url: /locations
+            - listitem [ref=e250]:
+              - link "Dashboard" [ref=e251] [cursor=pointer]:
+                - /url: /dashboard
+        - generic [ref=e252]:
+          - heading "Company" [level=4] [ref=e253]
+          - list [ref=e254]:
+            - listitem [ref=e255]:
+              - link "About Us" [ref=e256] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e257]:
+              - link "Contact" [ref=e258] [cursor=pointer]:
+                - /url: /contact
+            - listitem [ref=e259]:
+              - link "Login" [ref=e260] [cursor=pointer]:
+                - /url: /login
+            - listitem [ref=e261]:
+              - link "Sign Up" [ref=e262] [cursor=pointer]:
+                - /url: /signup
+        - generic [ref=e263]:
+          - heading "Stay Connected" [level=4] [ref=e264]
+          - paragraph [ref=e265]: Subscribe for supply chain updates and insights.
+          - generic [ref=e266]:
+            - textbox "Enter your email" [ref=e267]
+            - button "Subscribe" [ref=e268] [cursor=pointer]
+      - generic [ref=e270]:
+        - generic [ref=e271]: (c) 2026 SCM. All rights reserved.
+        - generic [ref=e272]:
+          - link "Privacy Policy" [ref=e273] [cursor=pointer]:
+            - /url: /contact
+          - link "Terms of Service" [ref=e274] [cursor=pointer]:
+            - /url: /contact
+          - link "System Status" [ref=e275] [cursor=pointer]:
+            - /url: /contact
+  - button "Open Next.js Dev Tools" [ref=e281] [cursor=pointer]:
+    - img [ref=e282]

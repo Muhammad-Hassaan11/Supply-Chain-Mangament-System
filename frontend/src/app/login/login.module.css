@@ -1,0 +1,479 @@
+.authPage {
+  background: linear-gradient(90deg, #eefaf8 0%, #eefaf8 38%, #ffffff 38%, #ffffff 100%);
+  color: #10272d;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.authLogo {
+  align-items: center;
+  color: #084b4a;
+  display: inline-flex;
+  font-family: var(--font-heading), "Segoe UI", Arial, sans-serif;
+  font-size: 2.1rem;
+  font-weight: 800;
+  gap: 10px;
+  left: 56px;
+  position: absolute;
+  top: 34px;
+  z-index: 3;
+}
+
+.authTopAction {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  position: absolute;
+  right: 54px;
+  top: 28px;
+  z-index: 4;
+}
+
+.splitGrid {
+  display: grid;
+  grid-template-columns: 38% 62%;
+  min-height: 100vh;
+}
+
+.leftPanel {
+  background:
+    linear-gradient(180deg, rgba(240,250,248,.9), rgba(229,247,244,.78)),
+    radial-gradient(circle at 70% 70%, rgba(15,154,148,.18), transparent 36%);
+  border-right: 1px solid #d5ebe8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 120px 48px 48px;
+  position: relative;
+}
+
+.leftContent {
+  max-width: 520px;
+  position: relative;
+  z-index: 2;
+}
+
+.badge {
+  align-items: center;
+  background: #dff5f2;
+  border: 1px solid #b9dfdc;
+  border-radius: 999px;
+  color: #084b4a;
+  display: inline-flex;
+  font-size: .86rem;
+  font-weight: 800;
+  gap: 8px;
+  padding: 8px 14px;
+}
+
+.headline {
+  color: #084b4a;
+  font-family: var(--font-heading), "Segoe UI", Arial, sans-serif;
+  font-size: clamp(2.4rem, 4.4vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.08;
+  margin: 28px 0 18px;
+}
+
+.lead {
+  color: #526777;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  margin: 0 0 28px;
+}
+
+.benefits {
+  display: grid;
+  gap: 20px;
+}
+
+.benefit {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+}
+
+.benefitIcon {
+  align-items: center;
+  background: #dff5f2;
+  border: 1px solid #d5ebe8;
+  border-radius: 8px;
+  color: #0f9a94;
+  display: flex;
+  flex-shrink: 0;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.benefitTitle {
+  color: #10272d;
+  display: block;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.benefitText {
+  color: #526777;
+  font-size: .9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.visualStrip {
+  bottom: 26px;
+  height: 220px;
+  left: 42px;
+  opacity: .95;
+  position: absolute;
+  right: 36px;
+}
+
+.cardWrap {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 92px 54px 38px;
+}
+
+.accountCard,
+.loginCard,
+.contactCard {
+  background: #ffffff;
+  border: 1px solid #d5ebe8;
+  border-radius: 8px;
+  box-shadow: 0 20px 58px rgba(16, 39, 45, .08);
+  max-width: 1040px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.loginCard {
+  max-width: 760px;
+}
+
+.cardHeader {
+  align-items: center;
+  border-bottom: 1px solid #edf4f5;
+  display: flex;
+  gap: 18px;
+  padding: 28px 30px 22px;
+}
+
+.headerIcon {
+  align-items: center;
+  background: #dff5f2;
+  border-radius: 50%;
+  color: #0f9a94;
+  display: flex;
+  flex-shrink: 0;
+  height: 58px;
+  justify-content: center;
+  width: 58px;
+}
+
+.cardTitle {
+  color: #10272d;
+  font-family: var(--font-heading), "Segoe UI", Arial, sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0 0 6px;
+}
+
+.cardSubtitle {
+  color: #526777;
+  font-size: .96rem;
+  margin: 0;
+}
+
+.cardBody {
+  padding: 24px 30px 30px;
+}
+
+.sectionTitle {
+  color: #10272d;
+  font-family: var(--font-heading), "Segoe UI", Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0 0 14px;
+}
+
+.roleGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.roleCard {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d5dee5;
+  border-radius: 8px;
+  color: #10272d;
+  cursor: pointer;
+  display: flex;
+  gap: 14px;
+  min-height: 82px;
+  padding: 16px;
+  text-align: left;
+  transition: all .2s ease;
+}
+
+.roleCard:hover,
+.roleActive {
+  background: #fbfffe;
+  border-color: #0f9a94;
+  box-shadow: inset 3px 0 0 #0f9a94;
+}
+
+.roleCard svg {
+  color: #0f9a94;
+  flex-shrink: 0;
+}
+
+.roleName {
+  display: block;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+
+.roleDesc {
+  color: #526777;
+  display: block;
+  font-size: .82rem;
+  line-height: 1.35;
+}
+
+.notice {
+  align-items: center;
+  background: #f0faf8;
+  border: 1px solid #d5ebe8;
+  border-radius: 8px;
+  color: #0b837c;
+  display: flex;
+  font-size: .88rem;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+}
+
+.formTitleRow {
+  align-items: center;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: auto 1fr;
+  margin-bottom: 14px;
+}
+
+.formTitleRow::after {
+  background: #d5dee5;
+  content: "";
+  height: 1px;
+}
+
+.form {
+  display: grid;
+  gap: 18px 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.formSingle {
+  display: grid;
+  gap: 18px;
+}
+
+.formGroup,
+.fullSpan {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.fullSpan {
+  grid-column: 1 / -1;
+}
+
+.label {
+  color: #10272d;
+  font-size: .86rem;
+  font-weight: 800;
+}
+
+.input,
+.select,
+.textarea {
+  background: #ffffff;
+  border: 1px solid #cfdee4;
+  border-radius: 8px;
+  color: #10272d;
+  font-size: .95rem;
+  min-height: 46px;
+  outline: none;
+  padding: 12px 14px;
+  transition: all .2s ease;
+  width: 100%;
+}
+
+.textarea {
+  min-height: 142px;
+  resize: vertical;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: #0f9a94;
+  box-shadow: 0 0 0 3px rgba(15,154,148,.14);
+}
+
+.submitBtn {
+  align-items: center;
+  background: linear-gradient(135deg, #0f9a94, #0b837c);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 10px 22px rgba(15,154,148,.22);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font-heading), "Segoe UI", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  grid-column: 1 / -1;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 18px;
+  transition: all .2s ease;
+  width: 100%;
+}
+
+.submitBtn:hover:not(:disabled) {
+  box-shadow: 0 14px 28px rgba(15,154,148,.28);
+  transform: translateY(-1px);
+}
+
+.submitBtn:disabled {
+  cursor: not-allowed;
+  opacity: .7;
+}
+
+.errorAlert,
+.successAlert,
+.adminNote {
+  align-items: center;
+  border-radius: 8px;
+  display: flex;
+  font-size: .9rem;
+  gap: 10px;
+  line-height: 1.45;
+  padding: 13px 14px;
+}
+
+.errorAlert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  margin-bottom: 16px;
+}
+
+.successAlert,
+.adminNote {
+  background: #f0faf8;
+  border: 1px solid #d5ebe8;
+  color: #0b837c;
+}
+
+.adminNote {
+  margin-top: 16px;
+}
+
+.terms {
+  color: #718597;
+  font-size: .86rem;
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.terms a {
+  color: #0f9a94;
+  font-weight: 800;
+}
+
+.spinner {
+  animation: spin .65s linear infinite;
+  border: 2px solid rgba(255,255,255,.35);
+  border-radius: 50%;
+  border-top-color: #fff;
+  height: 20px;
+  width: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1120px) {
+  .authPage {
+    background: #ffffff;
+  }
+
+  .splitGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .leftPanel {
+    border-bottom: 1px solid #d5ebe8;
+    border-right: none;
+    min-height: auto;
+    padding: 112px 28px 34px;
+  }
+
+  .visualStrip {
+    display: none;
+  }
+
+  .cardWrap {
+    min-height: auto;
+    padding: 34px 22px;
+  }
+
+  .roleGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .authLogo {
+    left: 18px;
+    top: 18px;
+  }
+
+  .authTopAction {
+    right: 18px;
+    top: 20px;
+  }
+
+  .leftPanel {
+    padding: 92px 18px 28px;
+  }
+
+  .benefits {
+    gap: 14px;
+  }
+
+  .cardHeader,
+  .cardBody {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .form,
+  .roleGrid {
+    grid-template-columns: 1fr;
+  }
+}

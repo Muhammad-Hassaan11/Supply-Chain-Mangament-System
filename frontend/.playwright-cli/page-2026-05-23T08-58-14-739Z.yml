@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - link "SCM" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - img [ref=e4]
+      - text: SCM
+    - generic [ref=e7]:
+      - generic [ref=e8]: Already have an account?
+      - link "Log in" [ref=e9] [cursor=pointer]:
+        - /url: /login
+    - generic [ref=e10]:
+      - complementary [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - img [ref=e14]
+            - text: End-to-End Supply Chain Intelligence
+          - heading "Join the smarter way to manage supply chains" [level=2] [ref=e17]
+          - paragraph [ref=e18]: Create your account and connect to a powerful network of partners, tools, and insights built to streamline operations and accelerate growth.
+          - generic [ref=e19]:
+            - generic [ref=e20]:
+              - img [ref=e22]
+              - generic [ref=e25]:
+                - generic [ref=e26]: Real-time Visibility
+                - paragraph [ref=e27]: Track orders, inventory, and shipments across your entire supply chain.
+            - generic [ref=e28]:
+              - img [ref=e30]
+              - generic [ref=e33]:
+                - generic [ref=e34]: Trusted & Secure
+                - paragraph [ref=e35]: Enterprise-grade account controls keep business data safe and compliant.
+            - generic [ref=e36]:
+              - img [ref=e38]
+              - generic [ref=e44]:
+                - generic [ref=e45]: Collaborate Seamlessly
+                - paragraph [ref=e46]: Work with suppliers, warehouses, clients, and partners in one platform.
+            - generic [ref=e47]:
+              - img [ref=e49]
+              - generic [ref=e53]:
+                - generic [ref=e54]: Data-Driven Decisions
+                - paragraph [ref=e55]: Use operational analytics to move faster with more confidence.
+        - img [ref=e57]
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - img [ref=e76]
+          - generic [ref=e79]:
+            - heading "Create your account" [level=1] [ref=e80]
+            - paragraph [ref=e81]: Choose your role to get started. Your experience will be customized for you.
+        - generic [ref=e82]:
+          - heading "I am signing up as" [level=2] [ref=e83]
+          - generic [ref=e84]:
+            - button "Supplier I supply goods or materials" [ref=e85] [cursor=pointer]:
+              - img [ref=e86]
+              - generic [ref=e91]:
+                - generic [ref=e92]: Supplier
+                - generic [ref=e93]: I supply goods or materials
+            - button "Warehouse Manager I manage warehouse operations" [ref=e94] [cursor=pointer]:
+              - img [ref=e95]
+              - generic [ref=e98]:
+                - generic [ref=e99]: Warehouse Manager
+                - generic [ref=e100]: I manage warehouse operations
+            - button "Client / Buyer I purchase goods or services" [ref=e101] [cursor=pointer]:
+              - img [ref=e102]
+              - generic [ref=e106]:
+                - generic [ref=e107]: Client / Buyer
+                - generic [ref=e108]: I purchase goods or services
+            - button "Logistics Partner I provide logistics or transportation" [ref=e109] [cursor=pointer]:
+              - img [ref=e110]
+              - generic [ref=e115]:
+                - generic [ref=e116]: Logistics Partner
+                - generic [ref=e117]: I provide logistics or transportation
+          - generic [ref=e118]:
+            - img [ref=e119]
+            - text: "The fields you see are tailored for your selected role: Supplier."
+          - heading "Create your supplier account" [level=2] [ref=e122]
+          - generic [ref=e123]:
+            - generic [ref=e124]:
+              - generic [ref=e125]: Full name *
+              - textbox "Enter your full name" [ref=e126]
+            - generic [ref=e127]:
+              - generic [ref=e128]: Business email *
+              - textbox "Enter your business email" [ref=e129]
+            - generic [ref=e130]:
+              - generic [ref=e131]: Company name *
+              - textbox "Enter your company name" [ref=e132]
+            - generic [ref=e133]:
+              - generic [ref=e134]: Phone number *
+              - textbox "(555) 123-4567" [ref=e135]
+            - generic [ref=e136]:
+              - generic [ref=e137]: Product category *
+              - combobox [ref=e138]:
+                - option "Select primary product category" [selected]
+                - option "Manufacturing"
+                - option "Retail & eCommerce"
+                - option "Automotive"
+                - option "Pharmaceuticals"
+                - option "Food & Beverage"
+            - generic [ref=e139]:
+              - generic [ref=e140]: Average lead time *
+              - textbox "e.g., 7-14 days" [ref=e141]
+            - generic [ref=e142]:
+              - generic [ref=e143]: Certifications (optional)
+              - combobox [ref=e144]:
+                - option "Select all that apply" [selected]
+                - option "ISO 9001"
+                - option "GMP"
+                - option "Cold Chain Certified"
+                - option "Hazmat Certified"
+              - generic [ref=e145]: You can update certifications later from your profile.
+            - generic [ref=e146]:
+              - generic [ref=e147]: Create password *
+              - textbox "Enter a strong password" [ref=e148]
+            - generic [ref=e149]:
+              - generic [ref=e150]: Confirm password *
+              - textbox "Confirm your password" [ref=e151]
+            - button "Create Supplier Account" [ref=e152] [cursor=pointer]
+            - paragraph [ref=e153]:
+              - text: By creating an account, you agree to our
+              - link "Terms of Service" [ref=e154] [cursor=pointer]:
+                - /url: /contact
+              - text: and
+              - link "Privacy Policy" [ref=e155] [cursor=pointer]:
+                - /url: /contact
+              - text: .
+          - generic [ref=e156]:
+            - img [ref=e157]
+            - text: Admin accounts are created internally. If you need administrator access for your organization, contact your system administrator.
+  - button "Open Next.js Dev Tools" [ref=e165] [cursor=pointer]:
+    - img [ref=e166]

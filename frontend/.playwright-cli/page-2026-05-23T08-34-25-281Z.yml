@@ -1,0 +1,50 @@
+- generic [active] [ref=e1]:
+  - complementary [ref=e2]:
+    - generic [ref=e3]:
+      - img [ref=e5]
+      - generic [ref=e8]:
+        - generic [ref=e9]: SCM
+        - generic [ref=e10]: Supply Chain DBMS
+      - button "Toggle sidebar" [ref=e11] [cursor=pointer]:
+        - img [ref=e12]
+    - navigation [ref=e14]:
+      - link "Dashboard" [ref=e15] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e17]
+        - generic [ref=e22]: Dashboard
+      - link "Suppliers" [ref=e24] [cursor=pointer]:
+        - /url: /suppliers
+        - img [ref=e26]
+        - generic [ref=e31]: Suppliers
+      - link "Products" [ref=e32] [cursor=pointer]:
+        - /url: /products
+        - img [ref=e34]
+        - generic [ref=e37]: Products
+      - link "Warehouses" [ref=e38] [cursor=pointer]:
+        - /url: /warehouses
+        - img [ref=e40]
+        - generic [ref=e43]: Warehouses
+      - link "Inventory" [ref=e44] [cursor=pointer]:
+        - /url: /inventory
+        - img [ref=e46]
+        - generic [ref=e50]: Inventory
+      - link "Shipments" [ref=e51] [cursor=pointer]:
+        - /url: /shipments
+        - img [ref=e53]
+        - generic [ref=e58]: Shipments
+      - link "Query Lab" [ref=e59] [cursor=pointer]:
+        - /url: /query-lab
+        - img [ref=e61]
+        - generic [ref=e64]: Query Lab
+      - link "Reports" [ref=e65] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e67]
+        - generic [ref=e68]: Reports
+    - link "Login" [ref=e70] [cursor=pointer]:
+      - /url: /login
+      - img [ref=e71]
+      - generic [ref=e74]: Login
+  - main [ref=e75]:
+    - paragraph [ref=e78]: Querying SQL Server...
+  - button "Open Next.js Dev Tools" [ref=e84] [cursor=pointer]:
+    - img [ref=e85]
