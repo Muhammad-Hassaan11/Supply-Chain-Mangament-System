@@ -1,24 +1,192 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { api } from "@/lib/api";
 
-const reportCards = [
-  { title: "Inventory Health", value: "98%", note: "Stable stock coverage", color: "#0f9a94" },
-  { title: "Supplier Rating", value: "4.7/5", note: "Average partner score", color: "#0284c7" },
-  { title: "Shipment SLA", value: "94%", note: "On-time delivery rate", color: "#10a66a" },
-  { title: "Query Latency", value: "42 ms", note: "Average SQL response", color: "#d97706" },
+type ReportId =
+  | "inventory-health"
+  | "shipment-performance"
+  | "supplier-scorecard"
+  | "product-cost-analysis"
+  | "warehouse-utilisation"
+  | "full-traceability";
+
+interface ReportDef {
+  id: ReportId;
+  title: string;
+  description: string;
+  accent: string;
+  sql: string;
+}
+
+interface QueryResult {
+  columns: string[];
+  rows: Record<string, unknown>[];
+  row_count: number;
+}
+
+const reportCards: ReportDef[] = [
+  {
+    id: "inventory-health",
+    title: "Inventory health report",
+    description: "Full stock levels, low alerts, and warehouse capacity ratios.",
+    accent: "#0f9a94",
+    sql: `
+SELECT
+  w.warehouse_name,
+  p.product_name,
+  i.location,
+  i.quantity,
+  CASE WHEN i.quantity < 10 THEN 'Low' ELSE 'OK' END AS stock_status
+FROM Inventory i
+JOIN Warehouse w ON i.warehouse_id = w.warehouse_id
+JOIN Product p ON i.product_id = p.product_id
+ORDER BY i.quantity ASC, w.warehouse_name ASC;
+`.trim(),
+  },
+  {
+    id: "shipment-performance",
+    title: "Shipment performance",
+    description: "Delivery rates, transit times, and pending shipment analysis.",
+    accent: "#10a66a",
+    sql: `
+SELECT
+  s.shipment_id,
+  s.tracking_number,
+  MIN(sl.log_timestamp) AS start_time,
+  MAX(sl.log_timestamp) AS last_event_time,
+  DATEDIFF(hour, MIN(sl.log_timestamp), MAX(sl.log_timestamp)) AS hours_in_transit,
+  SUM(CASE WHEN sl.event_type = 'Delivered' THEN 1 ELSE 0 END) AS delivered_events
+FROM Shipments s
+JOIN Shipment_logs sl ON s.shipment_id = sl.shipment_id
+GROUP BY s.shipment_id, s.tracking_number
+ORDER BY last_event_time DESC;
+`.trim(),
+  },
+  {
+    id: "supplier-scorecard",
+    title: "Supplier scorecard",
+    description: "Ratings, lead times, and compliance across all vendors.",
+    accent: "#0284c7",
+    sql: `
+SELECT
+  s.supplier_id,
+  s.contact_email,
+  s.rating,
+  COUNT(p.product_id) AS total_products,
+  CAST(AVG(CAST(p.unit_price AS float)) AS decimal(10,2)) AS avg_unit_price,
+  CAST(AVG(CAST(p.lead_time_day AS float)) AS decimal(10,1)) AS avg_lead_time_days
+FROM Suppliers s
+LEFT JOIN Product p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_id, s.contact_email, s.rating
+ORDER BY s.rating DESC, total_products DESC;
+`.trim(),
+  },
+  {
+    id: "product-cost-analysis",
+    title: "Product cost analysis",
+    description: "Unit price trends and high-value product breakdown.",
+    accent: "#d97706",
+    sql: `
+SELECT
+  p.product_id,
+  p.product_name,
+  p.unit_price,
+  p.lead_time_day,
+  CASE
+    WHEN p.unit_price >= 500 THEN 'High'
+    WHEN p.unit_price >= 100 THEN 'Medium'
+    ELSE 'Low'
+  END AS cost_band
+FROM Product p
+ORDER BY p.unit_price DESC;
+`.trim(),
+  },
+  {
+    id: "warehouse-utilisation",
+    title: "Warehouse utilisation",
+    description: "Bin usage, capacity fill rates, and overflow alerts.",
+    accent: "#14b8a6",
+    sql: `
+SELECT
+  w.warehouse_id,
+  w.warehouse_name,
+  w.capacity,
+  COALESCE(SUM(i.quantity), 0) AS total_stock,
+  CAST((COALESCE(SUM(i.quantity), 0) * 100.0) / NULLIF(w.capacity, 0) AS decimal(10,1)) AS utilisation_pct
+FROM Warehouse w
+LEFT JOIN Inventory i ON w.warehouse_id = i.warehouse_id
+GROUP BY w.warehouse_id, w.warehouse_name, w.capacity
+ORDER BY utilisation_pct DESC;
+`.trim(),
+  },
+  {
+    id: "full-traceability",
+    title: "Full chain traceability",
+    description: "End-to-end trace from supplier to delivery per product.",
+    accent: "#8b5cf6",
+    sql: `
+SELECT
+  sl.log_timestamp,
+  sl.event_type,
+  p.product_name,
+  w.warehouse_name,
+  s.tracking_number
+FROM Shipment_logs sl
+JOIN Shipments s ON sl.shipment_id = s.shipment_id
+JOIN Warehouse w ON s.warehouse_id = w.warehouse_id
+JOIN Product p ON sl.product_id = p.product_id
+ORDER BY sl.log_timestamp DESC;
+`.trim(),
+  },
 ];
 
-const rows = [
-  ["Low stock products", "Inventory", "8 items", "Review"],
-  ["Active supplier contracts", "Suppliers", "1,250+", "Healthy"],
-  ["Warehouse utilization", "Warehouses", "76%", "Optimal"],
-  ["In-transit shipments", "Shipments", "312", "Tracking"],
-  ["High-value products", "Products", "7", "Protected"],
-];
+function toCsv(columns: string[], rows: Record<string, unknown>[]) {
+  const escape = (value: unknown) => {
+    const raw = value === null || value === undefined ? "" : String(value);
+    const needsQuotes = /[",\n]/.test(raw);
+    const cleaned = raw.replace(/"/g, '""');
+    return needsQuotes ? `"${cleaned}"` : cleaned;
+  };
+
+  const header = columns.map(escape).join(",");
+  const body = rows.map((row) => columns.map((c) => escape(row[c])).join(",")).join("\n");
+  return `${header}\n${body}\n`;
+}
 
 export default function ReportsPage() {
+  const [active, setActive] = React.useState<ReportDef | null>(null);
+  const [result, setResult] = React.useState<QueryResult | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const runReport = async (report: ReportDef) => {
+    setActive(report);
+    setResult(null);
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await api.post<QueryResult>("/api/queries/execute", { sql: report.sql });
+      setResult(res);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to generate report.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportCsv = () => {
+    if (!active || !result) return;
+    const csv = toCsv(result.columns, result.rows);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${active.id}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "space-between" }}>
@@ -27,74 +195,86 @@ export default function ReportsPage() {
             Reports
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            Executive supply chain metrics for daily operations and leadership review.
+            Generate and export analytical reports from live data.
           </p>
         </div>
-        <Link className="glass-btn glass-btn-primary" href="/query-lab">
-          Run SQL Query
-        </Link>
+        <div className="glass-badge glass-badge-success" style={{ padding: "10px 14px" }}>
+          <span style={{ background: "#10a66a", borderRadius: "50%", display: "inline-block", height: "8px", width: "8px" }} />
+          SQL Server connected
+        </div>
       </div>
 
-      <div style={{ display: "grid", gap: "18px", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+      <div style={{ display: "grid", gap: "18px", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
         {reportCards.map((card) => (
-          <section key={card.title} className="glass-card glass-card-hover">
-            <div style={{ alignItems: "center", display: "flex", gap: "16px" }}>
-              <span
-                style={{
-                  background: `${card.color}18`,
-                  border: `1px solid ${card.color}33`,
-                  borderRadius: "50%",
-                  display: "inline-block",
-                  height: "52px",
-                  width: "52px",
-                }}
-              />
-              <div>
-                <div style={{ color: "var(--text-secondary)", fontSize: "0.82rem", fontWeight: 800, textTransform: "uppercase" }}>
-                  {card.title}
-                </div>
-                <div style={{ color: card.color, fontFamily: "var(--font-heading)", fontSize: "1.9rem", fontWeight: 800 }}>
-                  {card.value}
-                </div>
-                <div style={{ color: "var(--text-muted)", fontSize: "0.84rem" }}>{card.note}</div>
+          <section key={card.id} className="glass-card glass-card-hover" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ display: "flex", gap: "12px", alignItems: "start" }}>
+              <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: `${card.accent}14`, border: `1px solid ${card.accent}2a` }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800 }}>{card.title}</div>
+                <div style={{ color: "var(--text-secondary)", fontSize: ".9rem", marginTop: "4px" }}>{card.description}</div>
               </div>
             </div>
+            <div style={{ flex: 1 }} />
+            <button className="glass-btn glass-btn-secondary" onClick={() => runReport(card)} disabled={loading}>
+              {loading && active?.id === card.id ? "Generating..." : "Generate report"}
+            </button>
           </section>
         ))}
       </div>
 
-      <section className="glass-card">
-        <div style={{ marginBottom: "18px" }}>
-          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.25rem" }}>Report Summary</h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginTop: "4px" }}>
-            Snapshot of operational areas connected across the platform modules.
-          </p>
-        </div>
-        <div className="glass-table-container">
-          <table className="glass-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Module</th>
-                <th>Value</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(([metric, module, value, status]) => (
-                <tr key={metric}>
-                  <td style={{ fontWeight: 700 }}>{metric}</td>
-                  <td>{module}</td>
-                  <td>{value}</td>
-                  <td>
-                    <span className="glass-badge glass-badge-success">{status}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      {active ? (
+        <section className="glass-card" style={{ padding: "20px" }}>
+          <div style={{ alignItems: "start", display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+            <div>
+              <h2 style={{ fontSize: "1.25rem" }}>{active.title}</h2>
+              <p style={{ color: "var(--text-secondary)", fontSize: ".9rem", marginTop: "4px" }}>
+                {result ? `${result.row_count} rows generated.` : "Run the report to see live output from SQL Server."}
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <button className="glass-btn glass-btn-secondary" onClick={() => runReport(active)} disabled={loading}>
+                Refresh
+              </button>
+              <button className={`glass-btn glass-btn-primary ${!result ? "glass-btn-disabled" : ""}`} onClick={exportCsv} disabled={!result}>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          {error ? (
+            <div className="glass-card" style={{ borderColor: "#fecaca", background: "#fef2f2", color: "#7f1d1d", marginTop: "14px", padding: "14px" }}>
+              {error}
+            </div>
+          ) : null}
+
+          {result ? (
+            <div style={{ marginTop: "14px" }} className="glass-table-container">
+              <table className="glass-table" style={{ minWidth: "880px" }}>
+                <thead>
+                  <tr>
+                    {result.columns.map((c) => (
+                      <th key={c}>{c}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.rows.slice(0, 50).map((row, idx) => (
+                    <tr key={idx}>
+                      {result.columns.map((c) => (
+                        <td key={c}>{String(row[c] ?? "")}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div style={{ marginTop: "14px", color: "var(--text-secondary)" }}>
+              {loading ? "Running SQL report..." : "Select a report above to generate output."}
+            </div>
+          )}
+        </section>
+      ) : null}
     </div>
   );
 }

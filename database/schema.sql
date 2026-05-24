@@ -61,5 +61,9 @@ CREATE TABLE Users (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('Admin', 'Viewer'))
+    role VARCHAR(20) NOT NULL CHECK (role IN ('Admin', 'Viewer')),
+    full_name VARCHAR(120) NOT NULL DEFAULT 'Supply Chain User',
+    account_type VARCHAR(30) NULL CHECK (account_type IN ('admin', 'supplier', 'warehouse', 'client', 'logistics')),
+    status VARCHAR(20) NOT NULL DEFAULT 'Active' CHECK (status IN ('Active', 'Suspended')),
+    created_at DATETIME NOT NULL DEFAULT GETDATE()
 );

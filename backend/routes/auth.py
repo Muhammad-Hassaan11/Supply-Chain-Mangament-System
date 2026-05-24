@@ -32,12 +32,15 @@ def register(register_data: UserRegister):
 
     # 3. Create user
     hashed_pwd = hash_password(register_data.password)
+    full_name = (register_data.full_name or "Supply Chain User").strip() or "Supply Chain User"
+    account_type = register_data.account_type or ("admin" if register_data.role == "Admin" else None)
+    status_value = "Active"
     insert_query = """
-        INSERT INTO Users (email, password_hash, role)
-        VALUES (?, ?, ?)
+        INSERT INTO Users (email, password_hash, role, full_name, account_type, status)
+        VALUES (?, ?, ?, ?, ?, ?)
     """
     try:
-        execute_query(insert_query, (register_data.email, hashed_pwd, register_data.role))
+        execute_query(insert_query, (register_data.email, hashed_pwd, register_data.role, full_name, account_type, status_value))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

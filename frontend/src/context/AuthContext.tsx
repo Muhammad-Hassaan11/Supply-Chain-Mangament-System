@@ -13,7 +13,12 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, role: "Admin" | "Viewer", secretCode?: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    role: "Admin" | "Viewer",
+    options?: { secretCode?: string; fullName?: string; accountType?: string }
+  ) => Promise<void>;
   logout: () => void;
   isAdmin: boolean;
   isViewer: boolean;
@@ -99,15 +104,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     email: string,
     password: string,
     role: "Admin" | "Viewer",
-    secretCode?: string
+    options?: { secretCode?: string; fullName?: string; accountType?: string }
   ) => {
     try {
+      const secretCode = options?.secretCode;
       const response = await api.post<{
         access_token: string;
         token_type: string;
         role: "Admin" | "Viewer";
         email: string;
-      }>("/api/auth/register", { email, password, role, secret_code: secretCode || null });
+      }>(
+        "/api/auth/register",
+        {
+          email,
+          password,
+          role,
+          secret_code: secretCode || null,
+          full_name: options?.fullName || null,
+          account_type: options?.accountType || null,
+        }
+      );
 
       setAuthToken(response.access_token);
       localStorage.setItem("user_email", response.email);

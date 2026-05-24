@@ -12,9 +12,13 @@ DELETE FROM Suppliers;
 DELETE FROM Users;
 
 -- 2. Seed Users
-INSERT INTO Users (email, password_hash, role) VALUES
-('admin@supplychain.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Admin'),
-('viewer@supplychain.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Viewer');
+INSERT INTO Users (email, password_hash, role, full_name, account_type, status) VALUES
+('admin@supplychain.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Admin', 'Admin User', 'admin', 'Active'),
+('viewer@supplychain.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Viewer', 'Viewer User', 'client', 'Active'),
+('ahmed@titaniumforge.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Viewer', 'Ahmed Khan', 'supplier', 'Active'),
+('sara@eastcoaststorage.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Viewer', 'Sara Raza', 'warehouse', 'Active'),
+('mj@globaltech.io', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Viewer', 'Michael Johnson', 'client', 'Active'),
+('raj@pacwest-log.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Viewer', 'Raj Patel', 'logistics', 'Active');
 
 -- 3. Seed Suppliers (10 rows)
 INSERT INTO Suppliers (contact_id, rating, contact_email) VALUES

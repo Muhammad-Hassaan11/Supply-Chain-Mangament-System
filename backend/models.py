@@ -15,6 +15,8 @@ class UserRegister(BaseModel):
     password: str = Field(..., min_length=6, description="Password must be at least 6 characters")
     role: str = Field(..., description="Role must be either 'Admin' or 'Viewer'")
     secret_code: Optional[str] = Field(None, description="Secret code required for Admin registration")
+    full_name: Optional[str] = Field(None, description="Optional display name for admin user listing")
+    account_type: Optional[str] = Field(None, description="Optional portal account type (supplier/warehouse/client/logistics/admin)")
 
     @validator('role')
     def validate_role(cls, v):
@@ -22,11 +24,92 @@ class UserRegister(BaseModel):
             raise ValueError("Role must be 'Admin' or 'Viewer'")
         return v
 
+    @validator('account_type')
+    def validate_account_type(cls, v):
+        if v is None:
+            return v
+        if v not in ('admin', 'supplier', 'warehouse', 'client', 'logistics'):
+            raise ValueError("account_type must be one of: admin, supplier, warehouse, client, logistics")
+        return v
+
 class Token(BaseModel):
     access_token: str
     token_type: str
     role: str
     email: str
+
+# ==========================================
+# ADMIN USER MANAGEMENT SCHEMAS
+# ==========================================
+
+class AdminUser(BaseModel):
+    user_id: int
+    email: EmailStr
+    role: str
+    full_name: str
+    account_type: Optional[str] = None
+    status: str
+    created_at: datetime
+    metrics: Optional[dict] = None
+
+class AdminUserCreate(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+    role: str = Field(..., description="Role must be either 'Admin' or 'Viewer'")
+    full_name: str = Field(..., min_length=1, max_length=120)
+    account_type: Optional[str] = Field(None, description="supplier/warehouse/client/logistics/admin")
+    status: str = Field("Active", description="Active or Suspended")
+
+    @validator('role')
+    def validate_admin_role(cls, v):
+        if v not in ('Admin', 'Viewer'):
+            raise ValueError("Role must be 'Admin' or 'Viewer'")
+        return v
+
+    @validator('account_type')
+    def validate_admin_account_type(cls, v):
+        if v is None:
+            return v
+        if v not in ('admin', 'supplier', 'warehouse', 'client', 'logistics'):
+            raise ValueError("account_type must be one of: admin, supplier, warehouse, client, logistics")
+        return v
+
+    @validator('status')
+    def validate_status(cls, v):
+        if v not in ('Active', 'Suspended'):
+            raise ValueError("status must be 'Active' or 'Suspended'")
+        return v
+
+class AdminUserUpdate(BaseModel):
+    role: Optional[str] = None
+    full_name: Optional[str] = None
+    account_type: Optional[str] = None
+    status: Optional[str] = None
+    password: Optional[str] = Field(None, min_length=6)
+
+    @validator('role')
+    def validate_update_role(cls, v):
+        if v is None:
+            return v
+        if v not in ('Admin', 'Viewer'):
+            raise ValueError("Role must be 'Admin' or 'Viewer'")
+        return v
+
+    @validator('account_type')
+    def validate_update_account_type(cls, v):
+        if v is None:
+            return v
+        if v not in ('admin', 'supplier', 'warehouse', 'client', 'logistics'):
+            raise ValueError("account_type must be one of: admin, supplier, warehouse, client, logistics")
+        return v
+
+    @validator('status')
+    def validate_update_status(cls, v):
+        if v is None:
+            return v
+        if v not in ('Active', 'Suspended'):
+            raise ValueError("status must be 'Active' or 'Suspended'")
+        return v
 
 # ==========================================
 # MASTER SCM ENTITY SCHEMAS (CRUD)

@@ -105,7 +105,7 @@ export default function SignUpPage() {
       localStorage.setItem("account_type", accountType);
       localStorage.setItem("account_name", fullName);
       localStorage.setItem("company_name", company);
-      await register(email, password, "Viewer");
+      await register(email, password, "Viewer", { fullName, accountType });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Account creation failed.");
     } finally {
