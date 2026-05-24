@@ -8,7 +8,7 @@ Project root se:
 
 ```powershell
 cd backend
-.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
+.venv\Scripts\python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 Agar pehle se port busy ho ya backend restart karna ho:
@@ -16,7 +16,7 @@ Agar pehle se port busy ho ya backend restart karna ho:
 ```powershell
 taskkill /IM python.exe /F
 cd backend
-.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
+.venv\Scripts\python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 ## 2. Frontend run karna
@@ -67,14 +67,55 @@ Backend API:
 http://127.0.0.1:8000
 ```
 
-## 5. Login test
+## 5. Vercel frontend ko local backend se chalana
+
+Vercel par deployed frontend `localhost` ko directly access nahin kar sakta. Is liye backend ke samne tunnel chalani hogi.
+
+Backend start:
+
+```powershell
+cd backend
+.venv\Scripts\python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+Tunnel start karne ki example commands:
+
+```powershell
+ngrok http 8000
+```
+
+ya
+
+```powershell
+cloudflared tunnel --url http://127.0.0.1:8000
+```
+
+Tunnel aapko ek public URL dega, jese:
+
+```text
+https://abc123.ngrok-free.app
+```
+
+Phir Vercel Project Settings me yeh env set karo:
+
+```text
+NEXT_PUBLIC_API_URL=https://abc123.ngrok-free.app
+```
+
+Backend `.env` me Vercel domain CORS ke liye already allow hai:
+
+```text
+https://supply-chain-mangament-system.vercel.app
+```
+
+## 6. Login test
 
 ```text
 Email: admin@supplychain.com
 Password: password123
 ```
 
-## 6. Important note
+## 7. Important note
 
 SQL Server local machine par chalna chahiye aur database name yeh hona chahiye:
 
@@ -88,7 +129,7 @@ Backend config file:
 backend/.env
 ```
 
-## 7. Jo major changes ho chuki hain
+## 8. Jo major changes ho chuki hain
 
 - supplier create flow fix ho chuka hai
 - suppliers page par filter aur export working hain
@@ -96,7 +137,7 @@ backend/.env
 - supplier / warehouse / client / logistics ke role-based dashboard aur sidebar update ho chuke hain
 - signup/login ke baad role labels local profile ke mutabiq aa rahe hain
 
-## 8. Important changed files
+## 9. Important changed files
 
 ```text
 frontend/src/app/dashboard/page.tsx

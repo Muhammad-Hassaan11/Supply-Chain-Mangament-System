@@ -7,22 +7,30 @@ from dotenv import load_dotenv
 # Load environmental configs
 load_dotenv()
 
+def _parse_csv(value: str | None) -> list[str]:
+    if not value:
+        return []
+    return [v.strip() for v in value.split(",") if v.strip()]
+
 app = FastAPI(
     title="Supply Chain Management DBMS API",
     description="Raw SQL Server backend API for University SCM DBMS Project",
     version="1.0.0"
 )
 
-# Configure CORS for Next.js frontend (typically running on localhost:3000)
-# We allow credentials, standard methods, and headers
-origins = [
+# Configure CORS for Next.js frontend
+# - Local dev defaults
+# - Production should set CORS_ORIGINS and/or CORS_ORIGIN_REGEX in env
+origins = _parse_csv(os.getenv("CORS_ORIGINS")) or [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+origin_regex = os.getenv("CORS_ORIGIN_REGEX")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

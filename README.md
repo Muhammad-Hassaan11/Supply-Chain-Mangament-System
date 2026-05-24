@@ -43,3 +43,7 @@ dbms project/
 
 Refer to the complete quickstart guide:
 `specs/001-supply-chain-dbms/quickstart.md`
+
+## Deployment Note (Vercel)
+
+If you deploy the frontend to Vercel, you still need to deploy the FastAPI backend separately (and use a cloud-accessible SQL Server). See `specs/001-supply-chain-dbms/quickstart.md`.

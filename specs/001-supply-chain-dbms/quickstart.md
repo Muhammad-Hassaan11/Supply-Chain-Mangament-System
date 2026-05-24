@@ -81,3 +81,29 @@ This guide provides step-by-step setup instructions for running the three-tier u
    npm run dev
    ```
 4. Access the fully responsive dark glassmorphic user interface by opening [http://localhost:3000](http://localhost:3000) in your web browser.
+
+---
+
+## 4. Deploy (Vercel + Hosted Backend)
+
+If you deploy the **frontend** to Vercel, the **FastAPI backend + SQL Server** must also be hosted on a server that can reach your database.
+
+Important: Vercel can’t connect to your **local** SQL Server running on your laptop/PC. For production, use a cloud SQL Server (e.g., Azure SQL) or a publicly reachable SQL Server.
+
+### 4.1 Deploy backend (recommended: Docker on Render/Railway/Fly)
+
+1. Use the backend Dockerfile: `backend/Dockerfile`
+2. Set backend environment variables on the hosting provider:
+   - `DB_SERVER`, `DB_DATABASE`, `DB_TRUSTED_CONNECTION=no`, `DB_USERNAME`, `DB_PASSWORD`
+   - `JWT_SECRET_KEY`, `ADMIN_REGISTRATION_SECRET`
+   - `CORS_ORIGINS=https://<your-vercel-domain>`
+
+After deploy, note your backend URL (example: `https://your-backend.onrender.com`).
+
+### 4.2 Connect Vercel frontend to backend
+
+In Vercel Project Settings → Environment Variables, set:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-backend.onrender.com
+```
