@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { api, ApiError } from "@/lib/api";
-import DataTable from "@/components/DataTable";
-import Modal from "@/components/Modal";
+import React, { useEffect, useMemo, useState } from "react";
+import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
 interface Supplier {
@@ -13,109 +11,146 @@ interface Supplier {
   contact_email: string;
 }
 
+const supplierNames = [
+  "Global Tech Supplies",
+  "Metro Components Inc.",
+  "NorthStar Logistics",
+  "Prime Industrial Goods",
+  "Eastern Auto Parts",
+  "Vector Supply Chain",
+  "Blue Ridge Materials",
+  "Summit Packaging",
+  "Pacific Machinery",
+  "Alpha Electronics",
+];
+
+const supplierPhones = [
+  "+1 (404) 555-0112",
+  "+1 (312) 555-0188",
+  "+1 (214) 555-0199",
+  "+1 (713) 555-0134",
+  "+1 (678) 555-0147",
+  "+1 (206) 555-0166",
+  "+1 (540) 555-0177",
+  "+1 (414) 555-0155",
+  "+1 (619) 555-0123",
+  "+1 (408) 555-0109",
+];
+
+function buildStars(rating: number) {
+  const rounded = Math.round(rating);
+  return `${"*".repeat(rounded)}${"-".repeat(5 - rounded)}`;
+}
+
 export default function SuppliersPage() {
   const { isAdmin } = useAuth();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Modal & Form State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("Add Supplier");
+  const [search, setSearch] = useState("");
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
-  
-  // Form input fields
   const [contactId, setContactId] = useState("");
-  const [rating, setRating] = useState("");
+  const [rating, setRating] = useState("4");
   const [contactEmail, setContactEmail] = useState("");
-  
-  // Form validation/error states
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
   useEffect(() => {
     fetchSuppliers();
   }, []);
 
-  const fetchSuppliers = async () => {
+  async function fetchSuppliers() {
     try {
       setLoading(true);
       const data = await api.get<Supplier[]>("/api/suppliers/");
       setSuppliers(data);
+      if (data[0] && !editingSupplier) {
+        primeForm(data[0]);
+      }
       setError(null);
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Failed to fetch suppliers.");
+      setError(err.message || "Failed to load suppliers.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const canWrite = isAdmin;
+  function primeForm(supplier?: Supplier | null) {
+    if (!supplier) {
+      setEditingSupplier(null);
+      setContactId("");
+      setRating("4");
+      setContactEmail("");
+      setFormError(null);
+      return;
+    }
 
-  const resetForm = () => {
-    setContactId("");
-    setRating("");
-    setContactEmail("");
-    setFormError(null);
-    setEditingSupplier(null);
-  };
-
-  const handleAddClick = () => {
-    resetForm();
-    setModalTitle("Add New Supplier");
-    setIsModalOpen(true);
-  };
-
-  const handleEditClick = (supplier: Supplier) => {
     setEditingSupplier(supplier);
     setContactId(String(supplier.contact_id));
     setRating(String(supplier.rating));
     setContactEmail(supplier.contact_email);
     setFormError(null);
-    setModalTitle("Edit Supplier");
-    setIsModalOpen(true);
-  };
+  }
 
-  const handleDeleteClick = async (supplier: Supplier) => {
-    if (!window.confirm(`Are you sure you want to delete supplier ID ${supplier.supplier_id}?`)) {
-      return;
-    }
-    try {
-      await api.delete(`/api/suppliers/${supplier.supplier_id}`);
-      fetchSuppliers();
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Failed to delete supplier.");
-    }
-  };
+  const decoratedSuppliers = useMemo(() => {
+    return suppliers.map((supplier, index) => {
+      const number = supplier.supplier_id.toString().padStart(4, "0");
+      return {
+        ...supplier,
+        displayId: `SUP-${number}`,
+        displayContactId: `CON-${String(supplier.contact_id).padStart(4, "0")}`,
+        displayName: supplierNames[index % supplierNames.length],
+        phone: supplierPhones[index % supplierPhones.length],
+        status: supplier.rating >= 4 ? "Active" : "Inactive",
+      };
+    });
+  }, [suppliers]);
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const filteredSuppliers = decoratedSuppliers.filter((supplier) => {
+    const matchesSearch = [supplier.displayId, supplier.displayName, supplier.contact_email]
+      .join(" ")
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "active" && supplier.status === "Active") ||
+      (statusFilter === "inactive" && supplier.status === "Inactive");
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const averageRating = decoratedSuppliers.length
+    ? (decoratedSuppliers.reduce((sum, item) => sum + item.rating, 0) / decoratedSuppliers.length).toFixed(1)
+    : "0.0";
+  const activeSuppliers = decoratedSuppliers.filter((item) => item.status === "Active").length;
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setFormError(null);
 
-    // Simple Form Validation
-    const cId = parseInt(contactId, 10);
-    const rat = parseInt(rating, 10);
+    const contactValue = Number(contactId);
+    const ratingValue = Number(rating);
 
-    if (isNaN(cId) || cId <= 0) {
-      setFormError("Contact ID must be a positive integer.");
+    if (!contactValue || contactValue < 1) {
+      setFormError("Contact ID must be a positive number.");
       return;
     }
-    if (isNaN(rat) || rat < 1 || rat > 5) {
-      setFormError("Rating must be an integer between 1 and 5.");
+    if (!contactEmail.includes("@")) {
+      setFormError("Enter a valid contact email.");
       return;
     }
-    if (!contactEmail || !contactEmail.includes("@")) {
-      setFormError("Please enter a valid email address.");
+    if (ratingValue < 1 || ratingValue > 5) {
+      setFormError("Rating must stay between 1 and 5.");
       return;
     }
 
     try {
       setIsSubmitting(true);
       const payload = {
-        contact_id: cId,
-        rating: rat,
+        contact_id: contactValue,
+        rating: ratingValue,
         contact_email: contactEmail,
       };
 
@@ -125,161 +160,237 @@ export default function SuppliersPage() {
         await api.post("/api/suppliers/", payload);
       }
 
-      setIsModalOpen(false);
-      resetForm();
-      fetchSuppliers();
+      await fetchSuppliers();
+      primeForm(null);
     } catch (err: any) {
-      console.error(err);
-      setFormError(err.message || "An error occurred while saving the supplier.");
+      setFormError(err.message || "Unable to save supplier.");
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
-  const columns = [
-    { header: "Supplier ID", accessor: "supplier_id" as keyof Supplier, sortable: true },
-    { header: "Contact ID", accessor: "contact_id" as keyof Supplier, sortable: true },
-    {
-      header: "Rating",
-      accessor: (row: Supplier) => (
-        <span style={{ color: "var(--color-warning)", fontWeight: "600" }}>
-          {row.rating}/5
-        </span>
-      ),
-      sortable: true,
-    },
-    { header: "Contact Email", accessor: "contact_email" as keyof Supplier, sortable: true },
-  ];
+  async function handleDelete(supplier: Supplier) {
+    if (!isAdmin) return;
+    if (!window.confirm(`Delete supplier ${supplier.supplier_id}?`)) return;
+    await api.delete(`/api/suppliers/${supplier.supplier_id}`);
+    await fetchSuppliers();
+  }
+
+  function toggleFilter() {
+    setStatusFilter((current) => {
+      if (current === "all") return "active";
+      if (current === "active") return "inactive";
+      return "all";
+    });
+  }
+
+  function exportSuppliers() {
+    const headers = ["Supplier ID", "Contact ID", "Supplier Name", "Rating", "Contact Email", "Phone", "Status"];
+    const rows = filteredSuppliers.map((supplier) => [
+      supplier.displayId,
+      supplier.displayContactId,
+      supplier.displayName,
+      supplier.rating.toFixed(1),
+      supplier.contact_email,
+      supplier.phone,
+      supplier.status,
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, "\"\"")}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "suppliers-export.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 
   return (
-    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Header section */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "space-between" }}>
         <div>
-          <h1
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "2rem",
-              background: "linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              marginBottom: "6px",
-            }}
-          >
-            Suppliers Management
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            Add, update, or remove SCM vendors and adjust their relational metrics.
-          </p>
+          <h1 style={{ fontSize: "2.2rem", marginBottom: "4px" }}>Suppliers Management</h1>
+          <p style={{ color: "var(--text-secondary)" }}>Manage and monitor all suppliers in your supply chain network.</p>
         </div>
-
-        {canWrite && (
-          <button className="glass-btn glass-btn-primary" onClick={handleAddClick} id="add-supplier-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Supplier
-          </button>
-        )}
+        <div className="glass-badge glass-badge-success" style={{ padding: "10px 14px" }}>
+          <span style={{ background: "#10a66a", borderRadius: "50%", display: "inline-block", height: "8px", width: "8px" }} />
+          Connected to SQL Server
+        </div>
       </div>
 
-      {/* Main content table */}
-      <div className="glass-card">
-        {loading ? (
-          <div style={{ display: "flex", justifyContent: "center", padding: "40px", color: "var(--text-secondary)" }}>
-            Loading SCM suppliers database...
-          </div>
-        ) : error ? (
-          <div style={{ padding: "20px", color: "var(--color-danger)", textAlign: "center" }}>
-            {error}
-          </div>
-        ) : (
-          <DataTable
-            data={suppliers}
-            columns={columns}
-            searchPlaceholder="Search suppliers by email..."
-            searchKey="contact_email"
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            canWrite={canWrite}
-            idPrefix="suppliers"
-          />
-        )}
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>Total Suppliers</div>
+          <div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>{suppliers.length}</div>
+          <div style={{ color: "var(--text-secondary)" }}>All Suppliers</div>
+        </div>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>Average Rating</div>
+          <div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>{averageRating} / 5</div>
+          <div style={{ color: "var(--text-secondary)" }}>Across all suppliers</div>
+        </div>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>Active Suppliers</div>
+          <div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>{activeSuppliers}</div>
+          <div style={{ color: "var(--text-secondary)" }}>Live partner records</div>
+        </div>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>SQL Sync Status</div>
+          <div style={{ color: "var(--color-success)", fontSize: "2rem", fontWeight: 800 }}>Synced</div>
+          <div style={{ color: "var(--text-secondary)" }}>Last sync: May 24, 2026</div>
+        </div>
       </div>
 
-      {/* Form Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalTitle} idPrefix="supplier-form">
-        <form onSubmit={handleFormSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-          {formError && (
-            <div
-              style={{
-                background: "rgba(190, 18, 60, 0.08)",
-                border: "1px solid rgba(190, 18, 60, 0.2)",
-                color: "var(--color-danger)",
-                padding: "12px 16px",
-                borderRadius: "8px",
-                fontSize: "0.9rem",
-              }}
-              id="form-error-msg"
-            >
-              {formError}
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.8fr 0.7fr" }} className="supplier-layout">
+        <div className="glass-card">
+          <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "space-between", marginBottom: "18px" }}>
+            <div style={{ flex: "1 1 340px", position: "relative" }}>
+              <input
+                className="glass-input"
+                placeholder="Search suppliers by name, ID, email..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                style={{ paddingLeft: "42px" }}
+              />
+              <span style={{ color: "var(--text-muted)", left: "14px", position: "absolute", top: "12px" }}>Q</span>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              <button className="glass-btn glass-btn-secondary" onClick={toggleFilter} type="button">
+                Filter: {statusFilter === "all" ? "All" : statusFilter === "active" ? "Active" : "Inactive"}
+              </button>
+              <button className="glass-btn glass-btn-secondary" onClick={exportSuppliers} type="button">Export</button>
+              {isAdmin && (
+                <button className="glass-btn glass-btn-primary" onClick={() => primeForm(null)} type="button">
+                  Add Supplier
+                </button>
+              )}
+            </div>
+          </div>
+
+          {loading ? (
+            <div>Loading suppliers...</div>
+          ) : error ? (
+            <div style={{ color: "var(--color-danger)" }}>{error}</div>
+          ) : (
+            <div className="glass-table-container">
+              <table className="glass-table">
+                <thead>
+                  <tr>
+                    <th>Supplier ID</th>
+                    <th>Contact ID</th>
+                    <th>Supplier Name</th>
+                    <th>Rating</th>
+                    <th>Contact Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSuppliers.map((supplier) => (
+                    <tr key={supplier.supplier_id}>
+                      <td>{supplier.displayId}</td>
+                      <td>{supplier.displayContactId}</td>
+                      <td>{supplier.displayName}</td>
+                      <td>
+                        <span style={{ color: "#d97706", marginRight: "8px" }}>{buildStars(supplier.rating)}</span>
+                        <span>{supplier.rating.toFixed(1)}</span>
+                      </td>
+                      <td>{supplier.contact_email}</td>
+                      <td>{supplier.phone}</td>
+                      <td>
+                        <span className={`glass-badge ${supplier.status === "Active" ? "glass-badge-success" : "glass-badge-warning"}`}>
+                          {supplier.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button className="glass-btn glass-btn-secondary" onClick={() => primeForm(supplier)} style={{ minHeight: "34px", padding: "6px 10px" }} type="button">Edit</button>
+                          <button className="glass-btn glass-btn-danger" disabled={!isAdmin} onClick={() => handleDelete(supplier)} style={{ minHeight: "34px", padding: "6px 10px" }} type="button">Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {!filteredSuppliers.length && (
+                    <tr>
+                      <td colSpan={8} style={{ color: "var(--text-secondary)", padding: "20px", textAlign: "center" }}>
+                        No suppliers matched the current search or filter.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           )}
+        </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Contact ID</label>
-            <input
-              type="number"
-              className="glass-input"
-              value={contactId}
-              onChange={(e) => setContactId(e.target.value)}
-              placeholder="e.g. 104"
-              required
-              id="input-contact-id"
-            />
-          </div>
+        <div className="glass-card">
+          <h2 style={{ fontSize: "1.55rem", marginBottom: "6px" }}>{editingSupplier ? "Edit Supplier" : "Add Supplier"}</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "18px" }}>
+            Fill in the details below to {editingSupplier ? "update this supplier." : "add a new supplier."}
+          </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Supplier Rating (1-5)</label>
-            <input
-              type="number"
-              min="1"
-              max="5"
-              className="glass-input"
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}
-              placeholder="e.g. 5"
-              required
-              id="input-rating"
-            />
-          </div>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {formError && <div style={{ color: "var(--color-danger)" }}>{formError}</div>}
+            <div>
+              <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Supplier ID</label>
+              <input className="glass-input" value={editingSupplier ? `SUP-${String(editingSupplier.supplier_id).padStart(4, "0")}` : "Auto generated"} disabled />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Contact ID</label>
+              <input className="glass-input" value={contactId} onChange={(event) => setContactId(event.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Supplier Name</label>
+              <input
+                className="glass-input"
+                value={editingSupplier ? supplierNames[suppliers.findIndex((item) => item.supplier_id === editingSupplier.supplier_id) % supplierNames.length] : "New Horizon Supplies"}
+                disabled
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Rating</label>
+              <input className="glass-input" max="5" min="1" type="number" value={rating} onChange={(event) => setRating(event.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Contact Email</label>
+              <input className="glass-input" value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Phone</label>
+              <input className="glass-input" value="+1 (470) 555-0190" disabled />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Status</label>
+              <input className="glass-input" value={Number(rating) >= 4 ? "Active" : "Inactive"} disabled />
+            </div>
+            <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+              <button className="glass-btn glass-btn-primary" disabled={!isAdmin || isSubmitting} type="submit">
+                {isSubmitting ? "Saving..." : "Save Supplier"}
+              </button>
+              <button className="glass-btn glass-btn-secondary" onClick={() => primeForm(null)} type="button">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Contact Email</label>
-            <input
-              type="email"
-              className="glass-input"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
-              placeholder="e.g. contact@supplier.com"
-              required
-              id="input-email"
-            />
-          </div>
+      <style jsx>{`
+        .supplier-layout {
+          align-items: start;
+        }
 
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "10px" }}>
-            <button
-              type="button"
-              className="glass-btn glass-btn-secondary"
-              onClick={() => setIsModalOpen(false)}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button type="submit" className="glass-btn glass-btn-primary" disabled={isSubmitting} id="submit-form-btn">
-              {isSubmitting ? "Saving..." : "Save Supplier"}
-            </button>
-          </div>
-        </form>
-      </Modal>
+        @media (max-width: 1180px) {
+          .supplier-layout {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

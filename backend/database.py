@@ -23,9 +23,9 @@ def get_connection_string():
         if username and password:
             conn_str += f"UID={username};PWD={password};"
             
-    # Add optional parameter to avoid certificate validation issues with ODBC 18
-    if "18" in driver:
-        conn_str += "Encrypt=yes;TrustServerCertificate=yes;"
+    encrypt = os.getenv("DB_ENCRYPT", "no")
+    trust_cert = os.getenv("DB_TRUST_SERVER_CERTIFICATE", "yes")
+    conn_str += f"Encrypt={encrypt};TrustServerCertificate={trust_cert};"
         
     return conn_str
 
@@ -53,6 +53,9 @@ def execute_query(query: str, params: tuple = None, fetch: bool = False, fetch_o
     cursor = connection.cursor()
     
     try:
+        normalized_query = query.lstrip().upper()
+        is_read_query = normalized_query.startswith("SELECT")
+
         if params:
             cursor.execute(query, params)
         else:
@@ -66,11 +69,15 @@ def execute_query(query: str, params: tuple = None, fetch: bool = False, fetch_o
             
             if fetch_one:
                 row = cursor.fetchone()
+                if not is_read_query:
+                    connection.commit()
                 if row:
                     return dict(zip(columns, row))
                 return None
             else:
                 rows = cursor.fetchall()
+                if not is_read_query:
+                    connection.commit()
                 return [dict(zip(columns, row)) for row in rows]
         else:
             connection.commit()

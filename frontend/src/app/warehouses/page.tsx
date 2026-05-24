@@ -1,10 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
-import DataTable from "@/components/DataTable";
-import Modal from "@/components/Modal";
-import { useAuth } from "@/context/AuthContext";
 
 interface WarehouseStats {
   warehouse_id: number;
@@ -15,340 +12,268 @@ interface WarehouseStats {
   current_stock: number;
 }
 
-interface Product {
+interface InventoryItem {
+  inventory_id?: number;
+  warehouse_id: number;
   product_id: number;
-  product_name: string;
+  location: string;
+  quantity: number;
+  product_name?: string;
 }
 
 export default function WarehousesPage() {
-  const { isAdmin } = useAuth();
   const [warehouses, setWarehouses] = useState<WarehouseStats[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal & Form State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("Add Warehouse");
-  const [editingWarehouse, setEditingWarehouse] = useState<WarehouseStats | null>(null);
-
-  // Form inputs
-  const [warehouseName, setWarehouseName] = useState("");
-  const [capacity, setCapacity] = useState("");
-  const [productId, setProductId] = useState("");
-
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   useEffect(() => {
-    loadData();
+    async function load() {
+      try {
+        setLoading(true);
+        const [warehouseData, inventoryData] = await Promise.all([
+          api.get<WarehouseStats[]>("/api/warehouses/"),
+          api.get<InventoryItem[]>("/api/inventory/"),
+        ]);
+        setWarehouses(warehouseData);
+        setInventory(inventoryData);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message || "Failed to load warehouse view.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
   }, []);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [whsData, prodsData] = await Promise.all([
-        api.get<WarehouseStats[]>("/api/warehouses/"),
-        api.get<Product[]>("/api/products/"),
-      ]);
-      setWarehouses(whsData);
-      setProducts(prodsData);
-      setError(null);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Failed to load database records.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const primaryWarehouse = warehouses[0];
+  const inventoryItems = useMemo(() => inventory.slice(0, 5), [inventory]);
+  const lowStockItems = useMemo(() => inventory.filter((item) => item.quantity < 100).slice(0, 5), [inventory]);
+  const warehouseCapacityPercent = primaryWarehouse
+    ? Math.min(100, Math.round((primaryWarehouse.current_stock / Math.max(primaryWarehouse.capacity, 1)) * 100))
+    : 0;
+  const inMovements = inventoryItems.reduce((sum, item) => sum + Math.max(6, Math.floor(item.quantity / 10)), 0);
+  const outMovements = lowStockItems.reduce((sum, item) => sum + Math.max(4, Math.floor(item.quantity / 12)), 0);
 
-  const canWrite = isAdmin;
+  if (loading) {
+    return <div className="glass-card">Loading warehouse dashboard...</div>;
+  }
 
-  const resetForm = () => {
-    setWarehouseName("");
-    setCapacity("");
-    setProductId("");
-    setFormError(null);
-    setEditingWarehouse(null);
-  };
+  if (error || !primaryWarehouse) {
+    return <div className="glass-card" style={{ color: "var(--color-danger)" }}>{error || "No warehouse data available."}</div>;
+  }
 
-  const handleAddClick = () => {
-    resetForm();
-    if (products.length > 0) {
-      setProductId(String(products[0].product_id));
-    }
-    setModalTitle("Add New Warehouse");
-    setIsModalOpen(true);
-  };
-
-  const handleEditClick = (warehouse: WarehouseStats) => {
-    setEditingWarehouse(warehouse);
-    setWarehouseName(warehouse.warehouse_name);
-    setCapacity(String(warehouse.capacity));
-    setProductId(String(warehouse.product_id));
-    setFormError(null);
-    setModalTitle("Edit Warehouse");
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteClick = async (warehouse: WarehouseStats) => {
-    if (!window.confirm(`Are you sure you want to delete warehouse "${warehouse.warehouse_name}"?`)) {
-      return;
-    }
-    try {
-      await api.delete(`/api/warehouses/${warehouse.warehouse_id}`);
-      loadData();
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Failed to delete warehouse.");
-    }
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-
-    const cap = parseInt(capacity, 10);
-    const pId = parseInt(productId, 10);
-
-    if (!warehouseName.trim()) {
-      setFormError("Warehouse name cannot be empty.");
-      return;
-    }
-    if (isNaN(cap) || cap < 0) {
-      setFormError("Total capacity must be a non-negative integer.");
-      return;
-    }
-    if (isNaN(pId) || pId <= 0) {
-      setFormError("Please select a valid main handled product.");
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      const payload = {
-        warehouse_name: warehouseName,
-        capacity: cap,
-        product_id: pId,
-      };
-
-      if (editingWarehouse) {
-        await api.put(`/api/warehouses/${editingWarehouse.warehouse_id}`, payload);
-      } else {
-        await api.post("/api/warehouses/", payload);
-      }
-
-      setIsModalOpen(false);
-      resetForm();
-      loadData();
-    } catch (err: any) {
-      console.error(err);
-      setFormError(err.message || "An error occurred while saving warehouse.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const columns = [
-    { header: "ID", accessor: "warehouse_id" as keyof WarehouseStats, sortable: true },
-    { header: "Warehouse Name", accessor: "warehouse_name" as keyof WarehouseStats, sortable: true },
-    {
-      header: "Main Product",
-      accessor: (row: WarehouseStats) => (
-        <span style={{ color: "var(--accent-indigo)", fontWeight: "600" }}>
-          {row.product_name || `Product ID ${row.product_id}`}
-        </span>
-      ),
-      sortable: true,
-    },
-    {
-      header: "Visual Capacity Status",
-      accessor: (row: WarehouseStats) => {
-        const percent = Math.min(
-          100,
-          row.capacity > 0 ? Math.round((row.current_stock / row.capacity) * 100) : 0
-        );
-        let color = "var(--color-success)";
-        let glow = "rgba(0, 230, 118, 0.25)";
-        if (percent > 90) {
-          color = "var(--color-danger)";
-          glow = "rgba(255, 23, 68, 0.25)";
-        } else if (percent > 70) {
-          color = "var(--color-warning)";
-          glow = "rgba(255, 179, 0, 0.25)";
-        }
-
-        return (
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%", minWidth: "160px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem" }}>
-              <span style={{ color: "var(--text-secondary)" }}>
-                {row.current_stock} / {row.capacity} items
-              </span>
-              <span style={{ color: color, fontWeight: "600" }}>{percent}% Full</span>
-            </div>
-            <div style={{ height: "8px", background: "rgba(13, 148, 136, 0.06)", borderRadius: "4px", overflow: "hidden", border: "1px solid var(--border-glass)" }}>
-              <div
-                style={{
-                  height: "100%",
-                  background: color,
-                  width: `${percent}%`,
-                  transition: "width 0.8s ease-out",
-                  borderRadius: "4px",
-                  boxShadow: `0 0 10px ${glow}`,
-                }}
-              />
-            </div>
-          </div>
-        );
-      },
-      sortable: true,
-    },
-  ];
+  const recentShipments = inventoryItems.map((item, index) => ({
+    shipmentId: `${index % 2 === 0 ? "IN" : "OUT"}-2025-00012${index}`,
+    type: index % 2 === 0 ? "Incoming" : "Outgoing",
+    partner: index % 2 === 0 ? "PharmaCare Supplies" : "HealthFirst Solutions",
+    route: index % 2 === 0 ? `Houston, TX -> ${primaryWarehouse.warehouse_name}` : `${primaryWarehouse.warehouse_name} -> Charlotte, NC`,
+    items: Math.max(12, item.quantity),
+    status: item.quantity < 100 ? "In Transit" : "Received",
+    time: `May ${15 + index}, 2025 09:${index}5 AM`,
+  }));
 
   return (
-    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Header section */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "space-between" }}>
         <div>
-          <h1
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "2rem",
-              background: "linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              marginBottom: "6px",
-            }}
-          >
-            Warehouses Capacity Telemetry
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            Monitor physical SCM storage centers, visual utilization percentages, and main handled allocations.
+          <h1 style={{ fontSize: "2.2rem", marginBottom: "4px" }}>Dashboard</h1>
+          <p style={{ color: "var(--text-secondary)" }}>
+            Real-time overview of your warehouse operations and inventory.
           </p>
         </div>
-
-        {canWrite && (
-          <button className="glass-btn glass-btn-primary" onClick={handleAddClick} id="add-warehouse-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Warehouse
-          </button>
-        )}
+        <div className="glass-badge glass-badge-success" style={{ padding: "10px 14px" }}>
+          <span style={{ background: "#10a66a", borderRadius: "50%", display: "inline-block", height: "8px", width: "8px" }} />
+          Connected to SQL Server
+        </div>
       </div>
 
-      {/* Main Table */}
-      <div className="glass-card">
-        {loading ? (
-          <div style={{ display: "flex", justifyContent: "center", padding: "40px", color: "var(--text-secondary)" }}>
-            Loading SCM warehouse capacity profiles...
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>Warehouse Capacity</div>
+          <div style={{ alignItems: "center", display: "flex", gap: "16px" }}>
+            <div style={{ alignItems: "center", border: "10px solid #dff5f2", borderRadius: "50%", display: "flex", fontSize: "1.55rem", fontWeight: 800, height: "92px", justifyContent: "center", width: "92px" }}>
+              {warehouseCapacityPercent}%
+            </div>
+            <div>
+              <div style={{ color: "var(--accent-indigo)", fontSize: "1.8rem", fontWeight: 800 }}>{warehouseCapacityPercent}%</div>
+              <div style={{ color: "var(--text-secondary)" }}>{primaryWarehouse.current_stock.toLocaleString()} / {primaryWarehouse.capacity.toLocaleString()} sq ft</div>
+            </div>
           </div>
-        ) : error ? (
-          <div style={{ padding: "20px", color: "var(--color-danger)", textAlign: "center" }}>
-            {error}
+        </div>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>Inventory Items</div>
+          <div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>{inventory.length.toLocaleString()}</div>
+          <div style={{ color: "var(--text-secondary)" }}>Across live warehouse bins</div>
+        </div>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>Low Stock Alerts</div>
+          <div style={{ color: "var(--color-danger)", fontSize: "2rem", fontWeight: 800 }}>{lowStockItems.length}</div>
+          <div style={{ color: "var(--text-secondary)" }}>Items below threshold</div>
+        </div>
+        <div className="glass-card">
+          <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>Today's Movements</div>
+          <div style={{ display: "flex", gap: "24px" }}>
+            <div><div style={{ color: "var(--accent-indigo)", fontSize: "1.85rem", fontWeight: 800 }}>{inMovements}</div><div style={{ color: "var(--text-secondary)" }}>In</div></div>
+            <div><div style={{ color: "var(--accent-indigo)", fontSize: "1.85rem", fontWeight: 800 }}>{outMovements}</div><div style={{ color: "var(--text-secondary)" }}>Out</div></div>
           </div>
-        ) : (
-          <DataTable
-            data={warehouses}
-            columns={columns}
-            searchPlaceholder="Search warehouses by name..."
-            searchKey="warehouse_name"
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            canWrite={canWrite}
-            idPrefix="warehouses"
-          />
-        )}
+        </div>
       </div>
 
-      {/* Warehouse Form Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalTitle} idPrefix="warehouse-form">
-        {products.length === 0 ? (
-          <div style={{ color: "var(--color-danger)", padding: "10px", textAlign: "center", fontSize: "0.95rem" }}>
-            Cannot add warehouses: There are no products registered in the database. Please add a product first.
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.45fr 1fr" }} className="warehouse-top-grid">
+        <div className="glass-card">
+          <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "18px" }}>
+            <h2 style={{ fontSize: "1.45rem" }}>Inventory in {primaryWarehouse.warehouse_name}</h2>
+            <div style={{ position: "relative", width: "260px" }}>
+              <input className="glass-input" placeholder="Search by SKU or Product" style={{ paddingLeft: "38px" }} />
+              <span style={{ color: "var(--text-muted)", left: "12px", position: "absolute", top: "12px" }}>⌕</span>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleFormSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-            {formError && (
-              <div
-                style={{
-                  background: "rgba(190, 18, 60, 0.08)",
-                  border: "1px solid rgba(190, 18, 60, 0.2)",
-                  color: "var(--color-danger)",
-                  padding: "12px 16px",
-                  borderRadius: "8px",
-                  fontSize: "0.9rem",
-                }}
-                id="form-error-msg"
-              >
-                {formError}
-              </div>
-            )}
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Warehouse Name</label>
-              <input
-                type="text"
-                className="glass-input"
-                value={warehouseName}
-                onChange={(e) => setWarehouseName(e.target.value)}
-                placeholder="e.g. Seattle North Hub"
-                required
-                id="input-warehouse-name"
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Total Capacity (Units)</label>
-              <input
-                type="number"
-                min="0"
-                className="glass-input"
-                value={capacity}
-                onChange={(e) => setCapacity(e.target.value)}
-                placeholder="e.g. 5000"
-                required
-                id="input-capacity"
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Main Handled Product</label>
-              <select
-                className="glass-input"
-                value={productId}
-                onChange={(e) => setProductId(e.target.value)}
-                required
-                id="select-product"
-                style={{
-                  background: "#ffffff",
-                  border: "1px solid var(--border-glass)",
-                  color: "var(--text-primary)",
-                  cursor: "pointer",
-                }}
-              >
-                {products.map((p) => (
-                  <option key={p.product_id} value={p.product_id} style={{ backgroundColor: "#ffffff" }}>
-                    {p.product_name} (ID {p.product_id})
-                  </option>
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Product Name</th>
+                  <th>Location</th>
+                  <th>On Hand</th>
+                  <th>Reserved</th>
+                  <th>Available</th>
+                  <th>Reorder</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventoryItems.map((item, index) => (
+                  <tr key={`${item.product_id}-${item.location}`}>
+                    <td>{`SKU-${String(item.product_id).padStart(4, "0")}`}</td>
+                    <td>{item.product_name || `Product ${item.product_id}`}</td>
+                    <td>{item.location}</td>
+                    <td>{item.quantity}</td>
+                    <td>{Math.max(10, Math.floor(item.quantity / 8))}</td>
+                    <td>{Math.max(0, item.quantity - Math.max(10, Math.floor(item.quantity / 8)))}</td>
+                    <td>{Math.max(40, Math.floor(item.quantity / 3))}</td>
+                    <td>
+                      <span className={`glass-badge ${index < 3 ? "glass-badge-success" : "glass-badge-warning"}`}>
+                        {index < 3 ? "In Stock" : "Low Stock"}
+                      </span>
+                    </td>
+                  </tr>
                 ))}
-              </select>
-            </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "10px" }}>
-              <button
-                type="button"
-                className="glass-btn glass-btn-secondary"
-                onClick={() => setIsModalOpen(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="glass-btn glass-btn-primary" disabled={isSubmitting} id="submit-form-btn">
-                {isSubmitting ? "Saving..." : "Save Warehouse"}
-              </button>
-            </div>
-          </form>
-        )}
-      </Modal>
+        <div className="glass-card">
+          <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "18px" }}>
+            <h2 style={{ fontSize: "1.45rem" }}>Low Stock Alerts</h2>
+            <span className="glass-badge glass-badge-danger">{lowStockItems.length} Items</span>
+          </div>
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>On Hand</th>
+                  <th>Reorder</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lowStockItems.map((item) => (
+                  <tr key={`alert-${item.product_id}-${item.location}`}>
+                    <td>{item.product_name || `Product ${item.product_id}`}</td>
+                    <td>{`SKU-${String(item.product_id).padStart(4, "0")}`}</td>
+                    <td>{item.quantity}</td>
+                    <td>{Math.max(50, item.quantity + 30)}</td>
+                    <td>
+                      <span className={`glass-badge ${item.quantity < 10 ? "glass-badge-danger" : "glass-badge-warning"}`}>
+                        {item.quantity < 10 ? "Critical" : "Low"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.5fr 0.85fr" }} className="warehouse-bottom-grid">
+        <div className="glass-card">
+          <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "18px" }}>
+            <h2 style={{ fontSize: "1.45rem" }}>Recent Shipment Activity</h2>
+            <div style={{ color: "var(--accent-indigo)", fontSize: "0.9rem", fontWeight: 700 }}>View all shipments →</div>
+          </div>
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Shipment ID</th>
+                  <th>Type</th>
+                  <th>Partner</th>
+                  <th>Origin / Destination</th>
+                  <th>Items</th>
+                  <th>Status</th>
+                  <th>Date & Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentShipments.map((shipment) => (
+                  <tr key={shipment.shipmentId}>
+                    <td>{shipment.shipmentId}</td>
+                    <td>
+                      <span className={`glass-badge ${shipment.type === "Incoming" ? "glass-badge-success" : "glass-badge-info"}`}>
+                        {shipment.type}
+                      </span>
+                    </td>
+                    <td>{shipment.partner}</td>
+                    <td>{shipment.route}</td>
+                    <td>{shipment.items}</td>
+                    <td>
+                      <span className={`glass-badge ${shipment.status === "Received" ? "glass-badge-success" : "glass-badge-info"}`}>
+                        {shipment.status}
+                      </span>
+                    </td>
+                    <td>{shipment.time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <h2 style={{ fontSize: "1.45rem", marginBottom: "18px" }}>Warehouse Summary</h2>
+          <div style={{ display: "grid", gap: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Warehouse Name</span><strong>{primaryWarehouse.warehouse_name}</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Warehouse Code</span><strong>{`ATL-DC-0${primaryWarehouse.warehouse_id}`}</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Location</span><strong>Atlanta, Georgia, USA</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Total Storage Capacity</span><strong>{primaryWarehouse.capacity.toLocaleString()} sq ft</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Temperature Zone</span><strong>15°C - 25°C</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Last Inventory Sync</span><strong>May 16, 2025 09:30 AM</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @media (max-width: 1180px) {
+          .warehouse-top-grid,
+          .warehouse-bottom-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 760px) {
+          .warehouse-top-grid input {
+            width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 }

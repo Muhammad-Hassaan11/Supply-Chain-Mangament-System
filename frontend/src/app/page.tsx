@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 
 const stats = [
@@ -29,34 +27,6 @@ const industries = [
 ];
 
 export default function HomePage() {
-  const [trackingCode, setTrackingCode] = useState("");
-  const [trackingResult, setTrackingResult] = useState<null | {
-    code: string;
-    status: string;
-    origin: string;
-    destination: string;
-    eta: string;
-  }>(null);
-  const [searched, setSearched] = useState(false);
-
-  const handleTrack = (event: React.FormEvent) => {
-    event.preventDefault();
-    setSearched(true);
-
-    if (!trackingCode.trim()) {
-      setTrackingResult(null);
-      return;
-    }
-
-    setTrackingResult({
-      code: trackingCode.trim().toUpperCase(),
-      status: "In Transit",
-      origin: "Houston, TX",
-      destination: "Berlin, DE",
-      eta: "May 28, 2026",
-    });
-  };
-
   return (
     <main className="pub-anim-fade-up">
       <section
@@ -206,22 +176,13 @@ export default function HomePage() {
             <div className="pub-card">
               <h2 className="pub-heading-sm" style={{ marginBottom: "6px" }}>Track Your Shipment</h2>
               <p className="pub-text-sm" style={{ marginBottom: "14px" }}>Enter your tracking number to get real-time shipment updates.</p>
-              <form onSubmit={handleTrack} style={{ display: "flex", gap: "10px" }}>
-                <input
-                  className="pub-input"
-                  onChange={(event) => setTrackingCode(event.target.value)}
-                  placeholder="Enter tracking number"
-                  value={trackingCode}
-                />
-                <button className="pub-btn-primary" type="submit">Track Now</button>
-              </form>
-              {searched && (
-                <div className="pub-tag" style={{ marginTop: "14px" }}>
-                  {trackingResult
-                    ? `${trackingResult.code}: ${trackingResult.status}, ETA ${trackingResult.eta}`
-                    : "Please enter a tracking number."}
-                </div>
-              )}
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <input className="pub-input" placeholder="Enter tracking number" />
+                <button className="pub-btn-primary" type="button">Track Now</button>
+              </div>
+              <div className="pub-tag" style={{ marginTop: "14px" }}>
+                Example: TRK-USA-10015, In Transit, ETA May 28, 2026
+              </div>
             </div>
 
             <div className="pub-card portal-card">
@@ -297,9 +258,6 @@ export default function HomePage() {
           #home-stats-strip > div {
             border-right: none !important;
             border-bottom: 1px solid #d5ebe8;
-          }
-          form {
-            flex-direction: column;
           }
         }
       `}</style>

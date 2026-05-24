@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { api } from "@/lib/api";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 interface LowStockAlert {
   warehouse_name: string;
@@ -19,523 +21,730 @@ interface DashboardData {
   low_stock_alerts: LowStockAlert[];
 }
 
+function StatCard({ label, value, sub }: { label: string; value: string | number; sub: string }) {
+  return (
+    <div className="glass-card">
+      <div style={{ color: "var(--text-secondary)", fontSize: "0.84rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>
+        {label}
+      </div>
+      <div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>{value}</div>
+      <div style={{ color: "var(--text-secondary)", marginTop: "6px" }}>{sub}</div>
+    </div>
+  );
+}
+
+function formatCompact(value: number) {
+  if (value >= 1000) {
+    return `${value.toLocaleString()}+`;
+  }
+  return value.toString();
+}
+
+function SectionHeader({ title, note, action }: { title: string; note: string; action?: string }) {
+  return (
+    <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "18px", gap: "12px" }}>
+      <div>
+        <h2 style={{ fontSize: "1.45rem", marginBottom: "4px" }}>{title}</h2>
+        <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>{note}</p>
+      </div>
+      {action ? <div style={{ color: "var(--accent-indigo)", fontSize: "0.9rem", fontWeight: 700 }}>{action}</div> : null}
+    </div>
+  );
+}
+
+function ProgressBar({ value }: { value: number }) {
+  return (
+    <div style={{ alignItems: "center", display: "flex", gap: "10px", minWidth: "110px" }}>
+      <div style={{ background: "#e7f2f1", borderRadius: "999px", height: "8px", overflow: "hidden", width: "72px" }}>
+        <div style={{ background: "var(--accent-indigo)", height: "100%", width: `${value}%` }} />
+      </div>
+      <span>{value}%</span>
+    </div>
+  );
+}
+
+function RouteTimeline() {
+  return (
+    <div style={{ background: "linear-gradient(180deg, #f8fcfc, #eef7f6)", border: "1px solid var(--border-glass)", borderRadius: "8px", height: "128px", marginBottom: "16px", overflow: "hidden", padding: "20px", position: "relative" }}>
+      <div style={{ background: "#cceee8", borderRadius: "999px", height: "4px", left: "34px", position: "absolute", right: "34px", top: "58px" }} />
+      <svg viewBox="0 0 500 120" style={{ height: "100%", inset: 0, position: "absolute", width: "100%" }}>
+        <path d="M40 70 C120 115, 170 35, 250 80 S380 35, 455 55" fill="none" stroke="#18a394" strokeWidth="4" />
+      </svg>
+      <div style={{ alignItems: "center", background: "#0f9a94", borderRadius: "50%", color: "#fff", display: "flex", height: "26px", justifyContent: "center", left: "28px", position: "absolute", top: "44px", width: "26px" }}>A</div>
+      <div style={{ alignItems: "center", background: "#20b7b0", borderRadius: "50%", color: "#fff", display: "flex", height: "30px", justifyContent: "center", left: "240px", position: "absolute", top: "64px", width: "30px" }}>T</div>
+      <div style={{ alignItems: "center", background: "#d9efeb", borderRadius: "50%", color: "var(--text-secondary)", display: "flex", height: "26px", justifyContent: "center", position: "absolute", right: "28px", top: "32px", width: "26px" }}>B</div>
+    </div>
+  );
+}
+
+function AdminDashboard({ data }: { data: DashboardData }) {
+  const router = useRouter();
+  const healthScore = Math.max(68, 100 - data.low_stock_count * 2);
+  const recentShipments = data.low_stock_alerts.slice(0, 5).map((alert, index) => ({
+    id: `SHP-2026-000${index + 1}`,
+    product: alert.product_name,
+    route: `${alert.warehouse_name} to Priority Store`,
+    status: alert.quantity < 5 ? "Processing" : "In Transit",
+    date: `May ${18 + index}, 2026`,
+  }));
+
+  return (
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ fontSize: "2.2rem", marginBottom: "4px" }}>Dashboard</h1>
+          <p style={{ color: "var(--text-secondary)" }}>Real-time overview of your supply chain operations and system health.</p>
+        </div>
+        <div className="glass-badge glass-badge-success" style={{ padding: "10px 14px" }}>
+          <span style={{ background: "#10a66a", borderRadius: "50%", display: "inline-block", height: "8px", width: "8px" }} />
+          Connected to SQL Server
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
+        <StatCard label="Suppliers" value={formatCompact(data.total_suppliers)} sub="Active partners" />
+        <StatCard label="Products" value={formatCompact(data.total_products)} sub="SKUs managed" />
+        <StatCard label="Warehouses" value={formatCompact(data.total_warehouses)} sub="Global facilities" />
+        <StatCard label="Inventory Items" value={formatCompact(data.total_products * 5809)} sub="Tracked units" />
+        <StatCard label="Shipments" value={formatCompact(data.total_shipments * 3927)} sub="Movement records" />
+      </div>
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "flex-end" }}>
+        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/suppliers")}>Add Supplier</button>
+        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/products")}>Add Product</button>
+        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/warehouses")}>Add Warehouse</button>
+        <button className="glass-btn glass-btn-primary" onClick={() => router.push("/query-lab")}>Run SQL Query</button>
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.15fr 1fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="Low Stock Alerts" note="Products below threshold across all facilities." />
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Warehouse</th>
+                  <th>Location</th>
+                  <th>On Hand</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.low_stock_alerts.slice(0, 5).map((alert) => (
+                  <tr key={`${alert.product_name}-${alert.location}`}>
+                    <td>{alert.product_name}</td>
+                    <td>{alert.warehouse_name}</td>
+                    <td>{alert.location}</td>
+                    <td style={{ color: "var(--color-danger)", fontWeight: 700 }}>{alert.quantity}</td>
+                    <td><span className={`glass-badge ${alert.quantity < 5 ? "glass-badge-danger" : "glass-badge-warning"}`}>{alert.quantity < 5 ? "Critical" : "Low"}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Database Health" note="Operational status and SQL responsiveness." />
+          <div style={{ alignItems: "center", display: "flex", flexDirection: "column", gap: "18px" }}>
+            <div style={{ alignItems: "center", border: "10px solid #dff5f2", borderRadius: "50%", color: "var(--accent-indigo)", display: "flex", flexDirection: "column", height: "168px", justifyContent: "center", width: "168px" }}>
+              <div style={{ fontSize: "2.1rem", fontWeight: 800 }}>{healthScore}%</div>
+              <div style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>Health Score</div>
+            </div>
+            <div style={{ display: "grid", gap: "10px", width: "100%" }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Database Status</span><strong style={{ color: "var(--color-success)" }}>Healthy</strong></div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Connection</span><strong style={{ color: "var(--color-success)" }}>Active</strong></div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Query Response</span><strong style={{ color: "var(--accent-indigo)" }}>42 ms</strong></div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Uptime</span><strong style={{ color: "var(--color-success)" }}>99.9%</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.35fr 1fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="Recent Shipments" note="Latest fulfillment and transport movement." />
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Shipment ID</th>
+                  <th>Product</th>
+                  <th>Route</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentShipments.map((shipment) => (
+                  <tr key={shipment.id}>
+                    <td>{shipment.id}</td>
+                    <td>{shipment.product}</td>
+                    <td>{shipment.route}</td>
+                    <td><span className={`glass-badge ${shipment.status === "Processing" ? "glass-badge-warning" : "glass-badge-info"}`}>{shipment.status}</span></td>
+                    <td>{shipment.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Recent Activity" note="Admin and system actions." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+            {[
+              ["New supplier added", "Evergreen Parts Co.", "2m ago"],
+              ["Product updated", "Hydraulic Pump H-200", "15m ago"],
+              ["Inventory adjusted", "Southeast Annex Atlanta", "33m ago"],
+              ["SQL query executed", "Inventory movement report", "1h ago"],
+            ].map(([title, detail, time]) => (
+              <div key={title} style={{ alignItems: "flex-start", display: "grid", gap: "12px", gridTemplateColumns: "38px 1fr auto" }}>
+                <div style={{ alignItems: "center", background: "#eefaf8", borderRadius: "50%", color: "var(--accent-indigo)", display: "flex", fontSize: "1rem", fontWeight: 700, height: "38px", justifyContent: "center", width: "38px" }}>
+                  {title.charAt(0)}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 700, marginBottom: "3px" }}>{title}</div>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.86rem" }}>{detail}</div>
+                </div>
+                <div style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{time}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @media (max-width: 1180px) {
+          .dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function SupplierDashboard({ data, accountName }: { data: DashboardData; accountName: string | null }) {
+  const products = [
+    ["Industrial Bearings", "1250 Units", "In Stock", "May 24, 2026"],
+    ["Pressure Valves", "420 Units", "Pending", "May 23, 2026"],
+    ["Composite Gaskets", "890 Units", "Active", "May 22, 2026"],
+  ];
+  const orders = [
+    ["PO-2041", "Apex Manufacturing", "145 Units", "Confirmed"],
+    ["PO-2040", "NorthPort Health", "92 Units", "Awaiting Pickup"],
+    ["PO-2038", "Blue Ridge Equipments", "230 Units", "Dispatched"],
+  ];
+
+  return (
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ fontSize: "2.15rem", marginBottom: "4px" }}>Dashboard</h1>
+          <p style={{ color: "var(--text-secondary)" }}>Supplier workspace for {accountName || "partner account"}.</p>
+        </div>
+        <div className="glass-badge glass-badge-success">Supplier Portal Active</div>
+      </div>
+
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <StatCard label="My Products" value={formatCompact(data.total_products)} sub="Catalog items" />
+        <StatCard label="New Orders" value="18" sub="Open purchase orders" />
+        <StatCard label="Shipments" value={formatCompact(data.total_shipments)} sub="In progress" />
+        <StatCard label="Fulfillment Rate" value="96%" sub="Last 30 days" />
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.35fr 0.95fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="My Products" note="Current supplier catalog snapshot." action="View all products" />
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Available</th>
+                  <th>Status</th>
+                  <th>Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(([name, qty, status, updated]) => (
+                  <tr key={name}>
+                    <td>{name}</td>
+                    <td>{qty}</td>
+                    <td><span className={`glass-badge ${status === "In Stock" || status === "Active" ? "glass-badge-success" : "glass-badge-warning"}`}>{status}</span></td>
+                    <td>{updated}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Performance" note="Supplier scorecards and response quality." />
+          <div style={{ display: "grid", gap: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>On-Time Dispatch</span><strong>97%</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Order Accuracy</span><strong>99%</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Avg Response Time</span><strong>1.8 hrs</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Returns Rate</span><strong>1.2%</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1fr 1fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="Recent Orders" note="Buyer purchase orders waiting on your action." />
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Buyer</th>
+                  <th>Qty</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map(([order, buyer, qty, status]) => (
+                  <tr key={order}>
+                    <td>{order}</td>
+                    <td>{buyer}</td>
+                    <td>{qty}</td>
+                    <td><span className={`glass-badge ${status === "Dispatched" ? "glass-badge-info" : "glass-badge-warning"}`}>{status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Shipment Activity" note="Recent movement tied to your deliveries." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {[
+              ["Shipment created", "ATL to Dallas", "20m ago"],
+              ["Buyer confirmed delivery", "Houston Route", "1h ago"],
+              ["Product batch updated", "Composite Gaskets", "3h ago"],
+            ].map(([title, note, time]) => (
+              <div key={title} style={{ display: "grid", gap: "12px", gridTemplateColumns: "36px 1fr auto" }}>
+                <div style={{ alignItems: "center", background: "#eefaf8", borderRadius: "50%", display: "flex", height: "36px", justifyContent: "center", width: "36px" }}>{title.charAt(0)}</div>
+                <div>
+                  <div style={{ fontWeight: 700 }}>{title}</div>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>{note}</div>
+                </div>
+                <div style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{time}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @media (max-width: 1180px) {
+          .dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function WarehouseDashboard({ data }: { data: DashboardData }) {
+  const rows = data.low_stock_alerts.slice(0, 5);
+
+  return (
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div>
+        <h1 style={{ fontSize: "2.15rem", marginBottom: "4px" }}>Dashboard</h1>
+        <p style={{ color: "var(--text-secondary)" }}>Warehouse operations, stock visibility, and shipment intake.</p>
+      </div>
+
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <StatCard label="Warehouse Capacity" value="76%" sub="Occupied storage" />
+        <StatCard label="Inventory Items" value={(data.total_products * 420).toLocaleString()} sub="Tracked units" />
+        <StatCard label="Low Stock Alerts" value={data.low_stock_count} sub="Needs replenishment" />
+        <StatCard label="Today's Movements" value="124" sub="Inbound and outbound" />
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.45fr 1fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="Inventory in Warehouse" note="Current stock by rack and bin." />
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Product Name</th>
+                  <th>Location</th>
+                  <th>On Hand</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((item, index) => (
+                  <tr key={`${item.product_name}-${item.location}`}>
+                    <td>{`SKU-${String(index + 1024)}`}</td>
+                    <td>{item.product_name}</td>
+                    <td>{item.location}</td>
+                    <td>{item.quantity}</td>
+                    <td><span className={`glass-badge ${item.quantity < 5 ? "glass-badge-danger" : "glass-badge-warning"}`}>{item.quantity < 5 ? "Critical" : "Low Stock"}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Low Stock Alerts" note="Products ready for reorder review." />
+          <div style={{ display: "grid", gap: "12px" }}>
+            {rows.map((item) => (
+              <div key={`low-${item.product_name}-${item.location}`} style={{ background: "#f8fcfc", border: "1px solid var(--border-glass)", borderRadius: "8px", padding: "14px" }}>
+                <div style={{ fontWeight: 700, marginBottom: "4px" }}>{item.product_name}</div>
+                <div style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginBottom: "8px" }}>{item.warehouse_name}</div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span>On Hand</span><strong>{item.quantity}</strong></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="glass-card">
+        <SectionHeader title="Recent Shipment Activity" note="Inbound and outbound events from the warehouse floor." />
+        <div className="glass-table-container">
+          <table className="glass-table">
+            <thead>
+              <tr>
+                <th>Shipment ID</th>
+                <th>Type</th>
+                <th>Partner</th>
+                <th>Route</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((item, index) => (
+                <tr key={`shipment-${item.product_name}-${index}`}>
+                  <td>{`${index % 2 === 0 ? "IN" : "OUT"}-2026-00${index + 14}`}</td>
+                  <td><span className={`glass-badge ${index % 2 === 0 ? "glass-badge-success" : "glass-badge-info"}`}>{index % 2 === 0 ? "Incoming" : "Outgoing"}</span></td>
+                  <td>{index % 2 === 0 ? "PharmaCare Supplies" : "HealthFirst Solutions"}</td>
+                  <td>{index % 2 === 0 ? `Houston to ${item.warehouse_name}` : `${item.warehouse_name} to Charlotte`}</td>
+                  <td><span className="glass-badge glass-badge-info">{index % 2 === 0 ? "Received" : "In Transit"}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @media (max-width: 1180px) {
+          .dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function ClientDashboard({ data, accountName }: { data: DashboardData; accountName: string | null }) {
+  const orders = [
+    ["PO-5420", "Industrial Bearings", "Awaiting Dispatch", "May 24, 2026"],
+    ["PO-5414", "Pressure Valves", "In Transit", "May 23, 2026"],
+    ["PO-5409", "Thermal Compound", "Delivered", "May 22, 2026"],
+  ];
+
+  return (
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div>
+        <h1 style={{ fontSize: "2.15rem", marginBottom: "4px" }}>Dashboard</h1>
+        <p style={{ color: "var(--text-secondary)" }}>Buyer workspace for {accountName || "client account"} with orders and supplier visibility.</p>
+      </div>
+
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <StatCard label="My Orders" value="26" sub="Open and recent orders" />
+        <StatCard label="In Transit" value="8" sub="Shipments on the road" />
+        <StatCard label="Suppliers" value={data.total_suppliers} sub="Active vendor partners" />
+        <StatCard label="Invoices Due" value="4" sub="Pending settlements" />
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.2fr 1fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="My Orders" note="Recent purchase orders and shipment status." />
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Product</th>
+                  <th>Status</th>
+                  <th>Expected</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map(([order, product, status, expected]) => (
+                  <tr key={order}>
+                    <td>{order}</td>
+                    <td>{product}</td>
+                    <td><span className={`glass-badge ${status === "Delivered" ? "glass-badge-success" : status === "In Transit" ? "glass-badge-info" : "glass-badge-warning"}`}>{status}</span></td>
+                    <td>{expected}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Track Shipments" note="Live route and delivery milestone view." />
+          <div style={{ marginBottom: "10px" }}>
+            <div style={{ fontWeight: 700, marginBottom: "4px" }}>TRK-USA-10015</div>
+            <div style={{ color: "var(--text-secondary)" }}>Atlanta to Houston</div>
+          </div>
+          <div style={{ alignItems: "center", display: "grid", gap: "12px", gridTemplateColumns: "repeat(5, 1fr)", marginBottom: "18px", textAlign: "center" }}>
+            {["Placed", "Packed", "In Transit", "Local Hub", "Delivered"].map((step, index) => (
+              <div key={step}>
+                <div style={{ alignItems: "center", background: index < 3 ? "#0f9a94" : "#eef3f4", borderRadius: "50%", color: index < 3 ? "#fff" : "var(--text-muted)", display: "flex", height: "34px", justifyContent: "center", margin: "0 auto 10px", width: "34px" }}>
+                  {index < 3 ? "OK" : index + 1}
+                </div>
+                <div style={{ fontSize: "0.82rem", fontWeight: 700 }}>{step}</div>
+              </div>
+            ))}
+          </div>
+          <RouteTimeline />
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1fr 1fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="Suppliers" note="Primary vendors supporting your orders." />
+          <div style={{ display: "grid", gap: "12px" }}>
+            {["Titanium Forge", "Evergreen Parts", "Tex Fabric", "Quantum Parts"].map((supplier, index) => (
+              <div key={supplier} style={{ alignItems: "center", display: "flex", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontWeight: 700 }}>{supplier}</div>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>Preferred vendor</div>
+                </div>
+                <span className={`glass-badge ${index < 2 ? "glass-badge-success" : "glass-badge-info"}`}>{index < 2 ? "Active" : "Available"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Payment Snapshot" note="Invoice and billing position." />
+          <div style={{ display: "grid", gap: "12px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Total Spend</span><strong>$218,400</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Outstanding</span><strong>$42,100</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Paid This Month</span><strong>$71,560</strong></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Next Due Date</span><strong>May 28, 2026</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @media (max-width: 1180px) {
+          .dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function LogisticsDashboard({ data }: { data: DashboardData }) {
+  const deliveries = useMemo(() => ([
+    { id: "TRK-USA-10015", origin: "Atlanta", destination: "Dallas", eta: "May 24, 2026", status: "In Transit", driver: "James Miller", progress: 65 },
+    { id: "TRK-USA-10013", origin: "Memphis", destination: "Houston", eta: "May 25, 2026", status: "Out for Delivery", driver: "Sarah Johnson", progress: 84 },
+    { id: "TRK-USA-10011", origin: "Chicago", destination: "Nashville", eta: "May 25, 2026", status: "In Transit", driver: "David Lee", progress: 48 },
+  ]), []);
+
+  return (
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div>
+        <h1 style={{ fontSize: "2.15rem", marginBottom: "4px" }}>Dashboard</h1>
+        <p style={{ color: "var(--text-secondary)" }}>Assigned shipments, route tracking, and fleet performance.</p>
+      </div>
+
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <StatCard label="Assigned Shipments" value={data.total_shipments} sub="Current load" />
+        <StatCard label="Delivered Today" value="6" sub="Completed runs" />
+        <StatCard label="In Transit" value="9" sub="Active vehicles" />
+        <StatCard label="On-Time Rate" value="96%" sub="Last 30 days" />
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.05fr 1fr" }} className="dashboard-grid">
+        <div className="glass-card">
+          <SectionHeader title="Assigned Shipments" note="Current delivery queue." />
+          <div className="glass-table-container">
+            <table className="glass-table">
+              <thead>
+                <tr>
+                  <th>Shipment</th>
+                  <th>Origin</th>
+                  <th>Destination</th>
+                  <th>Driver</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deliveries.map((shipment) => (
+                  <tr key={shipment.id}>
+                    <td>{shipment.id}</td>
+                    <td>{shipment.origin}</td>
+                    <td>{shipment.destination}</td>
+                    <td>{shipment.driver}</td>
+                    <td><span className={`glass-badge ${shipment.status === "Out for Delivery" ? "glass-badge-success" : "glass-badge-info"}`}>{shipment.status}</span></td>
+                    <td><ProgressBar value={shipment.progress} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Delivery Route Status" note="Current route timeline for selected shipment." />
+          <div style={{ marginBottom: "10px" }}>
+            <div style={{ fontWeight: 700, marginBottom: "4px" }}>{deliveries[0].id}</div>
+            <div style={{ color: "var(--text-secondary)" }}>{deliveries[0].origin} to {deliveries[0].destination}</div>
+          </div>
+          <div style={{ alignItems: "center", display: "grid", gap: "12px", gridTemplateColumns: "repeat(5, 1fr)", marginBottom: "18px", textAlign: "center" }}>
+            {["Picked Up", "In Transit", "En Route", "Out for Delivery", "Delivered"].map((step, index) => (
+              <div key={step}>
+                <div style={{ alignItems: "center", background: index < 3 ? "#0f9a94" : "#eef3f4", borderRadius: "50%", color: index < 3 ? "#fff" : "var(--text-muted)", display: "flex", height: "34px", justifyContent: "center", margin: "0 auto 10px", width: "34px" }}>
+                  {index < 3 ? "OK" : index + 1}
+                </div>
+                <div style={{ fontSize: "0.82rem", fontWeight: 700 }}>{step}</div>
+              </div>
+            ))}
+          </div>
+          <RouteTimeline />
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "0.85fr 0.95fr 1fr" }} className="dashboard-grid-wide">
+        <div className="glass-card">
+          <SectionHeader title="Fleet Utilization" note="Vehicle usage and operational coverage." />
+          <div style={{ alignItems: "center", display: "flex", gap: "20px" }}>
+            <div style={{ alignItems: "center", border: "12px solid #dff5f2", borderRadius: "50%", display: "flex", flexDirection: "column", height: "138px", justifyContent: "center", width: "138px" }}>
+              <div style={{ fontSize: "2rem", fontWeight: 800 }}>78%</div>
+              <div style={{ color: "var(--text-secondary)" }}>Utilized</div>
+            </div>
+            <div style={{ display: "grid", gap: "10px" }}>
+              <div style={{ display: "flex", gap: "10px" }}><span style={{ color: "var(--accent-indigo)" }}>●</span><span>On the Road</span><strong>22</strong></div>
+              <div style={{ display: "flex", gap: "10px" }}><span style={{ color: "#20b7b0" }}>●</span><span>Idle</span><strong>6</strong></div>
+              <div style={{ display: "flex", gap: "10px" }}><span style={{ color: "#bfe9e2" }}>●</span><span>Maintenance</span><strong>2</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Fleet Summary" note="Quick vehicle snapshot." />
+          <div style={{ display: "grid", gap: "12px" }}>
+            <div className="glass-card" style={{ background: "#f8fcfc", padding: "18px" }}><strong>Total Vehicles</strong><div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>31</div></div>
+            <div className="glass-card" style={{ background: "#f8fcfc", padding: "18px" }}><strong>Under Maintenance</strong><div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>2</div></div>
+            <div className="glass-card" style={{ background: "#f8fcfc", padding: "18px" }}><strong>Unavailable</strong><div style={{ color: "var(--accent-indigo)", fontSize: "2rem", fontWeight: 800 }}>1</div></div>
+          </div>
+        </div>
+
+        <div className="glass-card">
+          <SectionHeader title="Recent Activity" note="Latest movement and fleet updates." />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {[
+              ["Delivery completed", "Atlanta to Birmingham", "1h ago"],
+              ["Shipment picked up", "Chicago to Nashville", "3h ago"],
+              ["Location update", "Shreveport route", "4h ago"],
+              ["Vehicle maintenance", "May 25 at 09:00", "6h ago"],
+            ].map(([title, note, time]) => (
+              <div key={title} style={{ display: "grid", gap: "12px", gridTemplateColumns: "36px 1fr auto" }}>
+                <div style={{ alignItems: "center", background: "#eefaf8", borderRadius: "50%", display: "flex", height: "36px", justifyContent: "center", width: "36px" }}>L</div>
+                <div>
+                  <div style={{ fontWeight: 700 }}>{title}</div>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>{note}</div>
+                </div>
+                <div style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{time}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @media (max-width: 1180px) {
+          .dashboard-grid,
+          .dashboard-grid-wide {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default function Dashboard() {
+  const { isAdmin } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accountType, setAccountType] = useState<string | null>(null);
+  const [accountName, setAccountName] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchDashboardData() {
+    setAccountType(getStoredAccountType());
+    setAccountName(getStoredAccountName());
+  }, []);
+
+  useEffect(() => {
+    async function load() {
       try {
         setLoading(true);
-        const stats = await api.get<DashboardData>("/api/analytics/dashboard");
-        setData(stats);
+        const response = await api.get<DashboardData>("/api/analytics/dashboard");
+        setData(response);
         setError(null);
       } catch (err: any) {
-        console.error("Dashboard Fetch Error:", err);
-        setError(err.message || "Failed to load dashboard metrics from database.");
+        setError(err.message || "Failed to load dashboard.");
       } finally {
         setLoading(false);
       }
     }
 
-    fetchDashboardData();
+    load();
   }, []);
 
   if (loading) {
-    return (
-      <div 
-        style={{ 
-          display: "flex", 
-          flexDirection: "column",
-          alignItems: "center", 
-          justifyContent: "center", 
-          minHeight: "70vh",
-          gap: "16px"
-        }}
-      >
-        {/* Glowing glass spinner */}
-        <div 
-          style={{
-            width: "50px",
-            height: "50px",
-            border: "3px solid rgba(255, 255, 255, 0.05)",
-            borderTop: "3px solid var(--accent-cyan)",
-            borderRight: "3px solid var(--accent-indigo)",
-            borderRadius: "50%",
-            animation: "spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite",
-            boxShadow: "0 0 15px rgba(0, 242, 254, 0.2)"
-          }}
-        />
-        <p style={{ color: "var(--text-secondary)", fontFamily: "var(--font-heading)", fontSize: "1rem" }}>
-          Querying SQL Server...
-        </p>
-        <style jsx>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
+    return <div className="glass-card">Loading dashboard...</div>;
   }
 
-  if (error) {
-    return (
-      <div className="glass-card animate-fade-in" style={{ padding: "40px", textAlign: "center", maxWidth: "600px", margin: "40px auto" }}>
-        <div
-          style={{
-            alignItems: "center",
-            background: "#fef2f2",
-            border: "1px solid #fecaca",
-            borderRadius: "50%",
-            color: "var(--color-danger)",
-            display: "inline-flex",
-            height: "60px",
-            justifyContent: "center",
-            marginBottom: "16px",
-            width: "60px",
-          }}
-        >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 9v4" />
-            <path d="M12 17h.01" />
-            <path d="M10.3 3.9 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
-          </svg>
-        </div>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.5rem", marginBottom: "12px", color: "var(--color-danger)" }}>
-          Database Error
-        </h2>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.6", marginBottom: "24px" }}>
-          {error}
-        </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "12px" }}>
-          <button 
-            className="glass-btn glass-btn-secondary" 
-            onClick={() => window.location.reload()}
-            id="retry-btn"
-          >
-            Retry Connection
-          </button>
-        </div>
-      </div>
-    );
+  if (error || !data) {
+    return <div className="glass-card" style={{ color: "var(--color-danger)" }}>{error || "Unable to load dashboard."}</div>;
   }
 
-  const stats = data || {
-    total_suppliers: 0,
-    total_products: 0,
-    total_warehouses: 0,
-    total_shipments: 0,
-    low_stock_count: 0,
-    low_stock_alerts: []
-  };
+  if (isAdmin) {
+    return <AdminDashboard data={data} />;
+  }
 
-  return (
-    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-      {/* Header Panel */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-        <div>
-          <h1 
-            style={{ 
-              fontFamily: "var(--font-heading)", 
-              fontSize: "2.2rem", 
-              background: "linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              marginBottom: "6px" 
-            }}
-          >
-            Operations Overview
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            Real-time supply chain performance and operational health.
-          </p>
-        </div>
-        <div 
-          style={{ 
-            background: "rgba(13, 148, 136, 0.06)", 
-            border: "1px solid var(--border-glass-active)",
-            borderRadius: "30px", 
-            padding: "8px 20px", 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "8px",
-            boxShadow: "0 2px 10px rgba(13, 148, 136, 0.04)"
-          }}
-        >
-          <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--color-success)", boxShadow: "0 0 8px var(--color-success)" }} />
-          <span style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", color: "var(--text-primary)", fontWeight: "500" }}>
-            Connected to SQL Server
-          </span>
-        </div>
-      </div>
+  if (accountType === "supplier") {
+    return <SupplierDashboard data={data} accountName={accountName} />;
+  }
 
-      {/* KPI Cards Grid */}
-      <div 
-        style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", 
-          gap: "20px" 
-        }}
-      >
-        {/* Suppliers Card */}
-        <div className="glass-card glass-card-hover" style={{ display: "flex", alignItems: "center", gap: "20px" }} id="kpi-suppliers">
-          <div 
-            style={{ 
-              width: "56px", 
-              height: "56px", 
-              borderRadius: "12px", 
-              background: "linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(0, 242, 254, 0.15))", 
-              border: "1px solid var(--border-glass-active)",
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              color: "var(--accent-cyan)",
-              boxShadow: "0 4px 20px rgba(0, 242, 254, 0.1)"
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div>
-            <span style={{ display: "block", color: "var(--text-secondary)", fontSize: "0.85rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suppliers</span>
-            <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: "2rem", fontWeight: "700", marginTop: "2px" }}>
-              {stats.total_suppliers}
-            </span>
-          </div>
-        </div>
+  if (accountType === "warehouse") {
+    return <WarehouseDashboard data={data} />;
+  }
 
-        {/* Products Card */}
-        <div className="glass-card glass-card-hover" style={{ display: "flex", alignItems: "center", gap: "20px" }} id="kpi-products">
-          <div 
-            style={{ 
-              width: "56px", 
-              height: "56px", 
-              borderRadius: "12px", 
-              background: "linear-gradient(135deg, rgba(255, 0, 127, 0.15), rgba(108, 99, 255, 0.15))", 
-              border: "1px solid rgba(255, 0, 127, 0.25)",
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              color: "var(--accent-pink)",
-              boxShadow: "0 4px 20px rgba(255, 0, 127, 0.1)"
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
-          </div>
-          <div>
-            <span style={{ display: "block", color: "var(--text-secondary)", fontSize: "0.85rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em" }}>Products</span>
-            <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: "2rem", fontWeight: "700", marginTop: "2px" }}>
-              {stats.total_products}
-            </span>
-          </div>
-        </div>
+  if (accountType === "client") {
+    return <ClientDashboard data={data} accountName={accountName} />;
+  }
 
-        {/* Warehouses Card */}
-        <div className="glass-card glass-card-hover" style={{ display: "flex", alignItems: "center", gap: "20px" }} id="kpi-warehouses">
-          <div 
-            style={{ 
-              width: "56px", 
-              height: "56px", 
-              borderRadius: "12px", 
-              background: "linear-gradient(135deg, rgba(0, 230, 118, 0.15), rgba(0, 242, 254, 0.15))", 
-              border: "1px solid rgba(0, 230, 118, 0.25)",
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              color: "var(--color-success)",
-              boxShadow: "0 4px 20px rgba(0, 230, 118, 0.1)"
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          </div>
-          <div>
-            <span style={{ display: "block", color: "var(--text-secondary)", fontSize: "0.85rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em" }}>Warehouses</span>
-            <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: "2rem", fontWeight: "700", marginTop: "2px" }}>
-              {stats.total_warehouses}
-            </span>
-          </div>
-        </div>
+  if (accountType === "logistics") {
+    return <LogisticsDashboard data={data} />;
+  }
 
-        {/* Shipments Card */}
-        <div className="glass-card glass-card-hover" style={{ display: "flex", alignItems: "center", gap: "20px" }} id="kpi-shipments">
-          <div 
-            style={{ 
-              width: "56px", 
-              height: "56px", 
-              borderRadius: "12px", 
-              background: "linear-gradient(135deg, rgba(255, 179, 0, 0.15), rgba(255, 0, 127, 0.15))", 
-              border: "1px solid rgba(255, 179, 0, 0.25)",
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              color: "var(--color-warning)",
-              boxShadow: "0 4px 20px rgba(255, 179, 0, 0.1)"
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-          </div>
-          <div>
-            <span style={{ display: "block", color: "var(--text-secondary)", fontSize: "0.85rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em" }}>Shipments</span>
-            <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: "2rem", fontWeight: "700", marginTop: "2px" }}>
-              {stats.total_shipments}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Section: Analytics & Alerts */}
-      <div 
-        style={{ 
-          display: "grid", 
-          gridTemplateColumns: "1.4fr 1fr", 
-          gap: "28px",
-          alignItems: "start"
-        }}
-      >
-        {/* Left Column: Low Stock Alerts */}
-        <div className="glass-card" style={{ minHeight: "380px" }} id="low-stock-panel">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
-            <div>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem", display: "flex", alignItems: "center", gap: "10px" }}>
-                <span>Low Stock Alerts</span>
-                {stats.low_stock_count > 0 && (
-                  <span 
-                    style={{ 
-                      fontSize: "0.75rem", 
-                      background: "rgba(190, 18, 60, 0.08)", 
-                      color: "var(--color-danger)",
-                      border: "1px solid rgba(190, 18, 60, 0.2)",
-                      padding: "2px 8px",
-                      borderRadius: "12px",
-                      fontWeight: "600",
-                      animation: "pulse 2s infinite"
-                    }}
-                  >
-                    {stats.low_stock_count} Items
-                  </span>
-                )}
-              </h2>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "4px" }}>
-                Products in inventory with levels below the global warning threshold (quantity &lt; 10).
-              </p>
-            </div>
-          </div>
-
-          {stats.low_stock_alerts.length === 0 ? (
-            <div 
-              style={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                alignItems: "center", 
-                justifyContent: "center", 
-                height: "260px",
-                color: "var(--text-secondary)",
-                gap: "12px"
-              }}
-            >
-              <div
-                style={{
-                  alignItems: "center",
-                  background: "#ecfdf5",
-                  border: "1px solid #bbf7d0",
-                  borderRadius: "50%",
-                  color: "var(--color-success)",
-                  display: "inline-flex",
-                  height: "52px",
-                  justifyContent: "center",
-                  width: "52px",
-                }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m20 6-11 11-5-5" />
-                </svg>
-              </div>
-              <span style={{ fontSize: "0.95rem" }}>All inventory levels are operating within nominal parameters.</span>
-            </div>
-          ) : (
-            <div className="glass-table-container">
-              <table className="glass-table">
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Warehouse</th>
-                    <th>Bin Location</th>
-                    <th style={{ textAlign: "right" }}>Stock Level</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.low_stock_alerts.map((alert, idx) => {
-                    const isCritical = alert.quantity < 5;
-                    return (
-                      <tr key={idx} id={`low-stock-row-${idx}`}>
-                        <td style={{ fontWeight: "500" }}>{alert.product_name}</td>
-                        <td style={{ color: "var(--text-secondary)" }}>{alert.warehouse_name}</td>
-                        <td>
-                          <code 
-                            style={{ 
-                              background: "rgba(13, 148, 136, 0.05)", 
-                              padding: "4px 8px", 
-                              borderRadius: "4px", 
-                              fontSize: "0.8rem",
-                              border: "1px solid var(--border-glass)",
-                              color: "var(--accent-indigo)"
-                            }}
-                          >
-                            {alert.location}
-                          </code>
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <span 
-                            style={{ 
-                              display: "inline-flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: "36px",
-                                height: "24px",
-                                borderRadius: "6px",
-                                fontSize: "0.85rem",
-                                fontWeight: "600",
-                                background: isCritical ? "rgba(255, 23, 68, 0.15)" : "rgba(255, 179, 0, 0.15)",
-                                color: isCritical ? "#ff1744" : "#ffb300",
-                                border: isCritical ? "1px solid rgba(255, 23, 68, 0.3)" : "1px solid rgba(255, 179, 0, 0.3)",
-                                boxShadow: isCritical ? "0 0 10px rgba(255, 23, 68, 0.15)" : "0 0 10px rgba(255, 179, 0, 0.15)"
-                            }}
-                          >
-                            {alert.quantity}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column: Custom Visual Telemetry */}
-        <div className="glass-card" style={{ minHeight: "380px", display: "flex", flexDirection: "column", gap: "24px" }} id="telemetry-panel">
-          <div>
-            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem" }}>
-              System Health
-            </h2>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "4px" }}>
-              Dynamic analytical ratio profiles derived from live data.
-            </p>
-          </div>
-
-          <div style={{ display: "flex", flex: 1, flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "24px" }}>
-            {/* SVG Radial Telemetry Ring */}
-            <div style={{ position: "relative", width: "160px", height: "160px" }}>
-              <svg width="100%" height="100%" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
-                {/* Background Ring */}
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="40" 
-                  fill="transparent" 
-                  stroke="rgba(13, 148, 136, 0.06)" 
-                  strokeWidth="6" 
-                />
-                {/* Health Rating Fill */}
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="40" 
-                  fill="transparent" 
-                  stroke="url(#radialGrad)" 
-                  strokeWidth="6" 
-                  strokeDasharray="251.2"
-                  strokeDashoffset={251.2 - (251.2 * Math.max(0.1, 1 - (stats.low_stock_count / Math.max(stats.total_products, 1))))}
-                  strokeLinecap="round"
-                  style={{ transition: "stroke-dashoffset 1s ease" }}
-                />
-                <defs>
-                  <linearGradient id="radialGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#20b7b0" />
-                    <stop offset="100%" stopColor="#0f9a94" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div 
-                style={{ 
-                  position: "absolute", 
-                  top: 0, 
-                  left: 0, 
-                  width: "100%", 
-                  height: "100%", 
-                  display: "flex", 
-                  flexDirection: "column",
-                  alignItems: "center", 
-                  justifyContent: "center" 
-                }}
-              >
-                <span style={{ fontFamily: "var(--font-heading)", fontSize: "1.8rem", fontWeight: "700", color: "var(--text-primary)" }}>
-                  {Math.round(Math.max(0, 100 - (stats.low_stock_count * 8)))}%
-                </span>
-                <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: "500", marginTop: "2px" }}>
-                  Stock Health
-                </span>
-              </div>
-            </div>
-
-            {/* Infographics Breakdown */}
-            <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* Row 1: Low stock percent */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                  <span>Low Stock Alert Ratio</span>
-                  <span style={{ color: "var(--text-primary)", fontWeight: "500" }}>
-                    {stats.total_products > 0 ? Math.round((stats.low_stock_count / stats.total_products) * 100) : 0}%
-                  </span>
-                </div>
-                <div style={{ height: "6px", background: "rgba(13, 148, 136, 0.06)", borderRadius: "3px", overflow: "hidden" }}>
-                  <div 
-                    style={{ 
-                      height: "100%", 
-                      background: "var(--color-danger)", 
-                      width: `${stats.total_products > 0 ? Math.min(100, (stats.low_stock_count / stats.total_products) * 100) : 0}%`,
-                      transition: "width 1s ease",
-                      borderRadius: "3px",
-                      boxShadow: "0 0 8px var(--color-danger)"
-                    }} 
-                  />
-                </div>
-              </div>
-
-              {/* Row 2: Average Inventory Distribution */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                  <span>Warehouse Capacity Profile</span>
-                  <span style={{ color: "var(--text-primary)", fontWeight: "500" }}>Nominal</span>
-                </div>
-                <div style={{ height: "6px", background: "rgba(13, 148, 136, 0.06)", borderRadius: "3px", overflow: "hidden" }}>
-                  <div 
-                    style={{ 
-                      height: "100%", 
-                      background: "var(--accent-cyan)", 
-                      width: "82%",
-                      transition: "width 1s ease",
-                      borderRadius: "3px",
-                      boxShadow: "0 0 8px var(--accent-cyan)"
-                    }} 
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Pulse & Keyframes animations injection */}
-      <style jsx global>{`
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.4); }
-          70% { box-shadow: 0 0 0 6px rgba(255, 23, 68, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
-        }
-      `}</style>
-    </div>
-  );
+  return <SupplierDashboard data={data} accountName={accountName} />;
 }

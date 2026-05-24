@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import PublicNavbar from "./PublicNavbar";
-import PublicFooter from "./PublicFooter";
 import Sidebar from "./Sidebar";
+
+const PublicNavbar = dynamic(() => import("./PublicNavbar"), { ssr: false });
+const PublicFooter = dynamic(() => import("./PublicFooter"), { ssr: false });
 
 const PUBLIC_ROUTES = [
   "/",

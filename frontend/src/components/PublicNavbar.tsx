@@ -29,10 +29,11 @@ export default function PublicNavbar() {
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -116,7 +117,7 @@ export default function PublicNavbar() {
         </nav>
 
         <div style={{ alignItems: "center", display: "flex", flexShrink: 0, gap: "10px" }}>
-          {user ? (
+          {mounted && user ? (
             <>
               <Link className="pub-btn-primary" href="/dashboard" id="pub-nav-portal">
                 Dashboard
@@ -206,7 +207,7 @@ export default function PublicNavbar() {
               {link.label}
             </Link>
           ))}
-          {!user && (
+          {mounted && !user && (
             <div style={{ display: "grid", gap: "10px", gridTemplateColumns: "1fr 1fr", marginTop: "10px" }}>
               <Link className="pub-btn-secondary" href="/login">
                 Login

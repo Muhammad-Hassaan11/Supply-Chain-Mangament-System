@@ -1,0 +1,59 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+  - alert [ref=e147]
+  - main [ref=e148]:
+    - link "SCM" [ref=e149] [cursor=pointer]:
+      - /url: /
+      - img [ref=e150]
+      - text: SCM
+    - generic [ref=e153]:
+      - generic [ref=e154]: New to SCM?
+      - link "Create Account" [ref=e155] [cursor=pointer]:
+        - /url: /signup
+    - generic [ref=e156]:
+      - complementary [ref=e157]:
+        - generic [ref=e158]:
+          - generic [ref=e159]:
+            - img [ref=e160]
+            - text: Secure Supply Chain Access
+          - heading "Welcome back to your operations hub" [level=1] [ref=e163]
+          - paragraph [ref=e164]: Log in to manage suppliers, products, warehouses, inventory, shipments, reports, and live SQL-backed insights from one connected platform.
+          - generic [ref=e165]:
+            - generic [ref=e166]:
+              - img [ref=e168]
+              - generic [ref=e171]:
+                - generic [ref=e172]: Real-time Visibility
+                - paragraph [ref=e173]: Monitor critical operational signals as they change.
+            - generic [ref=e174]:
+              - img [ref=e176]
+              - generic [ref=e182]:
+                - generic [ref=e183]: Connected Teams
+                - paragraph [ref=e184]: Coordinate activity across every supply chain partner.
+            - generic [ref=e185]:
+              - img [ref=e187]
+              - generic [ref=e190]:
+                - generic [ref=e191]: Reliable Controls
+                - paragraph [ref=e192]: Keep business processes protected and traceable.
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - img [ref=e197]
+          - generic [ref=e200]:
+            - heading "Log in to SCM" [level=1] [ref=e201]
+            - paragraph [ref=e202]: Access your supply chain workspace securely.
+        - generic [ref=e203]:
+          - generic [ref=e212]:
+            - img [ref=e213]
+            - text: "Network error: Unable to connect to server."
+          - generic [ref=e204]:
+            - generic [ref=e205]:
+              - generic [ref=e206]: Business email
+              - textbox "Business email" [ref=e207]:
+                - /placeholder: you@company.com
+                - text: admin@supplychain.com
+            - generic [ref=e208]:
+              - generic [ref=e209]: Password
+              - textbox "Password" [ref=e210]:
+                - /placeholder: Enter your password
+                - text: password123
+            - button "Log in" [ref=e211] [cursor=pointer]

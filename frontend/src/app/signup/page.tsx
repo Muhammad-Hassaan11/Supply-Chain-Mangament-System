@@ -94,6 +94,14 @@ export default function SignUpPage() {
 
     try {
       setLoading(true);
+      localStorage.setItem(
+        `profile:${email.toLowerCase()}`,
+        JSON.stringify({
+          accountType,
+          accountName: fullName,
+          companyName: company,
+        })
+      );
       localStorage.setItem("account_type", accountType);
       localStorage.setItem("account_name", fullName);
       localStorage.setItem("company_name", company);

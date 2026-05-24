@@ -46,7 +46,7 @@ def get_supplier(supplier_id: int):
 @router.post("/", response_model=Supplier, status_code=status.HTTP_201_CREATED)
 def create_supplier(supplier: SupplierCreate, current_user = Depends(require_write_access)):
     """
-    Creates a new supplier using raw SQL with output extraction.
+    Creates a new supplier using raw SQL.
     """
     try:
         # Validate rating in application layer (as double insurance)
@@ -58,11 +58,21 @@ def create_supplier(supplier: SupplierCreate, current_user = Depends(require_wri
 
         query = """
             INSERT INTO Suppliers (contact_id, rating, contact_email)
-            OUTPUT inserted.supplier_id, inserted.contact_id, inserted.rating, inserted.contact_email
             VALUES (?, ?, ?)
         """
         params = (supplier.contact_id, supplier.rating, supplier.contact_email)
-        result = execute_query(query, params, fetch_one=True)
+        execute_query(query, params)
+
+        result = execute_query(
+            """
+            SELECT TOP 1 supplier_id, contact_id, rating, contact_email
+            FROM Suppliers
+            WHERE contact_id = ? AND contact_email = ?
+            ORDER BY supplier_id DESC
+            """,
+            (supplier.contact_id, supplier.contact_email),
+            fetch_one=True
+        )
         
         if not result:
             raise HTTPException(

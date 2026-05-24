@@ -68,6 +68,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuthToken(response.access_token);
       localStorage.setItem("user_email", response.email);
       localStorage.setItem("user_role", response.role);
+      const savedProfile = localStorage.getItem(`profile:${response.email.toLowerCase()}`);
+      if (savedProfile) {
+        const parsedProfile = JSON.parse(savedProfile) as {
+          accountType?: string;
+          accountName?: string;
+          companyName?: string;
+        };
+        if (parsedProfile.accountType) {
+          localStorage.setItem("account_type", parsedProfile.accountType);
+        }
+        if (parsedProfile.accountName) {
+          localStorage.setItem("account_name", parsedProfile.accountName);
+        }
+        if (parsedProfile.companyName) {
+          localStorage.setItem("company_name", parsedProfile.companyName);
+        }
+      }
 
       setUser({ email: response.email, role: response.role });
       
@@ -95,6 +112,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuthToken(response.access_token);
       localStorage.setItem("user_email", response.email);
       localStorage.setItem("user_role", response.role);
+      const savedProfile = localStorage.getItem(`profile:${response.email.toLowerCase()}`);
+      if (savedProfile) {
+        const parsedProfile = JSON.parse(savedProfile) as {
+          accountType?: string;
+          accountName?: string;
+          companyName?: string;
+        };
+        if (parsedProfile.accountType) {
+          localStorage.setItem("account_type", parsedProfile.accountType);
+        }
+        if (parsedProfile.accountName) {
+          localStorage.setItem("account_name", parsedProfile.accountName);
+        }
+        if (parsedProfile.companyName) {
+          localStorage.setItem("company_name", parsedProfile.companyName);
+        }
+      }
 
       setUser({ email: response.email, role: response.role });
       

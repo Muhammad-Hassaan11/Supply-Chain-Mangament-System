@@ -116,6 +116,9 @@ export function clearAuthToken() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_email");
     localStorage.removeItem("user_role");
+    localStorage.removeItem("account_type");
+    localStorage.removeItem("account_name");
+    localStorage.removeItem("company_name");
   }
 }
 
@@ -129,6 +132,20 @@ export function getStoredRole(): string | null {
 export function getStoredEmail(): string | null {
   if (typeof window !== "undefined") {
     return localStorage.getItem("user_email");
+  }
+  return null;
+}
+
+export function getStoredAccountType(): string | null {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("account_type");
+  }
+  return null;
+}
+
+export function getStoredAccountName(): string | null {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("account_name");
   }
   return null;
 }

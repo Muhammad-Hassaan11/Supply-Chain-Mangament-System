@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 interface QueryCatalogItem {
   id: string;
@@ -18,6 +19,7 @@ interface QueryResult {
 }
 
 export default function QueryLabPage() {
+  const { isAdmin } = useAuth();
   const [catalog, setCatalog] = useState<QueryCatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +55,13 @@ export default function QueryLabPage() {
   const handleSelectQuery = (query: QueryCatalogItem) => {
     setActiveQuery(query);
     setCustomSql(query.sql);
+    setResult(null);
+    setExecutionError(null);
+  };
+
+  const handleNewCustomQuery = () => {
+    setActiveQuery(null);
+    setCustomSql("SELECT TOP 20 *\nFROM Product\nORDER BY product_id DESC;");
     setResult(null);
     setExecutionError(null);
   };
@@ -122,9 +131,16 @@ export default function QueryLabPage() {
 
         {/* Left Sidebar: Query Catalog */}
         <div className="glass-card" style={{ display: "flex", flexDirection: "column", gap: "16px", maxHeight: "calc(100vh - 180px)", overflowY: "auto" }}>
-          <h3 style={{ fontSize: "1.1rem", color: "var(--text-primary)", paddingBottom: "12px", borderBottom: "1px solid var(--border-glass)" }}>
-            Query Catalog
-          </h3>
+          <div style={{ alignItems: "center", borderBottom: "1px solid var(--border-glass)", display: "flex", gap: "10px", justifyContent: "space-between", paddingBottom: "12px" }}>
+            <h3 style={{ fontSize: "1.1rem", color: "var(--text-primary)" }}>
+              Query Catalog
+            </h3>
+            {isAdmin && (
+              <button className="glass-btn glass-btn-secondary" onClick={handleNewCustomQuery} style={{ minHeight: "34px", padding: "6px 12px" }}>
+                New Query
+              </button>
+            )}
+          </div>
           
           {loading ? (
             <div style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Loading catalog...</div>
@@ -188,9 +204,13 @@ export default function QueryLabPage() {
                   {activeQuery ? activeQuery.description : "Write and execute your own SQL query."}
                 </p>
               </div>
-              {activeQuery && (
+              {activeQuery ? (
                 <span style={{ background: "rgba(13, 148, 136, 0.08)", color: "var(--accent-indigo)", padding: "4px 10px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                   {activeQuery.category}
+                </span>
+              ) : (
+                <span style={{ background: "rgba(13, 148, 136, 0.08)", color: "var(--accent-indigo)", padding: "4px 10px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  Custom
                 </span>
               )}
             </div>
@@ -204,6 +224,7 @@ export default function QueryLabPage() {
                   className="glass-input"
                   value={customSql}
                   onChange={(e) => setCustomSql(e.target.value)}
+                  placeholder="Write your own SQL query here..."
                   style={{
                     fontFamily: "'Fira Code', 'Courier New', Courier, monospace",
                     fontSize: "0.95rem",
@@ -223,7 +244,7 @@ export default function QueryLabPage() {
                 <button 
                   className="glass-btn glass-btn-primary" 
                   onClick={handleExecute}
-                  disabled={isExecuting || !customSql.trim()}
+                  disabled={isExecuting || !customSql.trim() || !isAdmin}
                   style={{ padding: "10px 24px", letterSpacing: "0.5px" }}
                   id="execute-query-btn"
                 >
@@ -240,6 +261,11 @@ export default function QueryLabPage() {
                   )}
                 </button>
               </div>
+              {!isAdmin && (
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                  Custom SQL execution is available for admin accounts.
+                </p>
+              )}
             </div>
           </div>
 
