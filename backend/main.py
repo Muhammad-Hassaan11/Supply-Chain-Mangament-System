@@ -10,7 +10,7 @@ load_dotenv()
 def _parse_csv(value: str | None) -> list[str]:
     if not value:
         return []
-    return [v.strip() for v in value.split(",") if v.strip()]
+    return [v.strip().rstrip("/") for v in value.split(",") if v.strip()]
 
 app = FastAPI(
     title="Supply Chain Management DBMS API",
@@ -20,12 +20,15 @@ app = FastAPI(
 
 # Configure CORS for Next.js frontend
 # - Local dev defaults
-# - Production should set CORS_ORIGINS and/or CORS_ORIGIN_REGEX in env
+# - Production can override with CORS_ORIGINS and/or CORS_ORIGIN_REGEX
 origins = _parse_csv(os.getenv("CORS_ORIGINS")) or [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-origin_regex = os.getenv("CORS_ORIGIN_REGEX")
+origin_regex = os.getenv(
+    "CORS_ORIGIN_REGEX",
+    r"^https://([a-zA-Z0-9-]+\.)?(vercel\.app|ngrok-free\.app|trycloudflare\.com)$",
+)
 
 app.add_middleware(
     CORSMiddleware,
