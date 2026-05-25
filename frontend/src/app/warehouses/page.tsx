@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { api } from "@/lib/api";
+import { api, getStoredAccountType } from "@/lib/api";
+import { WarehouseFacilityPage } from "@/components/warehouse/WarehousePortal";
 
 interface WarehouseStats {
   warehouse_id: number;
@@ -21,7 +22,7 @@ interface InventoryItem {
   product_name?: string;
 }
 
-export default function WarehousesPage() {
+function GenericWarehousesPage() {
   const [warehouses, setWarehouses] = useState<WarehouseStats[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -298,4 +299,12 @@ export default function WarehousesPage() {
       `}</style>
     </div>
   );
+}
+
+export default function WarehousesPage() {
+  const [accountType] = useState<string | null>(() => getStoredAccountType());
+  if (accountType === "warehouse") {
+    return <WarehouseFacilityPage />;
+  }
+  return <GenericWarehousesPage />;
 }

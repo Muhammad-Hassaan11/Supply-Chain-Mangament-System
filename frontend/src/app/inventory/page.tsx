@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { api } from "@/lib/api";
+import { api, getStoredAccountType } from "@/lib/api";
 import DataTable from "@/components/DataTable";
 import Modal from "@/components/Modal";
 import { useAuth } from "@/context/AuthContext";
+import { WarehouseInventoryPage } from "@/components/warehouse/WarehousePortal";
 
 interface InventoryItem {
   warehouse_id: number;
@@ -25,7 +26,7 @@ interface Product {
   product_name: string;
 }
 
-export default function InventoryPage() {
+function GenericInventoryPage() {
   const { isAdmin } = useAuth();
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -388,4 +389,12 @@ export default function InventoryPage() {
       </Modal>
     </div>
   );
+}
+
+export default function InventoryPage() {
+  const [accountType] = useState<string | null>(() => getStoredAccountType());
+  if (accountType === "warehouse") {
+    return <WarehouseInventoryPage />;
+  }
+  return <GenericInventoryPage />;
 }

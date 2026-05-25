@@ -4,6 +4,7 @@ import React from "react";
 import { api } from "@/lib/api";
 import { getStoredAccountType } from "@/lib/api";
 import { ClientReportsPage } from "@/components/client/ClientPortal";
+import { WarehouseReportsPage } from "@/components/warehouse/WarehousePortal";
 
 type ReportId =
   | "inventory-health"
@@ -230,6 +231,10 @@ export default function ReportsPage() {
 
   if (accountType === "client") {
     return <ClientReportsPage />;
+  }
+
+  if (accountType === "warehouse") {
+    return <WarehouseReportsPage />;
   }
 
   return (

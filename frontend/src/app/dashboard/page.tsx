@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { ClientDashboardPage } from "@/components/client/ClientPortal";
+import { WarehouseDashboardPage } from "@/components/warehouse/WarehousePortal";
 
 interface LowStockAlert {
   warehouse_name: string;
@@ -731,7 +732,7 @@ export default function Dashboard() {
   }
 
   if (accountType === "warehouse") {
-    return <WarehouseDashboard data={data} />;
+    return <WarehouseDashboardPage />;
   }
 
   if (accountType === "client") {

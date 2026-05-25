@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { ClientProfilePage } from "@/components/client/ClientPortal";
+import { WarehouseProfilePage } from "@/components/warehouse/WarehousePortal";
 
 type ThemeMode = "Light" | "Dark" | "System";
 type SessionTimeout = "15 minutes" | "30 minutes" | "1 hour" | "4 hours";
@@ -391,6 +392,10 @@ export default function SettingsPage() {
 
   if (accountType === "client") {
     return <ClientProfilePage accountName={accountName} userEmail={user?.email} />;
+  }
+
+  if (accountType === "warehouse") {
+    return <WarehouseProfilePage />;
   }
 
   return (

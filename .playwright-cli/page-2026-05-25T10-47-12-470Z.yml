@@ -1,0 +1,49 @@
+- main [ref=e2]:
+  - link "SCM" [ref=e3] [cursor=pointer]:
+    - /url: /
+    - img [ref=e4]
+    - text: SCM
+  - generic [ref=e7]:
+    - generic [ref=e8]: New to SCM?
+    - link "Create Account" [ref=e9] [cursor=pointer]:
+      - /url: /signup
+  - generic [ref=e10]:
+    - complementary [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - img [ref=e14]
+          - text: Secure Supply Chain Access
+        - heading "Welcome back to your operations hub" [level=1] [ref=e17]
+        - paragraph [ref=e18]: Log in to manage suppliers, products, warehouses, inventory, shipments, reports, and live SQL-backed insights from one connected platform.
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - img [ref=e22]
+            - generic [ref=e25]:
+              - generic [ref=e26]: Real-time Visibility
+              - paragraph [ref=e27]: Monitor critical operational signals as they change.
+          - generic [ref=e28]:
+            - img [ref=e30]
+            - generic [ref=e36]:
+              - generic [ref=e37]: Connected Teams
+              - paragraph [ref=e38]: Coordinate activity across every supply chain partner.
+          - generic [ref=e39]:
+            - img [ref=e41]
+            - generic [ref=e44]:
+              - generic [ref=e45]: Reliable Controls
+              - paragraph [ref=e46]: Keep business processes protected and traceable.
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - img [ref=e51]
+        - generic [ref=e54]:
+          - heading "Log in to SCM" [level=1] [ref=e55]
+          - paragraph [ref=e56]: Access your supply chain workspace securely.
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e60]: Business email
+          - textbox "Business email" [ref=e61]:
+            - /placeholder: you@company.com
+        - generic [ref=e62]:
+          - generic [ref=e63]: Password
+          - textbox "Password" [ref=e64]:
+            - /placeholder: Enter your password
+        - button "Log in" [ref=e65] [cursor=pointer]

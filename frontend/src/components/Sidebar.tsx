@@ -163,9 +163,9 @@ export default function Sidebar() {
         buildNavItem("Dashboard", "/dashboard", "dashboard"),
         buildNavItem("My Warehouse", "/warehouses", "warehouses"),
         buildNavItem("Inventory", "/inventory", "inventory"),
-        buildNavItem("Incoming Shipments", "/shipments", "shipments"),
-        buildNavItem("Outgoing Shipments", "/shipments", "shipments"),
-        buildNavItem("Low Stock Alerts", "/inventory", "inventory"),
+        buildNavItem("Incoming Shipments", "/incoming-shipments", "shipments"),
+        buildNavItem("Outgoing Shipments", "/outgoing-shipments", "shipments"),
+        buildNavItem("Low Stock Alerts", "/low-stock-alerts", "inventory"),
         buildNavItem("Reports", "/reports", "reports"),
         buildNavItem("Profile", "/settings", "settings"),
       ];

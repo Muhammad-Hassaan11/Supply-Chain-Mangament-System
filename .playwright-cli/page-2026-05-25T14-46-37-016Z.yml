@@ -1,0 +1,180 @@
+- main [ref=e3]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - img [ref=e9]
+        - text: End-to-End Supply Chain Intelligence
+      - heading "Smart Supply Chain Solutions" [level=1] [ref=e12]
+      - paragraph [ref=e13]: Manage your entire supply chain from suppliers and products to warehouses, inventory, and shipments. Get real-time visibility and SQL-powered insights to make faster decisions.
+      - generic [ref=e14]:
+        - link "Explore Platform" [ref=e15] [cursor=pointer]:
+          - /url: /login
+          - text: Explore Platform
+          - img [ref=e16]
+        - link "Talk to Sales" [ref=e18] [cursor=pointer]:
+          - /url: /contact
+          - text: Talk to Sales
+          - img [ref=e19]
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - img [ref=e24]
+          - text: Real-time Visibility
+        - generic [ref=e26]:
+          - img [ref=e27]
+          - text: Data-Driven Insights
+        - generic [ref=e29]:
+          - img [ref=e30]
+          - text: Secure & Reliable
+    - generic "Supply chain dashboard, warehouse, and truck visual" [ref=e32]:
+      - generic [ref=e33]:
+        - img [ref=e34]
+        - generic [ref=e39]: Suppliers
+      - generic [ref=e40]:
+        - img [ref=e41]
+        - generic [ref=e44]: Products
+      - generic [ref=e45]:
+        - img [ref=e46]
+        - generic [ref=e49]: Warehouses
+      - generic [ref=e50]:
+        - img [ref=e51]
+        - generic [ref=e56]: Shipments
+      - generic [ref=e57]:
+        - generic [ref=e58]: Supply Chain Overview
+        - generic [ref=e59]:
+          - img [ref=e61]
+          - generic [ref=e68]: 76%
+        - img [ref=e76]
+  - generic [ref=e115]:
+    - generic [ref=e116]:
+      - img [ref=e118]
+      - generic [ref=e123]:
+        - generic [ref=e124]: Suppliers
+        - generic [ref=e125]: 1,250+
+        - generic [ref=e126]: Active Partners
+    - generic [ref=e127]:
+      - img [ref=e129]
+      - generic [ref=e132]:
+        - generic [ref=e133]: Products
+        - generic [ref=e134]: 12,500+
+        - generic [ref=e135]: SKUs Managed
+    - generic [ref=e136]:
+      - img [ref=e138]
+      - generic [ref=e141]:
+        - generic [ref=e142]: Warehouses
+        - generic [ref=e143]: 85+
+        - generic [ref=e144]: Global Facilities
+    - generic [ref=e145]:
+      - img [ref=e147]
+      - generic [ref=e152]:
+        - generic [ref=e153]: Shipments
+        - generic [ref=e154]: 58,900+
+        - generic [ref=e155]: On-Time Deliveries
+  - generic [ref=e157]:
+    - generic [ref=e158]:
+      - generic [ref=e159]:
+        - generic [ref=e160]:
+          - heading "Our Services" [level=2] [ref=e161]
+          - link "View all services" [ref=e162] [cursor=pointer]:
+            - /url: /services
+            - text: View all services
+            - img [ref=e163]
+        - generic [ref=e165]:
+          - generic [ref=e166]:
+            - img [ref=e168]
+            - heading "Supply Chain Visibility" [level=3] [ref=e174]
+            - paragraph [ref=e175]: Real-time tracking and end-to-end visibility across your network.
+          - generic [ref=e176]:
+            - img [ref=e178]
+            - heading "Inventory Management" [level=3] [ref=e181]
+            - paragraph [ref=e182]: Optimize inventory levels and reduce holding costs.
+          - generic [ref=e183]:
+            - img [ref=e185]
+            - heading "Shipment & Logistics" [level=3] [ref=e190]
+            - paragraph [ref=e191]: Streamline shipments and ensure on-time delivery.
+          - generic [ref=e192]:
+            - img [ref=e194]
+            - heading "SQL Insights & Analytics" [level=3] [ref=e198]
+            - paragraph [ref=e199]: Run SQL queries and unlock powerful business insights.
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - heading "Industries We Serve" [level=2] [ref=e202]
+          - link "View all industries" [ref=e203] [cursor=pointer]:
+            - /url: /industries
+            - text: View all industries
+            - img [ref=e204]
+        - generic [ref=e206]:
+          - generic [ref=e207]:
+            - heading "Manufacturing" [level=3] [ref=e208]
+            - paragraph [ref=e209]: Factory-to-warehouse flow
+          - generic [ref=e210]:
+            - heading "Pharmaceuticals" [level=3] [ref=e211]
+            - paragraph [ref=e212]: Compliance-ready logistics
+          - generic [ref=e213]:
+            - heading "Automotive" [level=3] [ref=e214]
+            - paragraph [ref=e215]: Parts and assembly supply
+          - generic [ref=e216]:
+            - heading "Retail & eCommerce" [level=3] [ref=e217]
+            - paragraph [ref=e218]: Order fulfillment network
+          - generic [ref=e219]:
+            - heading "Food & Beverage" [level=3] [ref=e220]
+            - paragraph [ref=e221]: Temperature-aware routing
+          - generic [ref=e222]:
+            - heading "Chemicals" [level=3] [ref=e223]
+            - paragraph [ref=e224]: Controlled inventory handling
+      - generic [ref=e225]:
+        - generic [ref=e226]:
+          - heading "Global Locations" [level=2] [ref=e227]
+          - link "View all locations" [ref=e228] [cursor=pointer]:
+            - /url: /locations
+            - text: View all locations
+            - img [ref=e229]
+        - generic [ref=e231]:
+          - img [ref=e232]
+          - generic [ref=e250]:
+            - generic [ref=e251]:
+              - generic [ref=e252]: North America
+              - strong [ref=e253]: 25+
+            - generic [ref=e254]:
+              - generic [ref=e255]: Europe
+              - strong [ref=e256]: 20+
+            - generic [ref=e257]:
+              - generic [ref=e258]: Asia Pacific
+              - strong [ref=e259]: 30+
+            - generic [ref=e260]:
+              - generic [ref=e261]: Middle East
+              - strong [ref=e262]: 5+
+            - generic [ref=e263]:
+              - generic [ref=e264]: South America
+              - strong [ref=e265]: 5+
+        - paragraph [ref=e266]:
+          - text: Operating in
+          - strong [ref=e267]: 85+
+          - text: warehouses across
+          - strong [ref=e268]: 30+
+          - text: countries.
+    - generic [ref=e269]:
+      - generic [ref=e270]:
+        - heading "Track Your Shipment" [level=2] [ref=e271]
+        - paragraph [ref=e272]: Enter your tracking number to get real-time shipment updates.
+        - generic [ref=e273]:
+          - textbox "Enter tracking number" [ref=e274]
+          - button "Track Now" [ref=e275] [cursor=pointer]
+        - generic [ref=e276]: "Example: TRK-USA-10015, In Transit, ETA May 28, 2026"
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - heading "Admin Portal" [level=2] [ref=e279]
+          - paragraph [ref=e280]: Powerful tools to manage suppliers, products, warehouses, inventory, and shipments.
+          - link "Admin Login" [ref=e281] [cursor=pointer]:
+            - /url: /login
+            - text: Admin Login
+            - img [ref=e282]
+        - img "Admin dashboard preview" [ref=e284]
+      - generic [ref=e285]:
+        - generic [ref=e286]:
+          - heading "User Portal" [level=2] [ref=e287]
+          - paragraph [ref=e288]: Access orders, shipments, and real-time updates in one place.
+          - link "User Login" [ref=e289] [cursor=pointer]:
+            - /url: /signup
+            - text: User Login
+            - img [ref=e290]
+        - img "Signup portal preview" [ref=e292]
