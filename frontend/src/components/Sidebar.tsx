@@ -11,6 +11,7 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ReactNode;
+  children?: { label: string; href: string }[];
 }
 
 function navIcon(path: string) {
@@ -73,8 +74,8 @@ function navIcon(path: string) {
   }
 }
 
-function buildNavItem(label: string, href: string, iconKey: string): NavItem {
-  return { label, href, icon: navIcon(iconKey) };
+function buildNavItem(label: string, href: string, iconKey: string, children?: { label: string; href: string }[]): NavItem {
+  return { label, href, icon: navIcon(iconKey), children };
 }
 
 export default function Sidebar() {
@@ -83,6 +84,8 @@ export default function Sidebar() {
   const [accountLabel, setAccountLabel] = useState<string | null>(null);
   const [accountName, setAccountName] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState<string | null>(null);
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
   const { user, logout, isAdmin } = useAuth();
   const userEmail = user?.email || null;
   const userRole = user?.role || null;
@@ -97,6 +100,8 @@ export default function Sidebar() {
       const storedAccountName = getStoredAccountName();
       setAccountType(storedAccountType);
       setAccountName(storedAccountName);
+      setCompanyName(localStorage.getItem("company_name"));
+      setLogoDataUrl(localStorage.getItem("settings:logo_data_url"));
 
       if (storedAccountType === "supplier") {
         setAccountLabel("Supplier");
@@ -128,7 +133,11 @@ export default function Sidebar() {
         buildNavItem("Products", "/products", "products"),
         buildNavItem("Warehouses", "/warehouses", "warehouses"),
         buildNavItem("Inventory", "/inventory", "inventory"),
-        buildNavItem("Shipments", "/shipments", "shipments"),
+        buildNavItem("Shipments", "/shipments", "shipments", [
+          { label: "All Shipments", href: "/shipments" },
+          { label: "Create Shipment", href: "/shipments/create" },
+          { label: "Shipment Logs", href: "/shipments/logs" },
+        ]),
         buildNavItem("Query Lab", "/query-lab", "query"),
         buildNavItem("Reports", "/reports", "reports"),
         buildNavItem("Users", "/users", "users"),
@@ -198,21 +207,25 @@ export default function Sidebar() {
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`} id="sidebar-nav">
       <div className={styles.brand}>
         <div className={styles.logoIcon}>
-          <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="url(#grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <defs>
-              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0f9a94" />
-                <stop offset="100%" stopColor="#20b7b0" />
-              </linearGradient>
-            </defs>
-            <path d="M24 4 41 13.5v21L24 44 7 34.5v-21L24 4Z" />
-            <path d="M15.5 18.2 24 23l8.5-4.8M24 23v10.4" />
-          </svg>
+          {logoDataUrl ? (
+            <img src={logoDataUrl} alt="Company logo" className={styles.logoImage} />
+          ) : (
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="url(#grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <defs>
+                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="var(--accent-indigo)" />
+                  <stop offset="100%" stopColor="var(--accent-cyan)" />
+                </linearGradient>
+              </defs>
+              <path d="M24 4 41 13.5v21L24 44 7 34.5v-21L24 4Z" />
+              <path d="M15.5 18.2 24 23l8.5-4.8M24 23v10.4" />
+            </svg>
+          )}
         </div>
         {!collapsed && (
           <div className={styles.brandText}>
-            <span className={styles.brandTitle}>SCM</span>
-            <span className={styles.brandSub}>Supply Chain Management</span>
+            <span className={styles.brandTitle}>{companyName ? companyName.slice(0, 18) : "SCM"}</span>
+            <span className={styles.brandSub}>{companyName || "Supply Chain Management"}</span>
           </div>
         )}
         <button
@@ -231,17 +244,30 @@ export default function Sidebar() {
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           return (
-            <Link
-              key={`${item.href}-${item.label}`}
-              href={item.href}
-              className={`${styles.navLink} ${isActive ? styles.active : ""}`}
-              id={`nav-link-${item.label.toLowerCase().replace(/\s/g, "-")}`}
-              title={collapsed ? item.label : undefined}
-            >
-              <span className={styles.navIcon}>{item.icon}</span>
-              {!collapsed && <span className={styles.navLabel}>{item.label}</span>}
-              {isActive && <span className={styles.activeIndicator} />}
-            </Link>
+            <div key={`${item.href}-${item.label}`} className={styles.navGroup}>
+              <Link
+                href={item.href}
+                className={`${styles.navLink} ${isActive ? styles.active : ""}`}
+                id={`nav-link-${item.label.toLowerCase().replace(/\s/g, "-")}`}
+                title={collapsed ? item.label : undefined}
+              >
+                <span className={styles.navIcon}>{item.icon}</span>
+                {!collapsed && <span className={styles.navLabel}>{item.label}</span>}
+                {isActive && <span className={styles.activeIndicator} />}
+              </Link>
+              {!collapsed && item.children && isActive ? (
+                <div className={styles.subNav}>
+                  {item.children.map((child) => {
+                    const childActive = pathname === child.href;
+                    return (
+                      <Link key={child.href} href={child.href} className={`${styles.subNavLink} ${childActive ? styles.subNavActive : ""}`}>
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
           );
         })}
       </nav>

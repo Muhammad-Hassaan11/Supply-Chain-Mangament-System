@@ -178,3 +178,37 @@ def update_user(user_id: int, payload: AdminUserUpdate, _admin=Depends(check_adm
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update user: {str(e)}")
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id: int, _admin=Depends(check_admin_role)):
+    """
+    Admin-only: delete a user account. Keeps at least one admin account active.
+    """
+    try:
+        ensure_user_profile_columns()
+        existing = execute_query(
+            "SELECT user_id, role FROM Users WHERE user_id = ?",
+            (user_id,),
+            fetch_one=True,
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail=f"User with ID {user_id} not found.")
+
+        if existing.get("role") == "Admin":
+            admin_count = execute_query(
+                "SELECT COUNT(*) AS total FROM Users WHERE role = 'Admin'",
+                fetch_one=True,
+            )
+            if int((admin_count or {}).get("total") or 0) <= 1:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot delete the last admin account.",
+                )
+
+        execute_query("DELETE FROM Users WHERE user_id = ?", (user_id,))
+        return None
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")

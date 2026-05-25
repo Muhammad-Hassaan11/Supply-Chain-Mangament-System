@@ -25,6 +25,14 @@ interface QueryResult {
   row_count: number;
 }
 
+interface DashboardStats {
+  total_products?: number;
+  low_stock_items?: number;
+  total_shipments?: number;
+  total_suppliers?: number;
+  total_warehouses?: number;
+}
+
 const reportCards: ReportDef[] = [
   {
     id: "inventory-health",
@@ -157,8 +165,16 @@ function toCsv(columns: string[], rows: Record<string, unknown>[]) {
 export default function ReportsPage() {
   const [active, setActive] = React.useState<ReportDef | null>(null);
   const [result, setResult] = React.useState<QueryResult | null>(null);
+  const [stats, setStats] = React.useState<DashboardStats | null>(null);
+  const [resultSearch, setResultSearch] = React.useState("");
+  const [showSql, setShowSql] = React.useState(false);
+  const [generatedAt, setGeneratedAt] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    api.get<DashboardStats>("/api/analytics/dashboard").then(setStats).catch(() => setStats(null));
+  }, []);
 
   const runReport = async (report: ReportDef) => {
     setActive(report);
@@ -168,6 +184,8 @@ export default function ReportsPage() {
     try {
       const res = await api.post<QueryResult>("/api/queries/execute", { sql: report.sql });
       setResult(res);
+      setGeneratedAt(new Date().toLocaleString());
+      setResultSearch("");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to generate report.");
     } finally {
@@ -175,14 +193,34 @@ export default function ReportsPage() {
     }
   };
 
+  const filteredRows = React.useMemo(() => {
+    if (!result) return [];
+    const query = resultSearch.trim().toLowerCase();
+    if (!query) return result.rows;
+    return result.rows.filter((row) => result.columns.some((column) => String(row[column] ?? "").toLowerCase().includes(query)));
+  }, [result, resultSearch]);
+
   const exportCsv = () => {
     if (!active || !result) return;
-    const csv = toCsv(result.columns, result.rows);
+    const csv = toCsv(result.columns, filteredRows);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = `${active.id}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportJson = () => {
+    if (!active || !result) return;
+    const blob = new Blob([JSON.stringify({ report: active.title, generated_at: generatedAt, rows: filteredRows }, null, 2)], {
+      type: "application/json;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${active.id}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -202,6 +240,21 @@ export default function ReportsPage() {
           <span style={{ background: "#10a66a", borderRadius: "50%", display: "inline-block", height: "8px", width: "8px" }} />
           SQL Server connected
         </div>
+      </div>
+
+      <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+        {[
+          ["Products", stats?.total_products ?? "-"],
+          ["Low Stock", stats?.low_stock_items ?? "-"],
+          ["Shipments", stats?.total_shipments ?? "-"],
+          ["Suppliers", stats?.total_suppliers ?? "-"],
+          ["Warehouses", stats?.total_warehouses ?? "-"],
+        ].map(([label, value]) => (
+          <div key={label} className="glass-card" style={{ padding: "16px" }}>
+            <div style={{ color: "var(--text-secondary)", fontSize: ".82rem", fontWeight: 800, textTransform: "uppercase" }}>{label}</div>
+            <div style={{ color: "var(--accent-indigo)", fontSize: "1.8rem", fontWeight: 900, marginTop: "6px" }}>{value}</div>
+          </div>
+        ))}
       </div>
 
       <div style={{ display: "grid", gap: "18px", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
@@ -235,6 +288,12 @@ export default function ReportsPage() {
               <button className="glass-btn glass-btn-secondary" onClick={() => runReport(active)} disabled={loading}>
                 Refresh
               </button>
+              <button className="glass-btn glass-btn-secondary" onClick={() => setShowSql((value) => !value)}>
+                {showSql ? "Hide SQL" : "Show SQL"}
+              </button>
+              <button className={`glass-btn glass-btn-secondary ${!result ? "glass-btn-disabled" : ""}`} onClick={exportJson} disabled={!result}>
+                Export JSON
+              </button>
               <button className={`glass-btn glass-btn-primary ${!result ? "glass-btn-disabled" : ""}`} onClick={exportCsv} disabled={!result}>
                 Export CSV
               </button>
@@ -247,7 +306,20 @@ export default function ReportsPage() {
             </div>
           ) : null}
 
+          {showSql ? (
+            <pre style={{ background: "#0f252b", borderRadius: "10px", color: "#dff5f2", marginTop: "14px", overflowX: "auto", padding: "14px" }}>
+              {active.sql}
+            </pre>
+          ) : null}
+
           {result ? (
+            <>
+            <div style={{ alignItems: "center", display: "flex", gap: "12px", justifyContent: "space-between", marginTop: "14px", flexWrap: "wrap" }}>
+              <div className="glass-badge glass-badge-info">
+                Showing {filteredRows.length} of {result.row_count} rows{generatedAt ? ` - ${generatedAt}` : ""}
+              </div>
+              <input className="glass-input" value={resultSearch} onChange={(e) => setResultSearch(e.target.value)} placeholder="Search report rows..." style={{ maxWidth: 320 }} />
+            </div>
             <div style={{ marginTop: "14px" }} className="glass-table-container">
               <table className="glass-table" style={{ minWidth: "880px" }}>
                 <thead>
@@ -258,7 +330,7 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {result.rows.slice(0, 50).map((row, idx) => (
+                  {filteredRows.slice(0, 100).map((row, idx) => (
                     <tr key={idx}>
                       {result.columns.map((c) => (
                         <td key={c}>{String(row[c] ?? "")}</td>
@@ -268,6 +340,7 @@ export default function ReportsPage() {
                 </tbody>
               </table>
             </div>
+            </>
           ) : (
             <div style={{ marginTop: "14px", color: "var(--text-secondary)" }}>
               {loading ? "Running SQL report..." : "Select a report above to generate output."}

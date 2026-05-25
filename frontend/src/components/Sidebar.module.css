@@ -35,6 +35,14 @@
   width: 42px;
 }
 
+.logoImage {
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  height: 42px;
+  object-fit: cover;
+  width: 42px;
+}
+
 .brandText {
   display: flex;
   flex-direction: column;
@@ -86,6 +94,12 @@
   padding: 22px 14px;
 }
 
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .navLink {
   align-items: center;
   border-radius: 8px;
@@ -133,6 +147,29 @@
   position: absolute;
   top: 15%;
   width: 4px;
+}
+
+.subNav {
+  border-left: 1px solid var(--border-glass-active);
+  display: grid;
+  gap: 4px;
+  margin-left: 25px;
+  padding-left: 14px;
+}
+
+.subNavLink {
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 8px 10px;
+  transition: var(--transition-smooth);
+}
+
+.subNavLink:hover,
+.subNavActive {
+  background: #f1faf8;
+  color: var(--accent-indigo);
 }
 
 .userSection {
@@ -253,6 +290,10 @@
   display: none;
 }
 
+.collapsed .subNav {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .sidebar {
     border-bottom: 1px solid var(--border-glass);
@@ -292,6 +333,14 @@
     flex-shrink: 0;
     min-height: 44px;
     min-width: 46px;
+  }
+
+  .navGroup {
+    flex-direction: row;
+  }
+
+  .subNav {
+    display: none;
   }
 
   .activeIndicator {

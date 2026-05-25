@@ -196,7 +196,7 @@ h6,
   font-family: var(--font-heading), "Space Grotesk", Arial, sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
-  padding: 14px 16px;
+  padding: var(--table-density-padding, 14px 16px);
   text-align: left;
 }
 
@@ -204,7 +204,7 @@ h6,
   border-bottom: 1px solid #edf4f5;
   color: var(--text-primary);
   font-size: 0.9rem;
-  padding: 14px 16px;
+  padding: var(--table-density-padding, 14px 16px);
   vertical-align: middle;
 }
 

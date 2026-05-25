@@ -256,7 +256,141 @@ function AddUserModal({
   );
 }
 
-function UserCard({ user }: { user: AdminUser }) {
+function UserDetailsModal({
+  user,
+  onClose,
+  onSaved,
+}: {
+  user: AdminUser | null;
+  onClose: () => void;
+  onSaved: (user: AdminUser) => void;
+}) {
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState<"Admin" | "Viewer">("Viewer");
+  const [accountType, setAccountType] = useState<AdminUser["account_type"]>("client");
+  const [status, setStatus] = useState<AdminUser["status"]>("Active");
+  const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setFullName(user.full_name);
+    setRole(user.role);
+    setAccountType(user.account_type || (user.role === "Admin" ? "admin" : "client"));
+    setStatus(user.status);
+    setNewPassword("");
+    setError(null);
+    setSaving(false);
+  }, [user]);
+
+  if (!user) return null;
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaving(true);
+    setError(null);
+    try {
+      const payload: Record<string, unknown> = {
+        full_name: fullName,
+        role,
+        account_type: role === "Admin" ? "admin" : accountType,
+        status,
+      };
+      if (newPassword.trim()) payload.password = newPassword;
+      const updated = await api.put<AdminUser>(`/api/users/${user.user_id}`, payload);
+      onSaved(updated);
+      onClose();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to save user.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        background: "rgba(16, 39, 45, 0.28)",
+        inset: 0,
+        position: "fixed",
+        zIndex: 60,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+      }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <form onSubmit={submit} className="glass-card" style={{ maxWidth: "680px", width: "100%", padding: "22px", display: "grid", gap: "14px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "start" }}>
+          <div>
+            <h2 style={{ fontSize: "1.3rem" }}>User Details</h2>
+            <p style={{ color: "var(--text-secondary)", marginTop: "4px" }}>Edit access, status, and reset password if needed.</p>
+          </div>
+          <button className="glass-btn glass-btn-secondary" type="button" onClick={onClose}>Close</button>
+        </div>
+
+        {error ? <div className="glass-badge glass-badge-danger">{error}</div> : null}
+
+        <div style={{ display: "grid", gap: "10px", gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>User ID<input className="glass-input" value={user.user_id} readOnly /></label>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>Email<input className="glass-input" value={user.email} readOnly /></label>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>Full name<input className="glass-input" value={fullName} onChange={(e) => setFullName(e.target.value)} required /></label>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>Created at<input className="glass-input" value={new Date(user.created_at).toLocaleString()} readOnly /></label>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>Role
+            <select className="glass-input" value={role} onChange={(e) => setRole(e.target.value as "Admin" | "Viewer")}>
+              <option value="Viewer">Viewer</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </label>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>Account type
+            <select className="glass-input" value={role === "Admin" ? "admin" : accountType || "client"} onChange={(e) => setAccountType(e.target.value as AdminUser["account_type"])} disabled={role === "Admin"}>
+              <option value="client">Client</option>
+              <option value="supplier">Supplier</option>
+              <option value="warehouse">Warehouse</option>
+              <option value="logistics">Logistics</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>Status
+            <select className="glass-input" value={status} onChange={(e) => setStatus(e.target.value as AdminUser["status"])}>
+              <option value="Active">Active</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+          </label>
+          <label style={{ display: "grid", gap: "6px", fontWeight: 800 }}>Reset password
+            <input className="glass-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Leave blank to keep old password" />
+          </label>
+        </div>
+
+        <div style={{ display: "grid", gap: "8px", gridTemplateColumns: "repeat(2, 1fr)" }}>
+          <div className="glass-card" style={{ padding: "12px" }}>
+            <div style={{ color: "var(--text-secondary)", fontSize: ".85rem" }}>{user.metrics?.a_label || "-"}</div>
+            <strong>{user.metrics ? formatMetric(user.metrics.a_value, user.metrics.a_label) : "-"}</strong>
+          </div>
+          <div className="glass-card" style={{ padding: "12px" }}>
+            <div style={{ color: "var(--text-secondary)", fontSize: ".85rem" }}>{user.metrics?.b_label || "-"}</div>
+            <strong>{user.metrics ? formatMetric(user.metrics.b_value, user.metrics.b_label) : "-"}</strong>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <button className="glass-btn glass-btn-secondary" type="button" onClick={onClose} disabled={saving}>Cancel</button>
+          <button className={`glass-btn glass-btn-primary ${saving ? "glass-btn-disabled" : ""}`} type="submit" disabled={saving}>
+            {saving ? "Saving..." : "Save user"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function UserCard({ user, onManage, onDelete }: { user: AdminUser; onManage: (user: AdminUser) => void; onDelete: (user: AdminUser) => void }) {
   const badge = accountLabel(user);
   const metrics = user.metrics;
 
@@ -313,6 +447,15 @@ function UserCard({ user }: { user: AdminUser }) {
           <div style={{ fontWeight: 800, marginTop: "2px" }}>{metrics ? formatMetric(metrics.b_value, metrics.b_label) : "—"}</div>
         </div>
       </div>
+
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <button className="glass-btn glass-btn-secondary" type="button" onClick={() => onManage(user)} style={{ flex: 1 }}>
+          Details / Reset
+        </button>
+        <button className="glass-btn glass-btn-secondary" type="button" onClick={() => onDelete(user)} style={{ borderColor: "#fecaca", color: "var(--color-danger)" }}>
+          Delete
+        </button>
+      </div>
     </section>
   );
 }
@@ -323,6 +466,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [search, setSearch] = useState("");
 
   const load = useCallback(async () => {
@@ -353,6 +497,19 @@ export default function UsersPage() {
         .includes(query)
     );
   }, [search, users]);
+
+  const deleteUser = async (user: AdminUser) => {
+    const ok = window.confirm(`Delete ${user.full_name}? This cannot be undone.`);
+    if (!ok) return;
+    setError(null);
+    try {
+      await api.delete(`/api/users/${user.user_id}`);
+      setUsers((prev) => prev.filter((item) => item.user_id !== user.user_id));
+      if (selectedUser?.user_id === user.user_id) setSelectedUser(null);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to delete user.");
+    }
+  };
 
   if (!isAdmin) {
     return (
@@ -405,7 +562,7 @@ export default function UsersPage() {
           ? Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="glass-card glass-shimmer" style={{ height: "132px", padding: "18px" }} />
             ))
-          : filteredUsers.map((user) => <UserCard key={user.user_id} user={user} />)}
+          : filteredUsers.map((user) => <UserCard key={user.user_id} user={user} onManage={setSelectedUser} onDelete={deleteUser} />)}
       </div>
       {!loading && !filteredUsers.length ? (
         <div className="glass-card" style={{ color: "var(--text-secondary)", textAlign: "center" }}>
@@ -417,6 +574,11 @@ export default function UsersPage() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         onCreated={(created) => setUsers((prev) => [created, ...prev])}
+      />
+      <UserDetailsModal
+        user={selectedUser}
+        onClose={() => setSelectedUser(null)}
+        onSaved={(updated) => setUsers((prev) => prev.map((item) => (item.user_id === updated.user_id ? updated : item)))}
       />
     </div>
   );

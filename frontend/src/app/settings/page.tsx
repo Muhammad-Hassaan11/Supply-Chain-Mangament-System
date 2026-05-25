@@ -2,7 +2,7 @@
 
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
@@ -39,13 +39,35 @@ function SettingCard({
   );
 }
 
-function applyVisualSettings(primaryColor: string, accentColor: string) {
+function applyVisualSettings(primaryColor: string, accentColor: string, themeMode: ThemeMode, tableDensity: "Comfortable" | "Compact") {
   const root = document.documentElement;
+  const resolvedTheme =
+    themeMode === "System" && window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "Dark" : themeMode;
   root.style.setProperty("--accent-indigo", primaryColor);
   root.style.setProperty("--border-glass-active", primaryColor);
   root.style.setProperty("--accent-cyan", accentColor);
   root.style.setProperty("--accent-indigo-glow", `${primaryColor}24`);
   root.style.setProperty("--accent-cyan-glow", `${accentColor}24`);
+  root.style.setProperty("--table-density-padding", tableDensity === "Compact" ? "9px 12px" : "14px 16px");
+  if (resolvedTheme === "Dark") {
+    root.style.setProperty("--bg-main", "#0f252b");
+    root.style.setProperty("--bg-card", "#17343b");
+    root.style.setProperty("--bg-card-hover", "#1e444b");
+    root.style.setProperty("--text-primary", "#effaf8");
+    root.style.setProperty("--text-secondary", "#c7d8dc");
+    root.style.setProperty("--text-muted", "#8fb0b7");
+    root.style.setProperty("--border-glass", "rgba(180, 230, 224, 0.20)");
+    document.body.style.background = "linear-gradient(135deg, #0f252b 0%, #12353b 100%)";
+  } else {
+    root.style.setProperty("--bg-main", "#f3fbf9");
+    root.style.setProperty("--bg-card", "rgba(255, 255, 255, 0.78)");
+    root.style.setProperty("--bg-card-hover", "rgba(232, 250, 247, 0.9)");
+    root.style.setProperty("--text-primary", "#10272d");
+    root.style.setProperty("--text-secondary", "#49616b");
+    root.style.setProperty("--text-muted", "#7c929b");
+    root.style.setProperty("--border-glass", "rgba(15, 154, 148, 0.22)");
+    document.body.style.background = "";
+  }
 }
 
 export default function SettingsPage() {
@@ -57,6 +79,8 @@ export default function SettingsPage() {
   const [supportEmail, setSupportEmail] = useState<string>("support@supplychain.com");
   const [companyName, setCompanyName] = useState<string>("Supply Chain Management");
   const [primaryColor, setPrimaryColor] = useState<string>("#0f9a94");
+  const [logoDataUrl, setLogoDataUrl] = useState<string>("");
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
 
   const [dbServerHost, setDbServerHost] = useState<string>("localhost");
   const [dbName, setDbName] = useState<string>("SupplyChain_Management");
@@ -113,6 +137,7 @@ export default function SettingsPage() {
     setCompanyName(storedCompany);
     setSupportEmail(localStorage.getItem("settings:support_email") || "support@supplychain.com");
     setPrimaryColor(localStorage.getItem("settings:primary_color") || "#0f9a94");
+    setLogoDataUrl(localStorage.getItem("settings:logo_data_url") || "");
 
     setDbServerHost(localStorage.getItem("settings:db_server_host") || "localhost");
     setDbName(localStorage.getItem("settings:db_name") || "SupplyChain_Management");
@@ -136,7 +161,9 @@ export default function SettingsPage() {
     setExportFormat((localStorage.getItem("settings:export_format") as "Excel (.xlsx)" | "CSV (.csv)") || "Excel (.xlsx)");
     applyVisualSettings(
       localStorage.getItem("settings:primary_color") || "#0f9a94",
-      localStorage.getItem("settings:accent_color") || "#0f9a94"
+      localStorage.getItem("settings:accent_color") || "#0f9a94",
+      (localStorage.getItem("settings:theme") as ThemeMode) || "Light",
+      (localStorage.getItem("settings:table_density") as "Comfortable" | "Compact") || "Comfortable"
     );
 
     const snap = JSON.stringify({
@@ -144,6 +171,7 @@ export default function SettingsPage() {
       companyName: storedCompany,
       supportEmail: localStorage.getItem("settings:support_email") || "support@supplychain.com",
       primaryColor: localStorage.getItem("settings:primary_color") || "#0f9a94",
+      logoDataUrl: localStorage.getItem("settings:logo_data_url") || "",
       dbServerHost: localStorage.getItem("settings:db_server_host") || "localhost",
       dbName: localStorage.getItem("settings:db_name") || "SupplyChain_Management",
       dbUsername: localStorage.getItem("settings:db_username") || "",
@@ -195,6 +223,7 @@ export default function SettingsPage() {
       companyName,
       supportEmail,
       primaryColor,
+      logoDataUrl,
       dbServerHost,
       dbName,
       dbUsername,
@@ -217,6 +246,7 @@ export default function SettingsPage() {
     companyName,
     supportEmail,
     primaryColor,
+    logoDataUrl,
     dbServerHost,
     dbName,
     dbUsername,
@@ -235,11 +265,16 @@ export default function SettingsPage() {
     snapshot,
   ]);
 
+  useEffect(() => {
+    applyVisualSettings(primaryColor, accentColor, themeMode, tableDensity);
+  }, [primaryColor, accentColor, themeMode, tableDensity]);
+
   const save = () => {
     localStorage.setItem("account_name", fullName);
     localStorage.setItem("company_name", companyName);
     localStorage.setItem("settings:support_email", supportEmail);
     localStorage.setItem("settings:primary_color", primaryColor);
+    localStorage.setItem("settings:logo_data_url", logoDataUrl);
     localStorage.setItem("settings:db_server_host", dbServerHost);
     localStorage.setItem("settings:db_name", dbName);
     localStorage.setItem("settings:db_username", dbUsername);
@@ -256,7 +291,7 @@ export default function SettingsPage() {
     localStorage.setItem("settings:table_density", tableDensity);
     localStorage.setItem("settings:api_key", apiKey);
     localStorage.setItem("settings:export_format", exportFormat);
-    applyVisualSettings(primaryColor, accentColor);
+    applyVisualSettings(primaryColor, accentColor, themeMode, tableDensity);
     window.dispatchEvent(new Event("scm-settings-updated"));
 
     setSnapshot(
@@ -265,6 +300,7 @@ export default function SettingsPage() {
         companyName,
         supportEmail,
         primaryColor,
+        logoDataUrl,
         dbServerHost,
         dbName,
         dbUsername,
@@ -292,6 +328,7 @@ export default function SettingsPage() {
       setCompanyName(String(snap.companyName ?? companyName));
       setSupportEmail(String(snap.supportEmail ?? supportEmail));
       setPrimaryColor(String(snap.primaryColor ?? primaryColor));
+      setLogoDataUrl(String(snap.logoDataUrl ?? logoDataUrl));
       setDbServerHost(String(snap.dbServerHost ?? dbServerHost));
       setDbName(String(snap.dbName ?? dbName));
       setDbUsername(String(snap.dbUsername ?? dbUsername));
@@ -307,10 +344,23 @@ export default function SettingsPage() {
       setTableDensity((snap.tableDensity as "Comfortable" | "Compact") || tableDensity);
       setApiKey(String(snap.apiKey ?? apiKey));
       setExportFormat((snap.exportFormat as "Excel (.xlsx)" | "CSV (.csv)") || exportFormat);
+      applyVisualSettings(
+        String(snap.primaryColor ?? primaryColor),
+        String(snap.accentColor ?? accentColor),
+        (snap.themeMode as ThemeMode) || themeMode,
+        (snap.tableDensity as "Comfortable" | "Compact") || tableDensity
+      );
     } catch {
       // ignore
     }
     setDirty(false);
+  };
+
+  const handleLogoUpload = (file?: File) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = () => setLogoDataUrl(String(reader.result || ""));
+    reader.readAsDataURL(file);
   };
 
   const testConnection = async () => {
@@ -430,8 +480,23 @@ export default function SettingsPage() {
               <div style={{ border: "1px dashed #cfe4e2", borderRadius: "10px", padding: "14px", background: "#f8fdfc" }}>
                 <div style={{ fontWeight: 800, marginBottom: "6px" }}>Company Logo</div>
                 <div style={{ color: "var(--text-secondary)", fontSize: ".88rem" }}>Upload logo (PNG, JPG or SVG)</div>
-                <button className="glass-btn glass-btn-secondary" type="button" style={{ marginTop: "10px", width: "100%" }}>
-                  Upload Logo
+                <div style={{ alignItems: "center", display: "flex", gap: "10px", marginTop: "10px" }}>
+                  <div style={{ alignItems: "center", background: "#eefaf8", border: "1px solid var(--border-glass)", borderRadius: "12px", display: "flex", height: 54, justifyContent: "center", overflow: "hidden", width: 54 }}>
+                    {logoDataUrl ? <img src={logoDataUrl} alt="Company logo preview" style={{ height: "100%", objectFit: "cover", width: "100%" }} /> : "SCM"}
+                  </div>
+                  <button className="glass-btn glass-btn-secondary" type="button" style={{ flex: 1 }} onClick={() => logoInputRef.current?.click()}>
+                    Upload Logo
+                  </button>
+                </div>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => handleLogoUpload(e.target.files?.[0])}
+                />
+                <button className="glass-btn glass-btn-secondary" type="button" style={{ marginTop: "10px", width: "100%" }} onClick={() => setLogoDataUrl("")}>
+                  Remove Logo
                 </button>
               </div>
               <div style={{ display: "grid", gap: "10px" }}>
