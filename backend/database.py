@@ -90,3 +90,33 @@ def execute_query(query: str, params: tuple = None, fetch: bool = False, fetch_o
     finally:
         cursor.close()
         connection.close()
+
+def ensure_user_profile_columns():
+    """
+    Upgrades older demo databases so admin user management can run without
+    requiring a full schema rebuild.
+    """
+    statements = [
+        """
+        IF COL_LENGTH('Users', 'full_name') IS NULL
+            ALTER TABLE Users ADD full_name VARCHAR(120) NOT NULL
+            CONSTRAINT DF_Users_full_name DEFAULT 'Supply Chain User'
+        """,
+        """
+        IF COL_LENGTH('Users', 'account_type') IS NULL
+            ALTER TABLE Users ADD account_type VARCHAR(30) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'status') IS NULL
+            ALTER TABLE Users ADD status VARCHAR(20) NOT NULL
+            CONSTRAINT DF_Users_status DEFAULT 'Active'
+        """,
+        """
+        IF COL_LENGTH('Users', 'created_at') IS NULL
+            ALTER TABLE Users ADD created_at DATETIME NOT NULL
+            CONSTRAINT DF_Users_created_at DEFAULT GETDATE()
+        """,
+    ]
+
+    for statement in statements:
+        execute_query(statement)

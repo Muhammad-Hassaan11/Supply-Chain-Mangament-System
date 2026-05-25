@@ -40,6 +40,42 @@ def get_shipments():
             detail=f"Failed to fetch shipments from database: {str(e)}"
         )
 
+@router.get("/logs/all")
+def get_all_shipment_logs():
+    """
+    Retrieves all shipment logs in table-view format for admin and role dashboards.
+    """
+    try:
+        query = """
+            SELECT
+                sl.log_seq_num,
+                sl.shipment_id,
+                s.tracking_number,
+                sl.product_id,
+                p.product_name,
+                sl.event_type,
+                sl.log_timestamp,
+                w.warehouse_id,
+                w.warehouse_name,
+                CASE
+                    WHEN sl.event_type LIKE '%Deliver%' THEN 'Completed'
+                    WHEN sl.event_type LIKE '%Created%' THEN 'Info'
+                    WHEN sl.event_type LIKE '%Arrived%' THEN 'Update'
+                    ELSE 'In Transit'
+                END AS status
+            FROM Shipment_logs sl
+            JOIN Shipments s ON sl.shipment_id = s.shipment_id
+            JOIN Product p ON sl.product_id = p.product_id
+            JOIN Warehouse w ON s.warehouse_id = w.warehouse_id
+            ORDER BY sl.log_timestamp DESC, sl.shipment_id DESC, sl.log_seq_num DESC
+        """
+        return execute_query(query, fetch=True) or []
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch shipment logs from database: {str(e)}"
+        )
+
 @router.get("/{shipment_id}", response_model=ShipmentWithWarehouse)
 def get_shipment(shipment_id: int):
     """

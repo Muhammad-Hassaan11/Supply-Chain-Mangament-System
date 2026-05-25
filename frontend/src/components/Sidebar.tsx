@@ -92,22 +92,32 @@ export default function Sidebar() {
   }, [collapsed]);
 
   useEffect(() => {
-    const storedAccountType = getStoredAccountType();
-    const storedAccountName = getStoredAccountName();
-    setAccountType(storedAccountType);
-    setAccountName(storedAccountName);
+    const refreshAccount = () => {
+      const storedAccountType = getStoredAccountType();
+      const storedAccountName = getStoredAccountName();
+      setAccountType(storedAccountType);
+      setAccountName(storedAccountName);
 
-    if (storedAccountType === "supplier") {
-      setAccountLabel("Supplier");
-    } else if (storedAccountType === "warehouse") {
-      setAccountLabel("Warehouse Manager");
-    } else if (storedAccountType === "client") {
-      setAccountLabel("Client / Buyer");
-    } else if (storedAccountType === "logistics") {
-      setAccountLabel("Logistics Partner");
-    } else {
-      setAccountLabel(null);
-    }
+      if (storedAccountType === "supplier") {
+        setAccountLabel("Supplier");
+      } else if (storedAccountType === "warehouse") {
+        setAccountLabel("Warehouse Manager");
+      } else if (storedAccountType === "client") {
+        setAccountLabel("Client / Buyer");
+      } else if (storedAccountType === "logistics") {
+        setAccountLabel("Logistics Partner");
+      } else {
+        setAccountLabel(null);
+      }
+    };
+
+    refreshAccount();
+    window.addEventListener("scm-settings-updated", refreshAccount);
+    window.addEventListener("storage", refreshAccount);
+    return () => {
+      window.removeEventListener("scm-settings-updated", refreshAccount);
+      window.removeEventListener("storage", refreshAccount);
+    };
   }, [userEmail, userRole]);
 
   const navItems = useMemo(() => {

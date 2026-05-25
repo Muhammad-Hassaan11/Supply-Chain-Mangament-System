@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from database import execute_query
+from database import ensure_user_profile_columns, execute_query
 from models import UserLogin, UserRegister, Token
 from auth import hash_password, verify_password, create_access_token
 
@@ -13,6 +13,7 @@ def register(register_data: UserRegister):
     Registers a new user inside the SQL Server Users table.
     Enforces check constraint validations and handles administrative secret codes.
     """
+    ensure_user_profile_columns()
     # 1. Check if user already exists
     check_query = "SELECT user_id FROM Users WHERE email = ?"
     exists = execute_query(check_query, (register_data.email,), fetch_one=True)

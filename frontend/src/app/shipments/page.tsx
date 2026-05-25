@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { api } from "@/lib/api";
 
 interface Shipment {
@@ -37,8 +38,8 @@ export default function ShipmentsPage() {
           setSelectedShipment(shipmentData[0]);
         }
         setError(null);
-      } catch (err: any) {
-        setError(err.message || "Failed to load shipments.");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load shipments.");
       } finally {
         setLoading(false);
       }
@@ -130,7 +131,9 @@ export default function ShipmentsPage() {
         <div className="glass-card">
           <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "18px" }}>
             <h2 style={{ fontSize: "1.45rem" }}>Active Deliveries</h2>
-            <div style={{ color: "var(--accent-indigo)", fontSize: "0.9rem", fontWeight: 700 }}>View all shipments →</div>
+            <Link href="/shipments/logs" style={{ color: "var(--accent-indigo)", fontSize: "0.9rem", fontWeight: 700 }}>
+              View all shipment logs -&gt;
+            </Link>
           </div>
           <div className="glass-table-container">
             <table className="glass-table">
@@ -206,7 +209,12 @@ export default function ShipmentsPage() {
             <div style={{ left: "248px", position: "absolute", top: "66px" }}>🚚</div>
             <div style={{ right: "32px", position: "absolute", top: "28px" }}>📍</div>
           </div>
-          <div style={{ color: "var(--accent-indigo)", fontSize: "0.92rem", fontWeight: 700 }}>View full tracking details →</div>
+          <Link
+            href={selectedShipment ? `/shipments/${selectedShipment.shipment_id}` : "/shipments/logs"}
+            style={{ color: "var(--accent-indigo)", fontSize: "0.92rem", fontWeight: 700 }}
+          >
+            View full tracking details -&gt;
+          </Link>
         </div>
       </div>
 

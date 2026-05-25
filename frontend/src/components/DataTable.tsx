@@ -20,7 +20,7 @@ interface DataTableProps<T> {
   idPrefix?: string;
 }
 
-export default function DataTable<T extends Record<string, any>>({
+export default function DataTable<T extends object>({
   data,
   columns,
   searchPlaceholder = "Search records...",
@@ -36,13 +36,21 @@ export default function DataTable<T extends Record<string, any>>({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Search Logic
   const filteredData = React.useMemo(() => {
     if (!searchTerm || !searchKey) return data;
+    const normalizedSearch = searchTerm.toLowerCase().trim();
     return data.filter((item) => {
-      const value = item[searchKey];
-      if (value === null || value === undefined) return false;
-      return String(value).toLowerCase().includes(searchTerm.toLowerCase());
+      const rowValues = item as Record<string, unknown>;
+      const primaryValue = rowValues[String(searchKey)];
+      const allValues = Object.values(rowValues)
+        .filter((value) => value !== null && value !== undefined)
+        .map((value) => String(value).toLowerCase());
+
+      if (primaryValue !== null && primaryValue !== undefined) {
+        allValues.unshift(String(primaryValue).toLowerCase());
+      }
+
+      return allValues.some((value) => value.includes(normalizedSearch));
     });
   }, [data, searchTerm, searchKey]);
 
@@ -50,8 +58,8 @@ export default function DataTable<T extends Record<string, any>>({
   const sortedData = React.useMemo(() => {
     if (!sortConfig) return filteredData;
     const sorted = [...filteredData].sort((a, b) => {
-      const aVal = a[sortConfig.key];
-      const bVal = b[sortConfig.key];
+      const aVal = (a as Record<string, unknown>)[sortConfig.key];
+      const bVal = (b as Record<string, unknown>)[sortConfig.key];
 
       if (aVal === null || aVal === undefined) return 1;
       if (bVal === null || bVal === undefined) return -1;
@@ -151,7 +159,7 @@ export default function DataTable<T extends Record<string, any>>({
                     <td key={colIdx}>
                       {typeof col.accessor === "function"
                         ? col.accessor(row)
-                        : (row[col.accessor as string] ?? "-")}
+                        : ((row as Record<string, unknown>)[col.accessor as string] as React.ReactNode ?? "-")}
                     </td>
                   ))}
                   {hasActions && (

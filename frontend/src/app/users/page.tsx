@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
@@ -321,6 +323,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -339,6 +342,17 @@ export default function UsersPage() {
     if (!isAdmin) return;
     load();
   }, [isAdmin, load]);
+
+  const filteredUsers = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return users;
+    return users.filter((user) =>
+      [user.full_name, user.email, user.role, user.account_type || "", user.status]
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    );
+  }, [search, users]);
 
   if (!isAdmin) {
     return (
@@ -361,6 +375,16 @@ export default function UsersPage() {
             <span style={{ background: "#10a66a", borderRadius: "50%", display: "inline-block", height: "8px", width: "8px" }} />
             SQL Server connected
           </div>
+          <div style={{ position: "relative", width: "280px" }}>
+            <input
+              className="glass-input"
+              placeholder="Search users..."
+              style={{ paddingLeft: "38px" }}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+            <span style={{ color: "var(--text-muted)", left: "12px", position: "absolute", top: "12px" }}>⌕</span>
+          </div>
           <button className="glass-btn glass-btn-primary" onClick={() => setAddOpen(true)}>
             Add User
           </button>
@@ -381,8 +405,13 @@ export default function UsersPage() {
           ? Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="glass-card glass-shimmer" style={{ height: "132px", padding: "18px" }} />
             ))
-          : users.map((user) => <UserCard key={user.user_id} user={user} />)}
+          : filteredUsers.map((user) => <UserCard key={user.user_id} user={user} />)}
       </div>
+      {!loading && !filteredUsers.length ? (
+        <div className="glass-card" style={{ color: "var(--text-secondary)", textAlign: "center" }}>
+          No users matched your search.
+        </div>
+      ) : null}
 
       <AddUserModal
         open={addOpen}

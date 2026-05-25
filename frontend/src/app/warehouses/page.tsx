@@ -26,6 +26,7 @@ export default function WarehousesPage() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [inventorySearch, setInventorySearch] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -49,7 +50,22 @@ export default function WarehousesPage() {
   }, []);
 
   const primaryWarehouse = warehouses[0];
-  const inventoryItems = useMemo(() => inventory.slice(0, 5), [inventory]);
+  const searchedInventory = useMemo(() => {
+    const query = inventorySearch.trim().toLowerCase();
+    if (!query) return inventory;
+    return inventory.filter((item) =>
+      [
+        `sku-${String(item.product_id).padStart(4, "0")}`,
+        item.product_name || "",
+        item.location,
+        String(item.quantity),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    );
+  }, [inventory, inventorySearch]);
+  const inventoryItems = useMemo(() => searchedInventory.slice(0, 5), [searchedInventory]);
   const lowStockItems = useMemo(() => inventory.filter((item) => item.quantity < 100).slice(0, 5), [inventory]);
   const warehouseCapacityPercent = primaryWarehouse
     ? Math.min(100, Math.round((primaryWarehouse.current_stock / Math.max(primaryWarehouse.capacity, 1)) * 100))
@@ -127,7 +143,13 @@ export default function WarehousesPage() {
           <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "18px" }}>
             <h2 style={{ fontSize: "1.45rem" }}>Inventory in {primaryWarehouse.warehouse_name}</h2>
             <div style={{ position: "relative", width: "260px" }}>
-              <input className="glass-input" placeholder="Search by SKU or Product" style={{ paddingLeft: "38px" }} />
+              <input
+                className="glass-input"
+                placeholder="Search by SKU or Product"
+                style={{ paddingLeft: "38px" }}
+                value={inventorySearch}
+                onChange={(event) => setInventorySearch(event.target.value)}
+              />
               <span style={{ color: "var(--text-muted)", left: "12px", position: "absolute", top: "12px" }}>⌕</span>
             </div>
           </div>

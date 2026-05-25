@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import React, { useEffect, useMemo, useState } from "react";
 import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
@@ -35,6 +37,15 @@ function SettingCard({
       {children}
     </div>
   );
+}
+
+function applyVisualSettings(primaryColor: string, accentColor: string) {
+  const root = document.documentElement;
+  root.style.setProperty("--accent-indigo", primaryColor);
+  root.style.setProperty("--border-glass-active", primaryColor);
+  root.style.setProperty("--accent-cyan", accentColor);
+  root.style.setProperty("--accent-indigo-glow", `${primaryColor}24`);
+  root.style.setProperty("--accent-cyan-glow", `${accentColor}24`);
 }
 
 export default function SettingsPage() {
@@ -123,6 +134,10 @@ export default function SettingsPage() {
 
     setApiKey(localStorage.getItem("settings:api_key") || "");
     setExportFormat((localStorage.getItem("settings:export_format") as "Excel (.xlsx)" | "CSV (.csv)") || "Excel (.xlsx)");
+    applyVisualSettings(
+      localStorage.getItem("settings:primary_color") || "#0f9a94",
+      localStorage.getItem("settings:accent_color") || "#0f9a94"
+    );
 
     const snap = JSON.stringify({
       fullName: storedName,
@@ -241,6 +256,8 @@ export default function SettingsPage() {
     localStorage.setItem("settings:table_density", tableDensity);
     localStorage.setItem("settings:api_key", apiKey);
     localStorage.setItem("settings:export_format", exportFormat);
+    applyVisualSettings(primaryColor, accentColor);
+    window.dispatchEvent(new Event("scm-settings-updated"));
 
     setSnapshot(
       JSON.stringify({
