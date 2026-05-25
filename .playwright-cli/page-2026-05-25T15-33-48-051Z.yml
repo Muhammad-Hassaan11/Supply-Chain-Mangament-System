@@ -1,0 +1,187 @@
+- generic [ref=e1]:
+  - complementary [ref=e2]:
+    - generic [ref=e3]:
+      - img [ref=e5]
+      - generic [ref=e8]:
+        - generic [ref=e9]: SCM
+        - generic [ref=e10]: Supply Chain Management
+      - button "Toggle sidebar" [ref=e11] [cursor=pointer]:
+        - img [ref=e12]
+    - navigation [ref=e14]:
+      - link "Dashboard" [ref=e16] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e18]
+        - generic [ref=e23]: Dashboard
+      - link "My Warehouse" [ref=e180] [cursor=pointer]:
+        - /url: /warehouses
+        - img [ref=e182]
+        - generic [ref=e185]: My Warehouse
+      - link "Inventory" [ref=e188] [cursor=pointer]:
+        - /url: /inventory
+        - img [ref=e190]
+        - generic [ref=e194]: Inventory
+      - link "Incoming Shipments" [ref=e196] [cursor=pointer]:
+        - /url: /incoming-shipments
+        - img [ref=e198]
+        - generic [ref=e203]: Incoming Shipments
+      - link "Outgoing Shipments" [ref=e205] [cursor=pointer]:
+        - /url: /outgoing-shipments
+        - img [ref=e207]
+        - generic [ref=e212]: Outgoing Shipments
+      - link "Low Stock Alerts" [ref=e214] [cursor=pointer]:
+        - /url: /low-stock-alerts
+        - img [ref=e216]
+        - generic [ref=e220]: Low Stock Alerts
+      - link "Reports" [ref=e25] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e27]
+        - generic [ref=e28]: Reports
+      - link "Profile" [active] [ref=e30] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e32]
+        - generic [ref=e35]: Profile
+    - generic [ref=e221]:
+      - generic [ref=e222]:
+        - generic [ref=e223]: W
+        - generic [ref=e224]:
+          - generic [ref=e225]: warehouse@example.com
+          - generic [ref=e226]: Warehouse Manager
+      - button "Logout" [ref=e227] [cursor=pointer]:
+        - img [ref=e228]
+        - generic [ref=e231]: Logout
+  - main [ref=e42]:
+    - main [ref=e491]:
+      - generic [ref=e492]:
+        - generic [ref=e493]:
+          - heading "Profile" [level=1] [ref=e494]
+          - paragraph [ref=e495]: View and manage your profile and preferences.
+        - generic [ref=e496]:
+          - generic [ref=e497]:
+            - generic [ref=e498]: DB
+            - text: Connected to SQL Server
+          - generic [ref=e500]:
+            - generic [ref=e501]: WM
+            - strong [ref=e502]: Warehouse Manager
+      - generic [ref=e503]:
+        - generic [ref=e504]:
+          - text: MA
+          - button "Cam" [ref=e505] [cursor=pointer]
+        - generic [ref=e506]:
+          - heading "Michael Anderson" [level=2] [ref=e507]
+          - paragraph [ref=e508]: michael.anderson@logisticsco.com
+          - paragraph [ref=e509]: (901) 555-0148
+          - button "Edit" [ref=e510] [cursor=pointer]
+        - generic [ref=e511]:
+          - text: Employee ID
+          - strong [ref=e512]: EMP-20481
+        - generic [ref=e513]:
+          - text: Assigned Warehouse
+          - strong [ref=e514]: Central Distribution Center
+        - generic [ref=e515]:
+          - text: Role
+          - strong [ref=e516]: Warehouse Manager
+        - generic [ref=e517]:
+          - text: Status
+          - strong [ref=e518]: Active
+      - generic [ref=e519]:
+        - generic [ref=e520]:
+          - generic [ref=e521]:
+            - heading "Personal Information" [level=2] [ref=e522]
+            - button "Edit" [ref=e523] [cursor=pointer]
+          - generic [ref=e524]:
+            - generic [ref=e525]:
+              - generic [ref=e526]: Full Name
+              - strong [ref=e527]: Michael Anderson
+            - generic [ref=e528]:
+              - generic [ref=e529]: Email
+              - strong [ref=e530]: michael.anderson@logisticsco.com
+            - generic [ref=e531]:
+              - generic [ref=e532]: Phone
+              - strong [ref=e533]: (901) 555-0148
+            - generic [ref=e534]:
+              - generic [ref=e535]: Alternate Phone
+              - strong [ref=e536]: (901) 555-0199
+            - generic [ref=e537]:
+              - generic [ref=e538]: Address
+              - strong [ref=e539]: 1234 Warehouse Ln, Memphis, TN 38118
+            - generic [ref=e540]:
+              - generic [ref=e541]: Emergency Contact
+              - strong [ref=e542]: Sarah Anderson (Spouse) • (901) 555-0172
+        - generic [ref=e543]:
+          - generic [ref=e544]:
+            - heading "Notification Preferences" [level=2] [ref=e545]
+            - button "Save" [ref=e546] [cursor=pointer]
+          - generic [ref=e547]:
+            - generic [ref=e548]: Low stock alerts
+            - button [ref=e549] [cursor=pointer]
+          - generic [ref=e551]:
+            - generic [ref=e552]: Incoming shipment updates
+            - button [ref=e553] [cursor=pointer]
+          - generic [ref=e555]:
+            - generic [ref=e556]: Outgoing shipment updates
+            - button [ref=e557] [cursor=pointer]
+          - generic [ref=e559]:
+            - generic [ref=e560]: System announcements
+            - button [ref=e561] [cursor=pointer]
+          - generic [ref=e563]:
+            - generic [ref=e564]: Email digest
+            - button [ref=e565] [cursor=pointer]
+        - generic [ref=e567]:
+          - heading "Performance Summary" [level=2] [ref=e569]
+          - generic [ref=e570]:
+            - generic [ref=e571]:
+              - generic [ref=e572]: Orders Processed
+              - strong [ref=e573]: 1,248
+            - generic [ref=e574]:
+              - generic [ref=e575]: Shipments Overseeing
+              - strong [ref=e576]: "312"
+            - generic [ref=e577]:
+              - generic [ref=e578]: Inventory Accuracy
+              - strong [ref=e579]: 99.4%
+            - generic [ref=e580]:
+              - generic [ref=e581]: On-Time Shipments
+              - strong [ref=e582]: 96.6%
+            - generic [ref=e583]:
+              - generic [ref=e584]: Issues Resolved
+              - strong [ref=e585]: "28"
+            - generic [ref=e586]:
+              - generic [ref=e587]: Team Utilization
+              - strong [ref=e588]: 87%
+      - generic [ref=e589]:
+        - generic [ref=e590]:
+          - generic [ref=e591]:
+            - heading "Recent Activity Log" [level=2] [ref=e592]
+            - button "View all" [ref=e593] [cursor=pointer]
+          - generic [ref=e594]:
+            - generic [ref=e595]:
+              - generic [ref=e596]: Shipment PO-12578 received
+              - strong [ref=e597]: 10:12 AM
+            - generic [ref=e598]:
+              - generic [ref=e599]: Outbound OUT-2025-0566 loading started
+              - strong [ref=e600]: 09:48 AM
+            - generic [ref=e601]:
+              - generic [ref=e602]: Low stock reviewed for PRD-6155
+              - strong [ref=e603]: 09:22 AM
+            - generic [ref=e604]:
+              - generic [ref=e605]: Cycle count completed in Storage B-05
+              - strong [ref=e606]: 08:55 AM
+            - generic [ref=e607]:
+              - generic [ref=e608]: Dock reassigned for PO-12577
+              - strong [ref=e609]: 08:14 AM
+        - generic [ref=e610]:
+          - generic [ref=e611]:
+            - heading "Connected Devices & Sessions" [level=2] [ref=e612]
+            - button "View all" [ref=e613] [cursor=pointer]
+          - generic [ref=e614]:
+            - generic [ref=e615]:
+              - generic [ref=e616]: Windows • Chrome • Current Session
+              - strong [ref=e617]: 8:46 AM
+            - generic [ref=e618]:
+              - generic [ref=e619]: iPhone 14 • Safari
+              - strong [ref=e620]: 7:25 AM
+            - generic [ref=e621]:
+              - generic [ref=e622]: Windows • Edge
+              - strong [ref=e623]: 9:03 AM
+  - button "Open Next.js Dev Tools" [ref=e175] [cursor=pointer]:
+    - img [ref=e176]
+  - alert [ref=e232]

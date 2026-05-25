@@ -2,8 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { api, getStoredAccountType } from "@/lib/api";
+import { api } from "@/lib/api";
 import { ClientShipmentsPage } from "@/components/client/ClientPortal";
+import { useStoredAccountState } from "@/lib/useStoredAccountState";
 
 interface Shipment {
   shipment_id: number;
@@ -23,7 +24,7 @@ interface ShipmentLog {
 }
 
 export default function ShipmentsPage() {
-  const [accountType] = useState<string | null>(() => getStoredAccountType());
+  const { accountType, isHydrated } = useStoredAccountState();
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [logs, setLogs] = useState<ShipmentLog[]>([]);
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
@@ -77,6 +78,10 @@ export default function ShipmentsPage() {
       })),
     [shipments]
   );
+
+  if (!isHydrated) {
+    return <div className="glass-card">Loading logistics dashboard...</div>;
+  }
 
   if (accountType === "client") {
     return <ClientShipmentsPage />;

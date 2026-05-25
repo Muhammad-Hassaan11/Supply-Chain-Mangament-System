@@ -1,0 +1,308 @@
+- generic [ref=e1]:
+  - complementary [ref=e2]:
+    - generic [ref=e3]:
+      - img [ref=e5]
+      - generic [ref=e8]:
+        - generic [ref=e9]: SCM
+        - generic [ref=e10]: Supply Chain Management
+      - button "Toggle sidebar" [ref=e11] [cursor=pointer]:
+        - img [ref=e12]
+    - navigation [ref=e14]:
+      - link "Dashboard" [active] [ref=e16] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e18]
+        - generic [ref=e23]: Dashboard
+      - link "My Warehouse" [ref=e323] [cursor=pointer]:
+        - /url: /warehouses
+        - img [ref=e325]
+        - generic [ref=e328]: My Warehouse
+      - link "Inventory" [ref=e330] [cursor=pointer]:
+        - /url: /inventory
+        - img [ref=e332]
+        - generic [ref=e336]: Inventory
+      - link "Incoming Shipments" [ref=e339] [cursor=pointer]:
+        - /url: /incoming-shipments
+        - img [ref=e341]
+        - generic [ref=e346]: Incoming Shipments
+      - link "Outgoing Shipments" [ref=e348] [cursor=pointer]:
+        - /url: /outgoing-shipments
+        - img [ref=e350]
+        - generic [ref=e355]: Outgoing Shipments
+      - link "Low Stock Alerts" [ref=e357] [cursor=pointer]:
+        - /url: /low-stock-alerts
+        - img [ref=e359]
+        - generic [ref=e363]: Low Stock Alerts
+      - link "Reports" [ref=e25] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e27]
+        - generic [ref=e28]: Reports
+      - link "Profile" [ref=e30] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e32]
+        - generic [ref=e35]: Profile
+    - generic [ref=e364]:
+      - generic [ref=e365]:
+        - generic [ref=e366]: W
+        - generic [ref=e367]:
+          - generic [ref=e368]: warehouse@example.com
+          - generic [ref=e369]: Warehouse Manager
+      - button "Logout" [ref=e370] [cursor=pointer]:
+        - img [ref=e371]
+        - generic [ref=e374]: Logout
+  - main [ref=e42]:
+    - main [ref=e377]:
+      - generic [ref=e378]:
+        - generic [ref=e379]:
+          - heading "Dashboard" [level=1] [ref=e380]
+          - paragraph [ref=e381]: Welcome back! Here's what's happening in your warehouse today.
+        - generic [ref=e382]:
+          - generic [ref=e383]:
+            - generic [ref=e384]: DB
+            - text: Connected to SQL Server
+          - generic [ref=e386]:
+            - generic [ref=e387]: WM
+            - strong [ref=e388]: Warehouse Manager
+      - generic [ref=e389]:
+        - generic [ref=e390]:
+          - generic [ref=e391]: WH
+          - generic [ref=e392]:
+            - generic [ref=e393]: Warehouse Capacity
+            - generic [ref=e394]: 68%
+            - generic [ref=e395]: "Used: 68,245 / 100,000 sq ft"
+        - generic [ref=e396]:
+          - generic [ref=e397]: BX
+          - generic [ref=e398]:
+            - generic [ref=e399]: Inventory Items
+            - generic [ref=e400]: 4,812
+            - generic [ref=e401]: Across 1,245 SKUs
+        - generic [ref=e402]:
+          - generic [ref=e403]: "!"
+          - generic [ref=e404]:
+            - generic [ref=e405]: Low Stock Alerts
+            - generic [ref=e406]: "18"
+            - generic [ref=e407]: SKUs below reorder level
+        - generic [ref=e408]:
+          - generic [ref=e409]: $
+          - generic [ref=e410]:
+            - generic [ref=e411]: Inventory Value
+            - generic [ref=e412]: $2.48M
+            - generic [ref=e413]: Total inventory value
+      - generic [ref=e414]:
+        - generic [ref=e415]:
+          - heading "Today's Movements" [level=2] [ref=e417]
+          - generic [ref=e418]:
+            - generic [ref=e419]:
+              - generic [ref=e420]: IN
+              - generic [ref=e421]:
+                - generic [ref=e422]: Inbound
+                - generic [ref=e423]: "8"
+                - generic [ref=e424]: 2,345 Units
+            - generic [ref=e425]:
+              - generic [ref=e426]: OUT
+              - generic [ref=e427]:
+                - generic [ref=e428]: Outbound
+                - generic [ref=e429]: "12"
+                - generic [ref=e430]: 3,876 Units
+        - generic [ref=e431]:
+          - generic [ref=e432]:
+            - heading "Recent Shipment Activity" [level=2] [ref=e433]
+            - button "View all" [ref=e434] [cursor=pointer]
+          - table [ref=e436]:
+            - rowgroup [ref=e437]:
+              - row "ID Partner Time Units Status Actions" [ref=e438]:
+                - columnheader "ID" [ref=e439]
+                - columnheader "Partner" [ref=e440]
+                - columnheader "Time" [ref=e441]
+                - columnheader "Units" [ref=e442]
+                - columnheader "Status" [ref=e443]
+                - columnheader "Actions" [ref=e444]
+            - rowgroup [ref=e445]:
+              - row "PO-12578 Acme Supplies Co. May 24, 2025 9:15 AM 1,200 Received View" [ref=e446]:
+                - cell "PO-12578" [ref=e447]
+                - cell "Acme Supplies Co." [ref=e448]
+                - cell "May 24, 2025 9:15 AM" [ref=e449]
+                - cell "1,200" [ref=e450]
+                - cell "Received" [ref=e451]
+                - cell "View" [ref=e452]:
+                  - button "View" [ref=e453] [cursor=pointer]
+              - row "PO-12577 Global Components Inc. May 24, 2025 10:30 AM 1,145 Received View" [ref=e454]:
+                - cell "PO-12577" [ref=e455]
+                - cell "Global Components Inc." [ref=e456]
+                - cell "May 24, 2025 10:30 AM" [ref=e457]
+                - cell "1,145" [ref=e458]
+                - cell "Received" [ref=e459]
+                - cell "View" [ref=e460]:
+                  - button "View" [ref=e461] [cursor=pointer]
+              - row "PO-98231 Retail Express May 24, 2025 1:45 PM 980 Received View" [ref=e462]:
+                - cell "PO-98231" [ref=e463]
+                - cell "Retail Express" [ref=e464]
+                - cell "May 24, 2025 1:45 PM" [ref=e465]
+                - cell "980" [ref=e466]
+                - cell "Received" [ref=e467]
+                - cell "View" [ref=e468]:
+                  - button "View" [ref=e469] [cursor=pointer]
+              - row "PO-98230 Metro Distributors May 24, 2025 3:30 PM 1,560 Received View" [ref=e470]:
+                - cell "PO-98230" [ref=e471]
+                - cell "Metro Distributors" [ref=e472]
+                - cell "May 24, 2025 3:30 PM" [ref=e473]
+                - cell "1,560" [ref=e474]
+                - cell "Received" [ref=e475]
+                - cell "View" [ref=e476]:
+                  - button "View" [ref=e477] [cursor=pointer]
+              - row "PO-12576 Precision Parts Ltd. May 25, 2025 8:00 AM 3,000 Received View" [ref=e478]:
+                - cell "PO-12576" [ref=e479]
+                - cell "Precision Parts Ltd." [ref=e480]
+                - cell "May 25, 2025 8:00 AM" [ref=e481]
+                - cell "3,000" [ref=e482]
+                - cell "Received" [ref=e483]
+                - cell "View" [ref=e484]:
+                  - button "View" [ref=e485] [cursor=pointer]
+        - generic [ref=e486]:
+          - generic [ref=e487]:
+            - heading "Warehouse Summary" [level=2] [ref=e488]
+            - button "Open" [ref=e489] [cursor=pointer]
+          - generic [ref=e490]:
+            - generic [ref=e491]:
+              - generic [ref=e492]: Total Area
+              - strong [ref=e493]: 100,000 sq ft
+            - generic [ref=e494]:
+              - generic [ref=e495]: Usable Area
+              - strong [ref=e496]: 92,500 sq ft
+            - generic [ref=e497]:
+              - generic [ref=e498]: Locations
+              - strong [ref=e499]: "512"
+            - generic [ref=e500]:
+              - generic [ref=e501]: Active SKUs
+              - strong [ref=e502]: 1,245
+            - generic [ref=e503]:
+              - generic [ref=e504]: Team Members
+              - strong [ref=e505]: "24"
+            - generic [ref=e506]:
+              - generic [ref=e507]: Safety Days
+              - strong [ref=e508]: 112 days
+      - generic [ref=e509]:
+        - generic [ref=e510]:
+          - generic [ref=e511]:
+            - heading "Top Inventory (By Value)" [level=2] [ref=e512]
+            - button "View all inventory" [ref=e513] [cursor=pointer]
+          - table [ref=e515]:
+            - rowgroup [ref=e516]:
+              - row "SKU Item On Hand Available Reserved Status Actions" [ref=e517]:
+                - columnheader "SKU" [ref=e518]
+                - columnheader "Item" [ref=e519]
+                - columnheader "On Hand" [ref=e520]
+                - columnheader "Available" [ref=e521]
+                - columnheader "Reserved" [ref=e522]
+                - columnheader "Status" [ref=e523]
+                - columnheader "Actions" [ref=e524]
+            - rowgroup [ref=e525]:
+              - row "PRD-1010 Industrial Bearings 6205 1,250 1,050 200 In Stock View" [ref=e526]:
+                - cell "PRD-1010" [ref=e527]
+                - cell "Industrial Bearings 6205" [ref=e528]
+                - cell "1,250" [ref=e529]
+                - cell "1,050" [ref=e530]
+                - cell "200" [ref=e531]
+                - cell "In Stock" [ref=e532]:
+                  - generic [ref=e533]: In Stock
+                - cell "View" [ref=e534]:
+                  - button "View" [ref=e535] [cursor=pointer]
+              - row "PRD-2048 Electric Motor 3HP 320 280 40 In Stock View" [ref=e536]:
+                - cell "PRD-2048" [ref=e537]
+                - cell "Electric Motor 3HP" [ref=e538]
+                - cell "320" [ref=e539]
+                - cell "280" [ref=e540]
+                - cell "40" [ref=e541]
+                - cell "In Stock" [ref=e542]:
+                  - generic [ref=e543]: In Stock
+                - cell "View" [ref=e544]:
+                  - button "View" [ref=e545] [cursor=pointer]
+              - row "PRD-3012 Hydraulic Pump 10GPM 185 150 35 In Stock View" [ref=e546]:
+                - cell "PRD-3012" [ref=e547]
+                - cell "Hydraulic Pump 10GPM" [ref=e548]
+                - cell "185" [ref=e549]
+                - cell "150" [ref=e550]
+                - cell "35" [ref=e551]
+                - cell "In Stock" [ref=e552]:
+                  - generic [ref=e553]: In Stock
+                - cell "View" [ref=e554]:
+                  - button "View" [ref=e555] [cursor=pointer]
+              - row "PRD-4120 Conveyor Belt 2m x 50ft 410 390 20 In Stock View" [ref=e556]:
+                - cell "PRD-4120" [ref=e557]
+                - cell "Conveyor Belt 2m x 50ft" [ref=e558]
+                - cell "410" [ref=e559]
+                - cell "390" [ref=e560]
+                - cell "20" [ref=e561]
+                - cell "In Stock" [ref=e562]:
+                  - generic [ref=e563]: In Stock
+                - cell "View" [ref=e564]:
+                  - button "View" [ref=e565] [cursor=pointer]
+              - row "PRD-6155 V-Belt A-42 18 18 0 Low Stock View" [ref=e566]:
+                - cell "PRD-6155" [ref=e567]
+                - cell "V-Belt A-42" [ref=e568]
+                - cell "18" [ref=e569]
+                - cell "18" [ref=e570]
+                - cell "0" [ref=e571]
+                - cell "Low Stock" [ref=e572]:
+                  - generic [ref=e573]: Low Stock
+                - cell "View" [ref=e574]:
+                  - button "View" [ref=e575] [cursor=pointer]
+        - generic [ref=e576]:
+          - generic [ref=e577]:
+            - heading "Low Stock Alerts" [level=2] [ref=e578]
+            - button "View all alerts" [ref=e579] [cursor=pointer]
+          - table [ref=e581]:
+            - rowgroup [ref=e582]:
+              - row "SKU Item On Hand Reorder Status Actions" [ref=e583]:
+                - columnheader "SKU" [ref=e584]
+                - columnheader "Item" [ref=e585]
+                - columnheader "On Hand" [ref=e586]
+                - columnheader "Reorder" [ref=e587]
+                - columnheader "Status" [ref=e588]
+                - columnheader "Actions" [ref=e589]
+            - rowgroup [ref=e590]:
+              - row "PRD-7088 Pneumatic Cylinder 12 25 Critical View" [ref=e591]:
+                - cell "PRD-7088" [ref=e592]
+                - cell "Pneumatic Cylinder" [ref=e593]
+                - cell "12" [ref=e594]
+                - cell "25" [ref=e595]
+                - cell "Critical" [ref=e596]:
+                  - generic [ref=e597]: Critical
+                - cell "View" [ref=e598]:
+                  - button "View" [ref=e599] [cursor=pointer]
+              - row "PRD-6155 V-Belt A-42 18 40 Critical View" [ref=e600]:
+                - cell "PRD-6155" [ref=e601]
+                - cell "V-Belt A-42" [ref=e602]
+                - cell "18" [ref=e603]
+                - cell "40" [ref=e604]
+                - cell "Critical" [ref=e605]:
+                  - generic [ref=e606]: Critical
+                - cell "View" [ref=e607]:
+                  - button "View" [ref=e608] [cursor=pointer]
+              - row "PRD-3022 Gearbox 20:1 5 15 Critical View" [ref=e609]:
+                - cell "PRD-3022" [ref=e610]
+                - cell "Gearbox 20:1" [ref=e611]
+                - cell "5" [ref=e612]
+                - cell "15" [ref=e613]
+                - cell "Critical" [ref=e614]:
+                  - generic [ref=e615]: Critical
+                - cell "View" [ref=e616]:
+                  - button "View" [ref=e617] [cursor=pointer]
+              - row "PRD-8120 Solenoid Valve 24V 22 30 Low View" [ref=e618]:
+                - cell "PRD-8120" [ref=e619]
+                - cell "Solenoid Valve 24V" [ref=e620]
+                - cell "22" [ref=e621]
+                - cell "30" [ref=e622]
+                - cell "Low" [ref=e623]
+                - cell "View" [ref=e624]:
+                  - button "View" [ref=e625] [cursor=pointer]
+              - row "PRD-9055 Filter Element 28 50 Low View" [ref=e626]:
+                - cell "PRD-9055" [ref=e627]
+                - cell "Filter Element" [ref=e628]
+                - cell "28" [ref=e629]
+                - cell "50" [ref=e630]
+                - cell "Low" [ref=e631]
+                - cell "View" [ref=e632]:
+                  - button "View" [ref=e633] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e318] [cursor=pointer]:
+    - img [ref=e319]
+  - alert [ref=e375]

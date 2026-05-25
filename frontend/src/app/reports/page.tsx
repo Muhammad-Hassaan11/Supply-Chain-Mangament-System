@@ -2,9 +2,9 @@
 
 import React from "react";
 import { api } from "@/lib/api";
-import { getStoredAccountType } from "@/lib/api";
 import { ClientReportsPage } from "@/components/client/ClientPortal";
 import { WarehouseReportsPage } from "@/components/warehouse/WarehousePortal";
+import { useStoredAccountState } from "@/lib/useStoredAccountState";
 
 type ReportId =
   | "inventory-health"
@@ -166,7 +166,7 @@ function toCsv(columns: string[], rows: Record<string, unknown>[]) {
 }
 
 export default function ReportsPage() {
-  const [accountType] = React.useState<string | null>(() => getStoredAccountType());
+  const { accountType, isHydrated } = useStoredAccountState();
   const [active, setActive] = React.useState<ReportDef | null>(null);
   const [result, setResult] = React.useState<QueryResult | null>(null);
   const [stats, setStats] = React.useState<DashboardStats | null>(null);
@@ -228,6 +228,10 @@ export default function ReportsPage() {
     link.click();
     URL.revokeObjectURL(url);
   };
+
+  if (!isHydrated) {
+    return <div className="glass-card">Loading reports...</div>;
+  }
 
   if (accountType === "client") {
     return <ClientReportsPage />;

@@ -1,0 +1,317 @@
+- generic [active] [ref=e1]:
+  - complementary [ref=e2]:
+    - generic [ref=e3]:
+      - img [ref=e5]
+      - generic [ref=e8]:
+        - generic [ref=e9]: SCM
+        - generic [ref=e10]: Supply Chain Management
+      - button "Toggle sidebar" [ref=e11] [cursor=pointer]:
+        - img [ref=e12]
+    - navigation [ref=e14]:
+      - link "Dashboard" [ref=e16] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e18]
+        - generic [ref=e23]: Dashboard
+      - link "Reports" [ref=e25] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e27]
+        - generic [ref=e28]: Reports
+      - link "Profile" [ref=e30] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e32]
+        - generic [ref=e35]: Profile
+    - link "Login" [ref=e37] [cursor=pointer]:
+      - /url: /login
+      - img [ref=e38]
+      - generic [ref=e41]: Login
+  - main [ref=e42]:
+    - main [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - heading "Inventory" [level=1] [ref=e46]
+          - paragraph [ref=e47]: Real-time view of all inventory in your assigned warehouse.
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]: DB
+            - text: Connected to SQL Server
+          - generic [ref=e52]:
+            - generic [ref=e53]: WM
+            - strong [ref=e54]: Warehouse Manager
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]: BX
+          - generic [ref=e58]:
+            - generic [ref=e59]: Total SKUs
+            - generic [ref=e60]: 1,245
+            - generic [ref=e61]: Active SKUs
+        - generic [ref=e62]:
+          - generic [ref=e63]: UN
+          - generic [ref=e64]:
+            - generic [ref=e65]: On Hand Units
+            - generic [ref=e66]: 92,500
+            - generic [ref=e67]: Total units
+        - generic [ref=e68]:
+          - generic [ref=e69]: RS
+          - generic [ref=e70]:
+            - generic [ref=e71]: Reserved Units
+            - generic [ref=e72]: 12,840
+            - generic [ref=e73]: Reserved units
+        - generic [ref=e74]:
+          - generic [ref=e75]: OK
+          - generic [ref=e76]:
+            - generic [ref=e77]: Available Units
+            - generic [ref=e78]: 79,660
+            - generic [ref=e79]: Ready to ship
+        - generic [ref=e80]:
+          - generic [ref=e81]: $
+          - generic [ref=e82]:
+            - generic [ref=e83]: Inventory Value
+            - generic [ref=e84]: $2.48M
+            - generic [ref=e85]: Total inventory value
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - generic [ref=e88]: Search
+          - textbox "Search" [ref=e89]:
+            - /placeholder: Search SKU, shipment, supplier...
+        - generic [ref=e90]:
+          - generic [ref=e91]: Category
+          - combobox "Category" [ref=e92]:
+            - option "All Categories" [selected]
+            - option "Industrial"
+            - option "Electrical"
+            - option "Hydraulics"
+            - option "Material Handling"
+            - option "Power Transmission"
+            - option "Mechanical"
+            - option "Pneumatics"
+            - option "Filters"
+        - generic [ref=e93]:
+          - generic [ref=e94]: Status
+          - combobox "Status" [ref=e95]:
+            - option "All Statuses" [selected]
+            - option "In Stock"
+            - option "Low Stock"
+            - option "Critical"
+        - generic [ref=e96]:
+          - generic [ref=e97]: Aisle / Dock
+          - combobox "Aisle / Dock" [ref=e98]:
+            - option "All Locations" [selected]
+            - option "A01 / B05"
+            - option "A02 / C12"
+            - option "B01 / A03"
+            - option "B02 / D07"
+            - option "A03 / B11"
+            - option "C02 / D09"
+            - option "B03 / A08"
+            - option "C03 / F01"
+        - button "Reset Filters" [ref=e99] [cursor=pointer]
+        - button "Export" [ref=e100] [cursor=pointer]
+      - generic [ref=e101]:
+        - heading "Inventory (8)" [level=2] [ref=e103]
+        - table [ref=e105]:
+          - rowgroup [ref=e106]:
+            - row "SKU Item Category Aisle / Bin On Hand Reserved Available Status Actions" [ref=e107]:
+              - columnheader "SKU" [ref=e108]
+              - columnheader "Item" [ref=e109]
+              - columnheader "Category" [ref=e110]
+              - columnheader "Aisle / Bin" [ref=e111]
+              - columnheader "On Hand" [ref=e112]
+              - columnheader "Reserved" [ref=e113]
+              - columnheader "Available" [ref=e114]
+              - columnheader "Status" [ref=e115]
+              - columnheader "Actions" [ref=e116]
+          - rowgroup [ref=e117]:
+            - row "PRD-1010 Industrial Bearings 6205 Industrial A01 / B05 1,250 200 1,050 In Stock View" [ref=e118]:
+              - cell "PRD-1010" [ref=e119]
+              - cell "Industrial Bearings 6205" [ref=e120]
+              - cell "Industrial" [ref=e121]
+              - cell "A01 / B05" [ref=e122]
+              - cell "1,250" [ref=e123]
+              - cell "200" [ref=e124]
+              - cell "1,050" [ref=e125]
+              - cell "In Stock" [ref=e126]:
+                - generic [ref=e127]: In Stock
+              - cell "View" [ref=e128]:
+                - button "View" [ref=e129] [cursor=pointer]
+            - row "PRD-2048 Electric Motor 3HP Electrical A02 / C12 320 40 280 In Stock View" [ref=e130]:
+              - cell "PRD-2048" [ref=e131]
+              - cell "Electric Motor 3HP" [ref=e132]
+              - cell "Electrical" [ref=e133]
+              - cell "A02 / C12" [ref=e134]
+              - cell "320" [ref=e135]
+              - cell "40" [ref=e136]
+              - cell "280" [ref=e137]
+              - cell "In Stock" [ref=e138]:
+                - generic [ref=e139]: In Stock
+              - cell "View" [ref=e140]:
+                - button "View" [ref=e141] [cursor=pointer]
+            - row "PRD-3012 Hydraulic Pump 10GPM Hydraulics B01 / A03 185 35 150 In Stock View" [ref=e142]:
+              - cell "PRD-3012" [ref=e143]
+              - cell "Hydraulic Pump 10GPM" [ref=e144]
+              - cell "Hydraulics" [ref=e145]
+              - cell "B01 / A03" [ref=e146]
+              - cell "185" [ref=e147]
+              - cell "35" [ref=e148]
+              - cell "150" [ref=e149]
+              - cell "In Stock" [ref=e150]:
+                - generic [ref=e151]: In Stock
+              - cell "View" [ref=e152]:
+                - button "View" [ref=e153] [cursor=pointer]
+            - row "PRD-4120 Conveyor Belt 2m x 50ft Material Handling B02 / D07 410 20 390 In Stock View" [ref=e154]:
+              - cell "PRD-4120" [ref=e155]
+              - cell "Conveyor Belt 2m x 50ft" [ref=e156]
+              - cell "Material Handling" [ref=e157]
+              - cell "B02 / D07" [ref=e158]
+              - cell "410" [ref=e159]
+              - cell "20" [ref=e160]
+              - cell "390" [ref=e161]
+              - cell "In Stock" [ref=e162]:
+                - generic [ref=e163]: In Stock
+              - cell "View" [ref=e164]:
+                - button "View" [ref=e165] [cursor=pointer]
+            - row "PRD-6155 V-Belt A-42 Power Transmission A03 / B11 18 0 18 Low Stock View" [ref=e166]:
+              - cell "PRD-6155" [ref=e167]
+              - cell "V-Belt A-42" [ref=e168]
+              - cell "Power Transmission" [ref=e169]
+              - cell "A03 / B11" [ref=e170]
+              - cell "18" [ref=e171]
+              - cell "0" [ref=e172]
+              - cell "18" [ref=e173]
+              - cell "Low Stock" [ref=e174]:
+                - generic [ref=e175]: Low Stock
+              - cell "View" [ref=e176]:
+                - button "View" [ref=e177] [cursor=pointer]
+            - row "PRD-7022 Gearbox 20:1 Mechanical C02 / D09 5 1 4 Critical View" [ref=e178]:
+              - cell "PRD-7022" [ref=e179]
+              - cell "Gearbox 20:1" [ref=e180]
+              - cell "Mechanical" [ref=e181]
+              - cell "C02 / D09" [ref=e182]
+              - cell "5" [ref=e183]
+              - cell "1" [ref=e184]
+              - cell "4" [ref=e185]
+              - cell "Critical" [ref=e186]:
+                - generic [ref=e187]: Critical
+              - cell "View" [ref=e188]:
+                - button "View" [ref=e189] [cursor=pointer]
+            - row "PRD-8120 Solenoid Valve 24V Pneumatics B03 / A08 22 8 14 Low Stock View" [ref=e190]:
+              - cell "PRD-8120" [ref=e191]
+              - cell "Solenoid Valve 24V" [ref=e192]
+              - cell "Pneumatics" [ref=e193]
+              - cell "B03 / A08" [ref=e194]
+              - cell "22" [ref=e195]
+              - cell "8" [ref=e196]
+              - cell "14" [ref=e197]
+              - cell "Low Stock" [ref=e198]:
+                - generic [ref=e199]: Low Stock
+              - cell "View" [ref=e200]:
+                - button "View" [ref=e201] [cursor=pointer]
+            - row "PRD-5055 Filter Element Filters C03 / F01 28 5 23 In Stock View" [ref=e202]:
+              - cell "PRD-5055" [ref=e203]
+              - cell "Filter Element" [ref=e204]
+              - cell "Filters" [ref=e205]
+              - cell "C03 / F01" [ref=e206]
+              - cell "28" [ref=e207]
+              - cell "5" [ref=e208]
+              - cell "23" [ref=e209]
+              - cell "In Stock" [ref=e210]:
+                - generic [ref=e211]: In Stock
+              - cell "View" [ref=e212]:
+                - button "View" [ref=e213] [cursor=pointer]
+      - generic [ref=e214]:
+        - generic [ref=e215]:
+          - heading "Inventory Composition by Category" [level=2] [ref=e217]
+          - generic [ref=e218]:
+            - generic [ref=e219]:
+              - generic [ref=e220]: Industrial
+              - strong [ref=e221]: $842K (33.9%)
+            - generic [ref=e222]:
+              - generic [ref=e223]: Electrical
+              - strong [ref=e224]: $512K (20.6%)
+            - generic [ref=e225]:
+              - generic [ref=e226]: Hydraulics
+              - strong [ref=e227]: $368K (14.8%)
+            - generic [ref=e228]:
+              - generic [ref=e229]: Material Handling
+              - strong [ref=e230]: $296K (11.9%)
+            - generic [ref=e231]:
+              - generic [ref=e232]: MRO
+              - strong [ref=e233]: $212K (8.9%)
+            - generic [ref=e234]:
+              - generic [ref=e235]: Other
+              - strong [ref=e236]: $248K (10%)
+        - generic [ref=e237]:
+          - generic [ref=e238]:
+            - heading "Top Fast-Moving Items" [level=2] [ref=e239]
+            - button "View all" [ref=e240] [cursor=pointer]
+          - table [ref=e242]:
+            - rowgroup [ref=e243]:
+              - row "SKU Item Units Sold Status Actions" [ref=e244]:
+                - columnheader "SKU" [ref=e245]
+                - columnheader "Item" [ref=e246]
+                - columnheader "Units Sold" [ref=e247]
+                - columnheader "Status" [ref=e248]
+                - columnheader "Actions" [ref=e249]
+            - rowgroup [ref=e250]:
+              - row "PRD-1010 Industrial Bearings 6205 1320 In Stock View" [ref=e251]:
+                - cell "PRD-1010" [ref=e252]
+                - cell "Industrial Bearings 6205" [ref=e253]
+                - cell "1320" [ref=e254]
+                - cell "In Stock" [ref=e255]:
+                  - generic [ref=e256]: In Stock
+                - cell "View" [ref=e257]:
+                  - button "View" [ref=e258] [cursor=pointer]
+              - row "PRD-2048 Electric Motor 3HP 1180 In Stock View" [ref=e259]:
+                - cell "PRD-2048" [ref=e260]
+                - cell "Electric Motor 3HP" [ref=e261]
+                - cell "1180" [ref=e262]
+                - cell "In Stock" [ref=e263]:
+                  - generic [ref=e264]: In Stock
+                - cell "View" [ref=e265]:
+                  - button "View" [ref=e266] [cursor=pointer]
+              - row "PRD-3012 Hydraulic Pump 10GPM 1040 In Stock View" [ref=e267]:
+                - cell "PRD-3012" [ref=e268]
+                - cell "Hydraulic Pump 10GPM" [ref=e269]
+                - cell "1040" [ref=e270]
+                - cell "In Stock" [ref=e271]:
+                  - generic [ref=e272]: In Stock
+                - cell "View" [ref=e273]:
+                  - button "View" [ref=e274] [cursor=pointer]
+              - row "PRD-4120 Conveyor Belt 2m x 50ft 900 In Stock View" [ref=e275]:
+                - cell "PRD-4120" [ref=e276]
+                - cell "Conveyor Belt 2m x 50ft" [ref=e277]
+                - cell "900" [ref=e278]
+                - cell "In Stock" [ref=e279]:
+                  - generic [ref=e280]: In Stock
+                - cell "View" [ref=e281]:
+                  - button "View" [ref=e282] [cursor=pointer]
+              - row "PRD-6155 V-Belt A-42 760 In Stock View" [ref=e283]:
+                - cell "PRD-6155" [ref=e284]
+                - cell "V-Belt A-42" [ref=e285]
+                - cell "760" [ref=e286]
+                - cell "In Stock" [ref=e287]:
+                  - generic [ref=e288]: In Stock
+                - cell "View" [ref=e289]:
+                  - button "View" [ref=e290] [cursor=pointer]
+        - generic [ref=e291]:
+          - heading "Stock Summary by Zone" [level=2] [ref=e293]
+          - generic [ref=e294]:
+            - generic [ref=e295]:
+              - generic [ref=e296]: Zone A
+              - strong [ref=e297]: 28,450 units
+            - generic [ref=e298]:
+              - generic [ref=e299]: Zone B
+              - strong [ref=e300]: 24,180 units
+            - generic [ref=e301]:
+              - generic [ref=e302]: Zone C
+              - strong [ref=e303]: 18,920 units
+            - generic [ref=e304]:
+              - generic [ref=e305]: Zone D
+              - strong [ref=e306]: 12,950 units
+            - generic [ref=e307]:
+              - generic [ref=e308]: Zone E
+              - strong [ref=e309]: 8,000 units
+            - generic [ref=e310]:
+              - generic [ref=e311]: Total
+              - strong [ref=e312]: 92,500 units
+  - button "Open Next.js Dev Tools" [ref=e318] [cursor=pointer]:
+    - img [ref=e319]

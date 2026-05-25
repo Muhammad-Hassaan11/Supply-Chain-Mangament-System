@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { api, getStoredAccountType } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { ClientSuppliersPage } from "@/components/client/ClientPortal";
+import { useStoredAccountState } from "@/lib/useStoredAccountState";
 
 interface Supplier {
   supplier_id: number;
@@ -45,7 +46,7 @@ function buildStars(rating: number) {
 
 export default function SuppliersPage() {
   const { isAdmin } = useAuth();
-  const [accountType] = useState<string | null>(() => getStoredAccountType());
+  const { accountType, isHydrated } = useStoredAccountState();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,6 +123,10 @@ export default function SuppliersPage() {
 
     return matchesSearch && matchesStatus;
   });
+
+  if (!isHydrated) {
+    return <div className="glass-card">Loading suppliers...</div>;
+  }
 
   const averageRating = decoratedSuppliers.length
     ? (decoratedSuppliers.reduce((sum, item) => sum + item.rating, 0) / decoratedSuppliers.length).toFixed(1)

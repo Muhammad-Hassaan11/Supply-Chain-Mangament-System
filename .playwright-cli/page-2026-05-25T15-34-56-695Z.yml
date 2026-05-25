@@ -1,0 +1,210 @@
+- generic [ref=e1]:
+  - generic [ref=e114] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e115]:
+      - img [ref=e116]
+    - generic [ref=e119]:
+      - button "Open issues overlay" [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e122]: "0"
+          - generic [ref=e123]: "1"
+        - generic [ref=e124]: Issue
+      - button "Collapse issues badge" [ref=e125]:
+        - img [ref=e126]
+  - complementary [ref=e128]:
+    - generic [ref=e129]:
+      - img [ref=e131]
+      - generic [ref=e134]:
+        - generic [ref=e135]: SCM
+        - generic [ref=e136]: Supply Chain Management
+      - button "Toggle sidebar" [ref=e137] [cursor=pointer]:
+        - img [ref=e138]
+    - navigation [ref=e140]:
+      - link "Dashboard" [ref=e142] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e144]
+        - generic [ref=e149]: Dashboard
+      - link "My Warehouse" [ref=e151] [cursor=pointer]:
+        - /url: /warehouses
+        - img [ref=e153]
+        - generic [ref=e156]: My Warehouse
+      - link "Inventory" [ref=e158] [cursor=pointer]:
+        - /url: /inventory
+        - img [ref=e160]
+        - generic [ref=e164]: Inventory
+      - link "Incoming Shipments" [ref=e166] [cursor=pointer]:
+        - /url: /incoming-shipments
+        - img [ref=e168]
+        - generic [ref=e173]: Incoming Shipments
+      - link "Outgoing Shipments" [ref=e175] [cursor=pointer]:
+        - /url: /outgoing-shipments
+        - img [ref=e177]
+        - generic [ref=e182]: Outgoing Shipments
+      - link "Low Stock Alerts" [ref=e184] [cursor=pointer]:
+        - /url: /low-stock-alerts
+        - img [ref=e186]
+        - generic [ref=e190]: Low Stock Alerts
+      - link "Reports" [ref=e192] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e194]
+        - generic [ref=e195]: Reports
+      - link "Profile" [ref=e198] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e200]
+        - generic [ref=e203]: Profile
+    - generic [ref=e205]:
+      - generic [ref=e206]:
+        - generic [ref=e207]: W
+        - generic [ref=e208]:
+          - generic [ref=e209]: warehouse@example.com
+          - generic [ref=e210]: Warehouse Manager
+      - button "Logout" [ref=e211] [cursor=pointer]:
+        - img [ref=e212]
+        - generic [ref=e215]: Logout
+  - main [ref=e216]:
+    - main [ref=e217]:
+      - generic [ref=e218]:
+        - generic [ref=e219]:
+          - heading "Reports" [level=1] [ref=e220]
+          - paragraph [ref=e221]: Warehouse performance insights and operational reports for Central Distribution Center.
+        - generic [ref=e222]:
+          - generic [ref=e223]:
+            - generic [ref=e224]: DB
+            - text: Connected to SQL Server
+          - generic [ref=e226]:
+            - generic [ref=e227]: WM
+            - strong [ref=e228]: Warehouse Manager
+      - generic [ref=e362]: Inventory Health generated for May 18, 2025 - May 24, 2025.
+      - generic [ref=e229]:
+        - generic [ref=e230]:
+          - generic [ref=e231]: AC
+          - generic [ref=e232]:
+            - generic [ref=e233]: Inventory Accuracy
+            - generic [ref=e234]: 98.6%
+            - generic [ref=e235]: vs target 98%
+        - generic [ref=e236]:
+          - generic [ref=e237]: FR
+          - generic [ref=e238]:
+            - generic [ref=e239]: Fill Rate
+            - generic [ref=e240]: 96.3%
+            - generic [ref=e241]: vs target 95%
+        - generic [ref=e242]:
+          - generic [ref=e243]: DK
+          - generic [ref=e244]:
+            - generic [ref=e245]: Dock Utilization
+            - generic [ref=e246]: 72%
+            - generic [ref=e247]: vs target 70%
+        - generic [ref=e248]:
+          - generic [ref=e249]: TM
+          - generic [ref=e250]:
+            - generic [ref=e251]: Order Turnaround
+            - generic [ref=e252]: 15.2 hrs
+            - generic [ref=e253]: vs target 18 hrs
+      - generic [ref=e254]:
+        - generic [ref=e255]:
+          - generic [ref=e256]: Date Range
+          - combobox "Date Range" [ref=e257]:
+            - option "May 18, 2025 - May 24, 2025" [selected]
+            - option "May 11, 2025 - May 17, 2025"
+            - option "May 4, 2025 - May 10, 2025"
+        - generic [ref=e258]:
+          - generic [ref=e259]: Report Type
+          - combobox "Report Type" [ref=e260]:
+            - option "Operational" [selected]
+            - option "Inventory"
+            - option "Dispatch"
+            - option "Receiving"
+        - button "Generate Report" [ref=e261] [cursor=pointer]
+      - generic [ref=e262]:
+        - generic [ref=e263]:
+          - generic [ref=e264]:
+            - heading "Inventory Health" [level=2] [ref=e265]
+            - button "View Report" [ref=e266] [cursor=pointer]
+          - paragraph [ref=e267]: Operational report snapshot for operational metrics.
+        - generic [ref=e268]:
+          - generic [ref=e269]:
+            - heading "Receiving Performance" [level=2] [ref=e270]
+            - button "View Report" [ref=e271] [cursor=pointer]
+          - paragraph [ref=e272]: Operational report snapshot for operational metrics.
+        - generic [ref=e273]:
+          - generic [ref=e274]:
+            - heading "Dispatch Performance" [level=2] [ref=e275]
+            - button "View Report" [ref=e276] [cursor=pointer]
+          - paragraph [ref=e277]: Operational report snapshot for operational metrics.
+        - generic [ref=e278]:
+          - generic [ref=e279]:
+            - heading "Warehouse Utilization" [level=2] [ref=e280]
+            - button "View Report" [ref=e281] [cursor=pointer]
+          - paragraph [ref=e282]: Operational report snapshot for operational metrics.
+        - generic [ref=e283]:
+          - generic [ref=e284]:
+            - heading "Low Stock Trends" [level=2] [ref=e285]
+            - button "View Report" [ref=e286] [cursor=pointer]
+          - paragraph [ref=e287]: Operational report snapshot for operational metrics.
+        - generic [ref=e288]:
+          - generic [ref=e289]:
+            - heading "Cycle Count Summary" [level=2] [ref=e290]
+            - button "View Report" [ref=e291] [cursor=pointer]
+          - paragraph [ref=e292]: Operational report snapshot for operational metrics.
+      - generic [ref=e293]:
+        - heading "Recent Generated Reports" [level=2] [ref=e295]
+        - table [ref=e297]:
+          - rowgroup [ref=e298]:
+            - row "Report Name Report Type Date Range Generated On Format Actions" [ref=e299]:
+              - columnheader "Report Name" [ref=e300]
+              - columnheader "Report Type" [ref=e301]
+              - columnheader "Date Range" [ref=e302]
+              - columnheader "Generated On" [ref=e303]
+              - columnheader "Format" [ref=e304]
+              - columnheader "Actions" [ref=e305]
+          - rowgroup [ref=e306]:
+            - row "Inventory Health Report Operational May 18 - May 24 May 24, 2025 PDF View" [ref=e307]:
+              - cell "Inventory Health Report" [ref=e308]
+              - cell "Operational" [ref=e309]
+              - cell "May 18 - May 24" [ref=e310]
+              - cell "May 24, 2025" [ref=e311]
+              - cell "PDF" [ref=e312]
+              - cell "View" [ref=e313]:
+                - button "View" [ref=e314] [cursor=pointer]
+            - row "Dispatch Performance Report Operational May 11 - May 17 May 17, 2025 PDF View" [ref=e315]:
+              - cell "Dispatch Performance Report" [ref=e316]
+              - cell "Operational" [ref=e317]
+              - cell "May 11 - May 17" [ref=e318]
+              - cell "May 17, 2025" [ref=e319]
+              - cell "PDF" [ref=e320]
+              - cell "View" [ref=e321]:
+                - button "View" [ref=e322] [cursor=pointer]
+            - row "Receiving Performance Report Operational May 4 - May 10 May 10, 2025 Excel View" [ref=e323]:
+              - cell "Receiving Performance Report" [ref=e324]
+              - cell "Operational" [ref=e325]
+              - cell "May 4 - May 10" [ref=e326]
+              - cell "May 10, 2025" [ref=e327]
+              - cell "Excel" [ref=e328]
+              - cell "View" [ref=e329]:
+                - button "View" [ref=e330] [cursor=pointer]
+      - generic [ref=e333]:
+        - generic [ref=e334]:
+          - heading "Inventory Health" [level=2] [ref=e335]
+          - button "Close modal" [ref=e336] [cursor=pointer]:
+            - img [ref=e337]
+        - generic [ref=e340]:
+          - generic [ref=e341]:
+            - generic [ref=e342]:
+              - generic [ref=e343]: Report
+              - strong [ref=e344]: Inventory Health
+            - generic [ref=e345]:
+              - generic [ref=e346]: Type
+              - strong [ref=e347]: Operational
+            - generic [ref=e348]:
+              - generic [ref=e349]: Date Range
+              - strong [ref=e350]: May 18, 2025 - May 24, 2025
+            - generic [ref=e351]:
+              - generic [ref=e352]: Warehouse
+              - strong [ref=e353]: Central Distribution Center
+            - generic [ref=e354]:
+              - generic [ref=e355]: Status
+              - strong [ref=e356]: Ready to export
+            - generic [ref=e357]:
+              - generic [ref=e358]: Action
+              - strong [ref=e359]: Use Generate Report to download
+          - button "Download This Report" [active] [ref=e361] [cursor=pointer]
+  - alert [ref=e331]

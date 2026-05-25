@@ -1,0 +1,30 @@
+- generic [active] [ref=e1]:
+  - complementary [ref=e2]:
+    - generic [ref=e3]:
+      - img [ref=e5]
+      - generic [ref=e8]:
+        - generic [ref=e9]: SCM
+        - generic [ref=e10]: Supply Chain Management
+      - button "Toggle sidebar" [ref=e11] [cursor=pointer]:
+        - img [ref=e12]
+    - navigation [ref=e14]:
+      - link "Dashboard" [ref=e16] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e18]
+        - generic [ref=e23]: Dashboard
+      - link "Reports" [ref=e25] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e27]
+        - generic [ref=e28]: Reports
+      - link "Profile" [ref=e31] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e33]
+        - generic [ref=e36]: Profile
+    - link "Login" [ref=e38] [cursor=pointer]:
+      - /url: /login
+      - img [ref=e39]
+      - generic [ref=e42]: Login
+  - main [ref=e43]:
+    - generic [ref=e44]: Loading reports...
+  - button "Open Next.js Dev Tools" [ref=e50] [cursor=pointer]:
+    - img [ref=e51]

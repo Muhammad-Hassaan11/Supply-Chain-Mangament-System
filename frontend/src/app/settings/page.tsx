@@ -3,10 +3,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { ClientProfilePage } from "@/components/client/ClientPortal";
 import { WarehouseProfilePage } from "@/components/warehouse/WarehousePortal";
+import { useStoredAccountState } from "@/lib/useStoredAccountState";
 
 type ThemeMode = "Light" | "Dark" | "System";
 type SessionTimeout = "15 minutes" | "30 minutes" | "1 hour" | "4 hours";
@@ -74,8 +75,7 @@ function applyVisualSettings(primaryColor: string, accentColor: string, themeMod
 
 export default function SettingsPage() {
   const { user, isAdmin } = useAuth();
-  const [accountType] = useState<string | null>(() => getStoredAccountType());
-  const [accountName] = useState<string | null>(() => getStoredAccountName());
+  const { accountType, accountName, isHydrated } = useStoredAccountState();
 
   const [fullName, setFullName] = useState<string>("");
   const [supportEmail, setSupportEmail] = useState<string>("support@supplychain.com");
@@ -389,6 +389,10 @@ export default function SettingsPage() {
     ],
     [roleCounts]
   );
+
+  if (!isHydrated) {
+    return <div className="glass-card">Loading settings...</div>;
+  }
 
   if (accountType === "client") {
     return <ClientProfilePage accountName={accountName} userEmail={user?.email} />;

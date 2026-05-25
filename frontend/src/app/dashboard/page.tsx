@@ -2,10 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { ClientDashboardPage } from "@/components/client/ClientPortal";
 import { WarehouseDashboardPage } from "@/components/warehouse/WarehousePortal";
+import { useStoredAccountState } from "@/lib/useStoredAccountState";
 
 interface LowStockAlert {
   warehouse_name: string;
@@ -692,11 +693,10 @@ function LogisticsDashboard({ data }: { data: DashboardData }) {
 
 export default function Dashboard() {
   const { isAdmin } = useAuth();
+  const { accountType, accountName, isHydrated } = useStoredAccountState();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [accountType] = useState<string | null>(() => getStoredAccountType());
-  const [accountName] = useState<string | null>(() => getStoredAccountName());
 
   useEffect(() => {
     async function load() {
@@ -721,6 +721,10 @@ export default function Dashboard() {
 
   if (error || !data) {
     return <div className="glass-card" style={{ color: "var(--color-danger)" }}>{error || "Unable to load dashboard."}</div>;
+  }
+
+  if (!isHydrated) {
+    return <div className="glass-card">Loading dashboard...</div>;
   }
 
   if (isAdmin) {
