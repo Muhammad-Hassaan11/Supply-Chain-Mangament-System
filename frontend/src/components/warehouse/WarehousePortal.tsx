@@ -368,7 +368,7 @@ export function WarehouseDashboardPage() {
   );
 }
 
-export function WarehouseFacilityPage() {
+export function LegacyWarehouseFacilityPage() {
   const router = useRouter();
   return (
     <main className={styles.page}>
@@ -389,6 +389,261 @@ export function WarehouseFacilityPage() {
         <Card title="Facility Details"><Summary rows={[["Temperature Range", "15°C - 25°C"], ["Forklifts", "18"], ["Racks / Positions", "1,450"], ["Utilization", "68%"], ["Operational Status", "Operational"], ["Inbound Accuracy", "99.4%"]]} /></Card>
         <Card title="Recent Operational Activity" action={<button className={styles.linkBtn} onClick={() => router.push("/incoming-shipments")}>View all</button>}><Activity /></Card>
       </div>
+    </main>
+  );
+}
+
+export function WarehouseFacilityPage() {
+  const warehouses = [
+    { id: 1, name: "Northside Warehouse", city: "New York, NY", capacity: 2500, productId: 101, manager: "John Anderson", status: "Active" },
+    { id: 2, name: "West Coast Hub", city: "Los Angeles, CA", capacity: 3200, productId: 105, manager: "Sarah Johnson", status: "Active" },
+    { id: 3, name: "Central Distribution", city: "Dallas, TX", capacity: 2000, productId: 102, manager: "Michael Brown", status: "Active" },
+    { id: 4, name: "Southeast Warehouse", city: "Atlanta, GA", capacity: 1800, productId: 103, manager: "Emily Davis", status: "Active" },
+    { id: 5, name: "Midwest Depot", city: "Chicago, IL", capacity: 2350, productId: 104, manager: "David Wilson", status: "Maintenance" },
+  ];
+  const utilization = [
+    { name: "West Coast Hub", value: 91 },
+    { name: "Northside Warehouse", value: 82 },
+    { name: "Central Distribution", value: 75 },
+    { name: "Midwest Depot", value: 63 },
+    { name: "Southeast Warehouse", value: 58 },
+    { name: "Gulf Coast Warehouse", value: 45 },
+  ];
+  const [selectedWarehouseId, setSelectedWarehouseId] = React.useState(1);
+  const [notice, setNotice] = React.useState("");
+  const [form, setForm] = React.useState({
+    warehouse_id: "6",
+    warehouse_name: "Gulf Coast Warehouse",
+    capacity: "2000",
+    product_id: "106 - Appliance Set",
+    city: "Houston, TX",
+    notes: "Near port for efficient imports.",
+  });
+
+  const selectedWarehouse = warehouses.find((warehouse) => warehouse.id === selectedWarehouseId) || warehouses[0];
+  const totalCapacity = warehouses.reduce((sum, warehouse) => sum + warehouse.capacity, 0);
+
+  const updateForm = (key: keyof typeof form, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const fillFromWarehouse = (warehouseId: number) => {
+    const warehouse = warehouses.find((item) => item.id === warehouseId);
+    if (!warehouse) return;
+    setSelectedWarehouseId(warehouseId);
+    setForm({
+      warehouse_id: String(warehouse.id),
+      warehouse_name: warehouse.name,
+      capacity: String(warehouse.capacity),
+      product_id: `${warehouse.productId} - Linked Product`,
+      city: warehouse.city,
+      notes: `${warehouse.manager} currently manages this site.`,
+    });
+    setNotice(`${warehouse.name} loaded into the form.`);
+  };
+
+  return (
+    <main className={styles.page}>
+      <section className={styles.warehouseTopbar}>
+        <div className={styles.searchShell}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input className={styles.searchInput} placeholder="Search across suppliers, products, warehouses..." />
+          <span className={styles.shortcutKey}>Ctrl /</span>
+        </div>
+        <div className={styles.topbarActions}>
+          <button type="button" className={styles.topbarIcon} aria-label="Notifications">3</button>
+          <button type="button" className={styles.topbarIcon} aria-label="Help">?</button>
+          <div className={styles.profileChip}>
+            <span className={styles.profileAvatar}>AU</span>
+            <div>
+              <strong>Admin User</strong>
+              <span>Administrator</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.warehouseHero}>
+        <div className={styles.heroCopy}>
+          <div>
+            <h1 className={styles.heroTitle}>Warehouses <span>Management</span></h1>
+            <p className={styles.heroText}>
+              Track and manage warehouse locations and capacity data through structured forms connected to SQL Server.
+            </p>
+          </div>
+          <button className={styles.heroButton} type="button" onClick={() => setNotice("Warehouse form is ready for a new entry.")}>
+            <span>+</span>
+            Add Warehouse
+          </button>
+        </div>
+        <div className={styles.heroVisual}>
+          <div className={styles.visualGround} />
+          <div className={styles.visualWarehouse}>
+            <div className={styles.visualRoof} />
+            <div className={styles.visualBody}>
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+          <div className={styles.visualChart}>
+            <div />
+            <div />
+            <div />
+            <div />
+          </div>
+          <div className={styles.visualBoxes}>
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      </section>
+
+      {notice ? <div className={styles.notice}>{notice}</div> : null}
+
+      <section className={styles.statsGrid}>
+        <article className={styles.statCard}>
+          <div className={styles.statIcon}>⌂</div>
+          <div><p>Total Warehouses</p><strong>{warehouses.length + 3}</strong><span>Warehouses</span></div>
+        </article>
+        <article className={styles.statCard}>
+          <div className={styles.statIcon}>▤</div>
+          <div><p>Total Capacity</p><strong>{totalCapacity.toLocaleString()}</strong><span>Units</span></div>
+        </article>
+        <article className={styles.statCard}>
+          <div className={styles.statIcon}>◔</div>
+          <div><p>Utilization Rate</p><strong>72%</strong><span>Average</span></div>
+        </article>
+        <article className={styles.statCard}>
+          <div className={styles.statIcon}>◫</div>
+          <div><p>Linked Products</p><strong>25</strong><span>Products</span></div>
+        </article>
+      </section>
+
+      <section className={styles.managementCard}>
+        <div className={styles.tableWrap}>
+          <table className={styles.managementTable}>
+            <thead>
+              <tr>
+                <th>warehouse_id</th>
+                <th>warehouse_name</th>
+                <th>city/location</th>
+                <th>capacity</th>
+                <th>linked_product_id</th>
+                <th>manager</th>
+                <th>status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {warehouses.map((warehouse) => (
+                <tr key={warehouse.id}>
+                  <td className={styles.idCell}>{warehouse.id}</td>
+                  <td>{warehouse.name}</td>
+                  <td>{warehouse.city}</td>
+                  <td>{warehouse.capacity.toLocaleString()}</td>
+                  <td>{warehouse.productId}</td>
+                  <td>{warehouse.manager}</td>
+                  <td>
+                    <span className={`${styles.statusPill} ${warehouse.status === "Maintenance" ? styles.statusWarn : styles.statusActive}`}>
+                      {warehouse.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className={styles.rowActions}>
+                      <button type="button" className={styles.rowAction} onClick={() => setNotice(`Viewing ${warehouse.name}.`)}>◉</button>
+                      <button type="button" className={styles.rowAction} onClick={() => fillFromWarehouse(warehouse.id)}>✎</button>
+                      <button type="button" className={`${styles.rowAction} ${styles.rowDelete}`} onClick={() => setNotice(`${warehouse.name} queued for deletion review.`)}>🗑</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className={styles.tableFooter}>
+            <span>Showing 1 to 5 of 8 entries</span>
+            <div className={styles.pagination}>
+              <button type="button">‹</button>
+              <button type="button" className={styles.pageActive}>1</button>
+              <button type="button">2</button>
+              <button type="button">›</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.bottomGrid}>
+        <div className={styles.managementCard}>
+          <div className={styles.sectionHeader}><h2>Warehouse Form</h2></div>
+          <div className={styles.formGrid}>
+            <label className={styles.formField}><span>warehouse_id *</span><input value={form.warehouse_id} onChange={(e) => updateForm("warehouse_id", e.target.value)} /></label>
+            <label className={styles.formField}><span>warehouse_name *</span><input value={form.warehouse_name} onChange={(e) => updateForm("warehouse_name", e.target.value)} /></label>
+            <label className={styles.formField}><span>capacity *</span><input value={form.capacity} onChange={(e) => updateForm("capacity", e.target.value)} /></label>
+            <label className={styles.formField}>
+              <span>product_id *</span>
+              <select value={form.product_id} onChange={(e) => updateForm("product_id", e.target.value)}>
+                <option>101 - Industrial Bearings</option>
+                <option>102 - Hydraulic Pump</option>
+                <option>103 - Conveyor Belt</option>
+                <option>104 - Motor Kit</option>
+                <option>105 - Solenoid Valve</option>
+                <option>106 - Appliance Set</option>
+              </select>
+            </label>
+            <label className={styles.formField}><span>city / location *</span><input value={form.city} onChange={(e) => updateForm("city", e.target.value)} /></label>
+            <label className={styles.formField}><span>notes</span><input value={form.notes} onChange={(e) => updateForm("notes", e.target.value)} /></label>
+          </div>
+          <div className={styles.formActions}>
+            <button className={styles.heroButton} type="button" onClick={() => setNotice(`${form.warehouse_name} saved locally for demo flow.`)}>
+              <span>Save</span>
+              Warehouse
+            </button>
+            <button
+              className={styles.resetButton}
+              type="button"
+              onClick={() => {
+                setForm({
+                  warehouse_id: String(selectedWarehouse.id),
+                  warehouse_name: selectedWarehouse.name,
+                  capacity: String(selectedWarehouse.capacity),
+                  product_id: `${selectedWarehouse.productId} - Linked Product`,
+                  city: selectedWarehouse.city,
+                  notes: `${selectedWarehouse.manager} currently manages this site.`,
+                });
+                setNotice("Form reset to selected warehouse.");
+              }}
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.managementCard}>
+          <div className={styles.sectionHeader}><h2>Warehouse Utilization</h2></div>
+          <div className={styles.utilizationList}>
+            {utilization.map((item) => (
+              <div key={item.name} className={styles.utilizationRow}>
+                <div className={styles.utilizationHead}>
+                  <span>{item.name}</span>
+                  <strong>{item.value}%</strong>
+                </div>
+                <div className={styles.utilizationTrack}>
+                  <div className={`${styles.utilizationFill} ${item.value < 70 ? styles.utilizationMedium : ""}`} style={{ width: `${item.value}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className={styles.legend}>
+            <span><i className={styles.legendHigh} /> High (&ge; 70%)</span>
+            <span><i className={styles.legendMedium} /> Medium (40% - 69%)</span>
+            <span><i className={styles.legendLow} /> Low (&lt; 40%)</span>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
