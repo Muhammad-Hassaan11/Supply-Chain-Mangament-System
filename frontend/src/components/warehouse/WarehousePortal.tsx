@@ -209,7 +209,7 @@ function Table({ headers, rows, detailsTitle = "Row Details" }: { headers: strin
           </tbody>
         </table>
       </div>
-      <Modal open={Boolean(selected)} onClose={() => setSelected(null)} title={detailsTitle}>
+      <Modal isOpen={Boolean(selected)} onClose={() => setSelected(null)} title={detailsTitle}>
         <div className={styles.summaryList}>
           {selected?.map((value, index) => (
             <div className={styles.summaryRow} key={`${headers[index]}-${value}`}>
@@ -436,7 +436,7 @@ export function WarehouseInventoryPage() {
         <Card title="Top Fast-Moving Items" action={<button className={styles.linkBtn} onClick={() => setOpenFastMoving(true)}>View all</button>}><Table headers={["SKU", "Item", "Units Sold", "Status"]} rows={inventoryRows.slice(0, 5).map((row, index) => [row.sku, row.item, String(1320 - index * 140), "In Stock"])} detailsTitle="Fast-Moving Item" /></Card>
         <Card title="Stock Summary by Zone"><Summary rows={[["Zone A", "28,450 units"], ["Zone B", "24,180 units"], ["Zone C", "18,920 units"], ["Zone D", "12,950 units"], ["Zone E", "8,000 units"], ["Total", "92,500 units"]]} /></Card>
       </div>
-      <Modal open={openFastMoving} onClose={() => setOpenFastMoving(false)} title="Top Fast-Moving Items">
+      <Modal isOpen={openFastMoving} onClose={() => setOpenFastMoving(false)} title="Top Fast-Moving Items">
         <Table headers={["SKU", "Item", "Units Sold", "Status"]} rows={inventoryRows.map((row, index) => [row.sku, row.item, String(1320 - index * 110), row.status])} detailsTitle="Fast-Moving Item" />
       </Modal>
     </main>
@@ -488,7 +488,7 @@ export function WarehouseIncomingPage() {
         <Card title="Dock Assignments"><Summary rows={[["Total Docks", "16"], ["In Use", "7"], ["Available", "7"], ["Unassigned", "2"], ["Peak Slot", "1:00 PM"], ["Team Lead", "Alicia Brown"]]} /></Card>
         <Card title="Recent Receiving Activity" action={<button className={styles.linkBtn} onClick={() => setShowActivity(true)}>View all activity</button>}><Activity /></Card>
       </div>
-      <Modal open={showActivity} onClose={() => setShowActivity(false)} title="Receiving Activity">
+      <Modal isOpen={showActivity} onClose={() => setShowActivity(false)} title="Receiving Activity">
         <Activity rows={[...recentActivities, ["PO-12570 checked-in", "08:30 AM"], ["PO-12560 delayed", "08:05 AM"]]} />
       </Modal>
     </main>
@@ -542,7 +542,7 @@ export function WarehouseOutgoingPage() {
         <Card title="Loading Progress"><Summary rows={[["Overall Progress", "68%"], ["Loaded Units", "4,040"], ["Loading Units", "1,744"], ["Pending Units", "2,746"], ["Remaining Units", "1,744"], ["Current Shift", "Day Shift"]]} /></Card>
         <Card title="Recent Outbound Activity" action={<button className={styles.linkBtn} onClick={() => setShowActivity(true)}>View all activity</button>}><Activity /></Card>
       </div>
-      <Modal open={showActivity} onClose={() => setShowActivity(false)} title="Outbound Activity">
+      <Modal isOpen={showActivity} onClose={() => setShowActivity(false)} title="Outbound Activity">
         <Activity rows={[...recentActivities, ["Shipment OUT-2025-0563 scheduled", "08:21 AM"], ["Delay alert updated for OUT-2025-0562", "07:48 AM"]]} />
       </Modal>
     </main>
@@ -588,7 +588,7 @@ export function WarehouseLowStockPage() {
           <Table headers={["SKU", "Item", "On Hand", "Days Rem.", "Est. Value", "Action"]} rows={queueRows} detailsTitle="Replenishment Queue Item" />
         </Card>
       </div>
-      <Modal open={showQueue} onClose={() => setShowQueue(false)} title="Priority Replenishment Queue">
+      <Modal isOpen={showQueue} onClose={() => setShowQueue(false)} title="Priority Replenishment Queue">
         <Table headers={["SKU", "Item", "On Hand", "Days Remaining", "Preferred Supplier", "Severity"]} rows={filteredRows.map((row) => [row.sku, row.item, String(row.onHand), String(row.daysRemaining), row.supplier, row.severity])} detailsTitle="Replenishment Detail" />
       </Modal>
     </main>
@@ -655,7 +655,7 @@ export function WarehouseReportsPage() {
           ["Receiving Performance Report", "Operational", "May 4 - May 10", "May 10, 2025", "Excel"],
         ]} detailsTitle="Generated Report" />
       </Card>
-      <Modal open={Boolean(selectedReport)} onClose={() => setSelectedReport(null)} title={selectedReport || "Report Preview"}>
+      <Modal isOpen={Boolean(selectedReport)} onClose={() => setSelectedReport(null)} title={selectedReport || "Report Preview"}>
         <Summary rows={[["Report", selectedReport || ""], ["Type", reportType], ["Date Range", dateRange], ["Warehouse", "Central Distribution Center"], ["Status", "Ready to export"], ["Action", "Use Generate Report to download"]]} />
         <div style={{ marginTop: 16 }}>
           <button className={styles.primaryBtn} type="button" onClick={() => selectedReport ? generate(selectedReport) : generate()}>Download This Report</button>
@@ -786,10 +786,10 @@ export function WarehouseProfilePage() {
         <Card title="Recent Activity Log" action={<button className={styles.linkBtn} onClick={() => setShowActivity(true)}>View all</button>}><Activity /></Card>
         <Card title="Connected Devices & Sessions" action={<button className={styles.linkBtn} onClick={() => setShowSessions(true)}>View all</button>}><Activity rows={[["Windows • Chrome • Current Session", "8:46 AM"], ["iPhone 14 • Safari", "7:25 AM"], ["Windows • Edge", "9:03 AM"]]} /></Card>
       </div>
-      <Modal open={showActivity} onClose={() => setShowActivity(false)} title="Recent Activity Log">
+      <Modal isOpen={showActivity} onClose={() => setShowActivity(false)} title="Recent Activity Log">
         <Activity rows={[...recentActivities, ["Approved outgoing shipment SO-92331", "09:15 AM"], ["Updated reorder level for PRD-2048", "08:03 AM"], ["Logged in from Chrome on Windows", "07:40 AM"]]} />
       </Modal>
-      <Modal open={showSessions} onClose={() => setShowSessions(false)} title="Connected Devices & Sessions">
+      <Modal isOpen={showSessions} onClose={() => setShowSessions(false)} title="Connected Devices & Sessions">
         <Summary rows={[["Windows • Chrome", "Current Session • Memphis, TN"], ["iPhone 14 • Safari", "May 23, 2025 • IP 192.168.1.78"], ["Windows • Edge", "May 22, 2025 • IP 192.168.1.91"], ["Session Timeout", "4 hours"], ["2FA", "Enabled"], ["Password Updated", "Apr 10, 2025"]]} />
       </Modal>
     </main>
