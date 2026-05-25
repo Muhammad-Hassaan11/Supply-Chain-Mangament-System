@@ -221,3 +221,74 @@ class QueryExecutionResponse(BaseModel):
     columns: List[str]
     rows: List[dict]
     row_count: int
+
+# ==========================================
+# CLIENT PORTAL SCHEMAS
+# ==========================================
+
+class ClientProfileResponse(BaseModel):
+    user_id: int
+    email: EmailStr
+    full_name: str
+    job_title: str
+    phone: str
+    alt_phone: Optional[str] = None
+    emergency_phone: Optional[str] = None
+    location: str
+    timezone: str
+    language: str
+    company_name: str
+    legal_name: str
+    headquarters: str
+    website: str
+    tax_id: str
+    client_id: str
+    client_type: str
+    access_level: str
+    assigned_since: str
+    support_email: EmailStr
+    billing_email: EmailStr
+    profile_image_url: Optional[str] = None
+
+class ClientProfileUpdate(BaseModel):
+    full_name: Optional[str] = None
+    job_title: Optional[str] = None
+    phone: Optional[str] = None
+    alt_phone: Optional[str] = None
+    emergency_phone: Optional[str] = None
+    location: Optional[str] = None
+    timezone: Optional[str] = None
+    language: Optional[str] = None
+    company_name: Optional[str] = None
+    website: Optional[str] = None
+    tax_id: Optional[str] = None
+    support_email: Optional[EmailStr] = None
+    billing_email: Optional[EmailStr] = None
+    profile_image_url: Optional[str] = None
+
+class ClientReportRequest(BaseModel):
+    report_type: str = "Summary Overview"
+    date_range: str = "May 1 – May 25, 2025"
+
+class ClientReportResponse(BaseModel):
+    file_name: str
+    content: str
+    generated_at: str
+
+class ClientPaymentRequest(BaseModel):
+    amount: str
+    invoice_reference: Optional[str] = None
+
+class ClientPaymentResponse(BaseModel):
+    success: bool
+    confirmation_message: str
+    paid_at: str
+
+class ClientSupportRequest(BaseModel):
+    subject: str
+    message: str
+
+class ClientSupportResponse(BaseModel):
+    success: bool
+    ticket_id: str
+    message: str

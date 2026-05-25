@@ -116,6 +116,54 @@ def ensure_user_profile_columns():
             ALTER TABLE Users ADD created_at DATETIME NOT NULL
             CONSTRAINT DF_Users_created_at DEFAULT GETDATE()
         """,
+        """
+        IF COL_LENGTH('Users', 'phone') IS NULL
+            ALTER TABLE Users ADD phone VARCHAR(40) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'alt_phone') IS NULL
+            ALTER TABLE Users ADD alt_phone VARCHAR(40) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'emergency_phone') IS NULL
+            ALTER TABLE Users ADD emergency_phone VARCHAR(40) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'location') IS NULL
+            ALTER TABLE Users ADD location VARCHAR(120) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'timezone') IS NULL
+            ALTER TABLE Users ADD timezone VARCHAR(80) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'language') IS NULL
+            ALTER TABLE Users ADD language VARCHAR(40) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'company_name') IS NULL
+            ALTER TABLE Users ADD company_name VARCHAR(120) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'website') IS NULL
+            ALTER TABLE Users ADD website VARCHAR(160) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'tax_id') IS NULL
+            ALTER TABLE Users ADD tax_id VARCHAR(50) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'support_email') IS NULL
+            ALTER TABLE Users ADD support_email VARCHAR(160) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'billing_email') IS NULL
+            ALTER TABLE Users ADD billing_email VARCHAR(160) NULL
+        """,
+        """
+        IF COL_LENGTH('Users', 'profile_image_url') IS NULL
+            ALTER TABLE Users ADD profile_image_url NVARCHAR(MAX) NULL
+        """,
     ]
 
     for statement in statements:

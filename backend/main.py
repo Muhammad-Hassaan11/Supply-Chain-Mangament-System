@@ -49,7 +49,7 @@ def read_root():
     }
 
 # Dynamic router registrations will go here during US implementation steps
-from routes import analytics, suppliers, products, warehouses, inventory, shipments, queries, auth, users
+from routes import analytics, suppliers, products, warehouses, inventory, shipments, queries, auth, users, client
 app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
 app.include_router(suppliers.router, prefix="/api/suppliers", tags=["Suppliers"])
 app.include_router(products.router, prefix="/api/products", tags=["Products"])
@@ -59,6 +59,7 @@ app.include_router(shipments.router, prefix="/api/shipments", tags=["Shipments"]
 app.include_router(queries.router, prefix="/api/queries", tags=["Query Lab"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users (Admin)"])
+app.include_router(client.router, prefix="/api/client", tags=["Client Portal"])
 
 
 

@@ -1,7 +1,10 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import styles from "./ClientPortal.module.css";
+import Modal from "@/components/Modal";
+import { api } from "@/lib/api";
 
 type DashboardData = {
   total_suppliers: number;
@@ -82,14 +85,14 @@ function Panel({
   children,
 }: {
   title: string;
-  action?: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <section className={styles.panel}>
       <div className={styles.panelHeader}>
         <h2>{title}</h2>
-        {action ? <button className={styles.linkAction} type="button">{action}</button> : null}
+        {action ? action : null}
       </div>
       {children}
     </section>
@@ -159,6 +162,7 @@ function SummaryList({ items }: { items: { label: string; value: string }[] }) {
 }
 
 export function ClientDashboardPage({ data, accountName }: { data: DashboardData; accountName: string | null }) {
+  const router = useRouter();
   return (
     <Shell
       title="Client Dashboard"
@@ -172,7 +176,7 @@ export function ClientDashboardPage({ data, accountName }: { data: DashboardData
       </div>
 
       <div className={styles.twoCol}>
-        <Panel title="My Orders" action="View all orders →">
+        <Panel title="My Orders" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/reports")}>View all orders →</button>}>
           <DataTable
             headers={["Order #", "Supplier", "Order Date", "Status", "Order Value", "ETA / Required Date"]}
             rows={[
@@ -185,7 +189,7 @@ export function ClientDashboardPage({ data, accountName }: { data: DashboardData
           />
         </Panel>
 
-        <Panel title="Shipment Tracking" action="Track all shipments →">
+        <Panel title="Shipment Tracking" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/shipments")}>Track all shipments →</button>}>
           <div className={styles.stackList}>
             {[
               ["SHP-250518-0001", "Global Textiles Inc.", "Los Angeles, USA → New York, USA", "In Transit", "ETA: May 24, 2025"],
@@ -211,7 +215,7 @@ export function ClientDashboardPage({ data, accountName }: { data: DashboardData
       </div>
 
       <div className={styles.threeCol}>
-        <Panel title="Supplier Performance (Top 5)" action="View full report →">
+        <Panel title="Supplier Performance (Top 5)" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/reports")}>View full report →</button>}>
           <DataTable
             headers={["Supplier", "On-Time Delivery", "Quality", "Responsiveness", "Overall"]}
             rows={[
@@ -257,6 +261,36 @@ export function ClientDashboardPage({ data, accountName }: { data: DashboardData
 }
 
 export function ClientReportsPage() {
+  const [reportModalOpen, setReportModalOpen] = React.useState(false);
+  const [generatedReport, setGeneratedReport] = React.useState<{ name: string; createdAt: string } | null>(null);
+  const [reportLoading, setReportLoading] = React.useState(false);
+  const [reportError, setReportError] = React.useState<string | null>(null);
+  const downloadReport = (content: string, fileName: string) => {
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  const generateReport = async () => {
+    try {
+      setReportLoading(true);
+      setReportError(null);
+      const response = await api.post<{ file_name: string; content: string; generated_at: string }>("/api/client/reports/generate", {
+        report_type: "Summary Overview",
+        date_range: "May 1 – May 25, 2025",
+      });
+      setGeneratedReport({ name: response.file_name, createdAt: response.generated_at });
+      setReportModalOpen(true);
+      downloadReport(response.content, response.file_name);
+    } catch (error: unknown) {
+      setReportError(error instanceof Error ? error.message : "Failed to generate report.");
+    } finally {
+      setReportLoading(false);
+    }
+  };
   return (
     <Shell title="Reports" subtitle="Gain insights into your procurement and supply chain performance.">
       <div className={styles.metricsGrid}>
@@ -273,7 +307,7 @@ export function ClientReportsPage() {
         </div>
         <div className={styles.filterInput}>May 1 – May 25, 2025</div>
         <div className={styles.filterInput}>Summary Overview</div>
-        <button className={styles.primaryButton} type="button">Generate Report</button>
+        <button className={styles.primaryButton} type="button" onClick={generateReport}>{reportLoading ? "Generating..." : "Generate Report"}</button>
       </div>
 
       <div className={styles.threeCol}>
@@ -310,7 +344,7 @@ export function ClientReportsPage() {
         </Panel>
       </div>
 
-      <Panel title="Recent Reports" action="View all reports →">
+      <Panel title="Recent Reports" action={<button className={styles.linkAction} type="button" onClick={generateReport}>View all reports →</button>}>
         <DataTable
           headers={["Report Name", "Report Type", "Date Range", "Generated On", "Format"]}
           rows={[
@@ -321,11 +355,20 @@ export function ClientReportsPage() {
           ]}
         />
       </Panel>
+      <Modal isOpen={reportModalOpen} onClose={() => setReportModalOpen(false)} title="Report Generated" idPrefix="client-report">
+        <div style={{ display: "grid", gap: "14px" }}>
+          {reportError ? <div style={{ color: "#c2410c" }}>{reportError}</div> : null}
+          <div>Your report is ready and has been downloaded.</div>
+          <div><strong>Report:</strong> {generatedReport?.name}</div>
+          <div><strong>Generated:</strong> {generatedReport?.createdAt}</div>
+        </div>
+      </Modal>
     </Shell>
   );
 }
 
 export function ClientSuppliersPage() {
+  const router = useRouter();
   return (
     <Shell title="Suppliers" subtitle="Manage your approved and preferred suppliers.">
       <div className={styles.metricsGrid}>
@@ -358,7 +401,7 @@ export function ClientSuppliersPage() {
               </div>
             </div>
           </Panel>
-          <Panel title="Preferred Supplier Categories" action="View all">
+          <Panel title="Preferred Supplier Categories" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/suppliers")}>View all</button>}>
             <SummaryList items={[
               { label: "Packaging", value: "6" },
               { label: "Textiles", value: "4" },
@@ -374,6 +417,7 @@ export function ClientSuppliersPage() {
 }
 
 export function ClientShipmentsPage() {
+  const [mapExpanded, setMapExpanded] = React.useState(false);
   return (
     <Shell title="Track My Shipments" subtitle="Real-time visibility and live tracking for all your active shipments.">
       <div className={styles.metricsGrid}>
@@ -395,7 +439,7 @@ export function ClientShipmentsPage() {
             ]}
           />
         </Panel>
-        <Panel title="Live Tracking Map" action="Expand Map ↗">
+        <Panel title="Live Tracking Map" action={<button className={styles.linkAction} type="button" onClick={() => setMapExpanded(true)}>Expand Map ↗</button>}>
           <MapCard />
         </Panel>
       </div>
@@ -411,14 +455,14 @@ export function ClientShipmentsPage() {
             ))}
           </div>
         </Panel>
-        <Panel title="Recent Tracking Updates" action="View all">
+        <Panel title="Recent Tracking Updates" action={<button className={styles.linkAction} type="button" onClick={() => setMapExpanded(true)}>View all</button>}>
           <div className={styles.insights}>
             <div className={styles.insightItem}>Out for Delivery — Los Angeles, USA — May 25, 2025 07:45 AM</div>
             <div className={styles.insightItem}>Arrived at Distribution Facility — May 24, 2025 09:10 PM</div>
             <div className={styles.insightItem}>Departed Port — Long Beach, USA — May 23, 2025 06:20 AM</div>
           </div>
         </Panel>
-        <Panel title="Exception Alerts" action="View all">
+        <Panel title="Exception Alerts" action={<button className={styles.linkAction} type="button" onClick={() => setMapExpanded(true)}>View all</button>}>
           <div className={styles.insights}>
             <div className={styles.alertItem}>Delay in customs clearance — Mumbai, IND</div>
             <div className={styles.alertItem}>Weather delay — Ho Chi Minh City, VN</div>
@@ -426,11 +470,38 @@ export function ClientShipmentsPage() {
           </div>
         </Panel>
       </div>
+      <Modal isOpen={mapExpanded} onClose={() => setMapExpanded(false)} title="Expanded Tracking Map" idPrefix="client-map">
+        <div style={{ display: "grid", gap: "14px" }}>
+          <MapCard />
+          <div style={{ color: "#607484" }}>Active route: Shanghai, CN → Pacific Route → New York, USA</div>
+        </div>
+      </Modal>
     </Shell>
   );
 }
 
 export function ClientInvoicesPage() {
+  const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
+  const [paymentAmount, setPaymentAmount] = React.useState("$12,000.00");
+  const [lastPayment, setLastPayment] = React.useState<string | null>(null);
+  const [paymentLoading, setPaymentLoading] = React.useState(false);
+  const [paymentError, setPaymentError] = React.useState<string | null>(null);
+  const submitPayment = async () => {
+    try {
+      setPaymentLoading(true);
+      setPaymentError(null);
+      const response = await api.post<{ confirmation_message: string; paid_at: string }>("/api/client/payments", {
+        amount: paymentAmount,
+        invoice_reference: "INV-2025-0528",
+      });
+      setLastPayment(`${response.confirmation_message} (${response.paid_at})`);
+      setPaymentModalOpen(false);
+    } catch (error: unknown) {
+      setPaymentError(error instanceof Error ? error.message : "Payment failed.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
   return (
     <Shell title="Invoices" subtitle="View your invoices, billing history, and manage payments.">
       <div className={styles.metricsGrid}>
@@ -462,9 +533,9 @@ export function ClientInvoicesPage() {
               { label: "Total Outstanding", value: "$312,450.00" },
               { label: "Overdue Amount", value: "$48,950.00" },
             ]} />
-            <button className={styles.primaryButton} type="button">Make a Payment</button>
+            <button className={styles.primaryButton} type="button" onClick={() => setPaymentModalOpen(true)}>Make a Payment</button>
           </Panel>
-          <Panel title="Upcoming Due Invoices" action="View all">
+          <Panel title="Upcoming Due Invoices" action={<button className={styles.linkAction} type="button" onClick={() => setPaymentModalOpen(true)}>View all</button>}>
             <div className={styles.insights}>
               <div className={styles.insightItem}>INV-2025-0528 — Due in 3 days</div>
               <div className={styles.insightItem}>INV-2025-0604 — Due in 10 days</div>
@@ -473,13 +544,30 @@ export function ClientInvoicesPage() {
           </Panel>
         </div>
       </div>
+      <Modal isOpen={paymentModalOpen} onClose={() => setPaymentModalOpen(false)} title="Make a Payment" idPrefix="client-payment">
+        <div style={{ display: "grid", gap: "14px" }}>
+          <label className={styles.modalField}>
+            <span>Payment Amount</span>
+            <input className={styles.profileInput} value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} />
+          </label>
+          {paymentError ? <div style={{ color: "#c2410c" }}>{paymentError}</div> : null}
+          <button className={styles.primaryButton} type="button" onClick={submitPayment}>{paymentLoading ? "Processing..." : "Confirm Payment"}</button>
+          {lastPayment ? <div style={{ color: "#118f87", fontWeight: 700 }}>{lastPayment}</div> : null}
+        </div>
+      </Modal>
     </Shell>
   );
 }
 
 export function ClientProfilePage({ accountName, userEmail }: { accountName: string | null; userEmail?: string | null }) {
+  const router = useRouter();
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [avatarDataUrl, setAvatarDataUrl] = React.useState<string | null>(null);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
   const [editingSection, setEditingSection] = React.useState<"personal" | "company" | "contact" | null>(null);
+  const [profileLoading, setProfileLoading] = React.useState(true);
+  const [profileMessage, setProfileMessage] = React.useState<string | null>(null);
+  const [supportLoading, setSupportLoading] = React.useState(false);
   const [profile, setProfile] = React.useState(() => {
     const storedName = typeof window !== "undefined" ? localStorage.getItem("account_name") : null;
     const storedCompany = typeof window !== "undefined" ? localStorage.getItem("company_name") : null;
@@ -523,23 +611,114 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
     };
   });
 
+  React.useEffect(() => {
+    async function loadProfile() {
+      try {
+        setProfileLoading(true);
+        const response = await api.get<{
+          full_name: string;
+          email: string;
+          phone: string;
+          alt_phone?: string | null;
+          emergency_phone?: string | null;
+          location: string;
+          timezone: string;
+          language: string;
+          company_name: string;
+          legal_name: string;
+          headquarters: string;
+          website: string;
+          tax_id: string;
+          client_id: string;
+          client_type: string;
+          access_level: string;
+          assigned_since: string;
+          support_email: string;
+          billing_email: string;
+          profile_image_url?: string | null;
+        }>("/api/client/profile");
+        setProfile((current) => ({
+          ...current,
+          fullName: response.full_name,
+          email: response.email,
+          phone: response.phone,
+          altPhone: response.alt_phone || current.altPhone,
+          emergencyPhone: response.emergency_phone || current.emergencyPhone,
+          location: response.location,
+          timezone: response.timezone,
+          language: response.language,
+          companyName: response.company_name,
+          legalName: response.legal_name,
+          headquarters: response.headquarters,
+          website: response.website,
+          taxId: response.tax_id,
+          clientId: response.client_id,
+          clientType: response.client_type,
+          accessLevel: response.access_level,
+          assignedSince: response.assigned_since,
+          supportEmail: response.support_email,
+          billingEmail: response.billing_email,
+        }));
+        setAvatarDataUrl(response.profile_image_url || null);
+      } catch (error: unknown) {
+        setProfileMessage(error instanceof Error ? error.message : "Failed to load profile.");
+      } finally {
+        setProfileLoading(false);
+      }
+    }
+    loadProfile();
+  }, []);
+
   const initials = React.useMemo(() => {
     const parts = profile.fullName.split(" ").filter(Boolean);
     return parts.slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "AR";
   }, [profile.fullName]);
+  const onAvatarSelected = async (file?: File) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const result = String(reader.result || "");
+      setAvatarDataUrl(result);
+      try {
+        await api.put("/api/client/profile", { profile_image_url: result });
+      } catch {}
+    };
+    reader.readAsDataURL(file);
+  };
 
   const setField = (field: keyof typeof profile, value: string) => {
     setProfile((current) => ({ ...current, [field]: value }));
   };
 
-  const saveSection = (section: "personal" | "company" | "contact") => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("account_name", profile.fullName);
-      localStorage.setItem("company_name", profile.companyName);
-      localStorage.setItem("settings:support_email", profile.supportEmail);
-      window.dispatchEvent(new Event("scm-settings-updated"));
+  const saveSection = async () => {
+    try {
+      setProfileMessage(null);
+      await api.put("/api/client/profile", {
+        full_name: profile.fullName,
+        phone: profile.phone,
+        alt_phone: profile.altPhone,
+        emergency_phone: profile.emergencyPhone,
+        location: profile.location,
+        timezone: profile.timezone,
+        language: profile.language,
+        company_name: profile.companyName,
+        website: profile.website,
+        tax_id: profile.taxId,
+        support_email: profile.supportEmail,
+        billing_email: profile.billingEmail,
+        profile_image_url: avatarDataUrl,
+      });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("account_name", profile.fullName);
+        localStorage.setItem("company_name", profile.companyName);
+        localStorage.setItem("settings:support_email", profile.supportEmail);
+        window.dispatchEvent(new Event("scm-settings-updated"));
+      }
+      setProfileMessage("Profile updated successfully.");
+      setEditingSection(null);
+    } catch (error: unknown) {
+      setProfileMessage(error instanceof Error ? error.message : "Failed to save profile.");
     }
-    setEditingSection(section === editingSection ? null : null);
   };
 
   const copyValue = async (label: string, value: string) => {
@@ -587,11 +766,39 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
     </div>
   );
 
+  const contactSupport = async () => {
+    try {
+      setSupportLoading(true);
+      setProfileMessage(null);
+      const response = await api.post<{ ticket_id: string; message: string }>("/api/client/support", {
+        subject: "Client support request",
+        message: `Support requested by ${profile.fullName} (${profile.email}).`,
+      });
+      setProfileMessage(`${response.message} Ticket: ${response.ticket_id}`);
+      router.push("/contact");
+    } catch (error: unknown) {
+      setProfileMessage(error instanceof Error ? error.message : "Failed to contact support.");
+    } finally {
+      setSupportLoading(false);
+    }
+  };
+
+  if (profileLoading) {
+    return <div className={styles.panel}>Loading profile...</div>;
+  }
+
   return (
     <Shell title="Profile" subtitle="Manage your buyer account details, preferences, and security settings.">
+      {profileMessage ? <div className={styles.clientNotice}>{profileMessage}</div> : null}
       <div className={styles.profileHero}>
         <div className={styles.profileHeroMain}>
-          <div className={styles.profilePhoto}>{initials}</div>
+          <div className={styles.profilePhotoWrap}>
+            <div className={styles.profilePhoto}>
+              {avatarDataUrl ? <img src={avatarDataUrl} alt="Profile avatar" className={styles.profilePhotoImage} /> : initials}
+            </div>
+            <button className={styles.photoEditBtn} type="button" onClick={() => fileInputRef.current?.click()}>✎</button>
+            <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={(e) => onAvatarSelected(e.target.files?.[0])} />
+          </div>
           <div className={styles.profileHeroInfo}>
             <div className={styles.profileHeroTop}>
               <div>
@@ -650,7 +857,7 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
           {editableRow("Email", "email", "personal")}
           {editableRow("Time Zone", "timezone", "personal")}
           {editableRow("Language", "language", "personal")}
-          {editingSection === "personal" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection("personal")}>Save Personal Info</button> : null}
+          {editingSection === "personal" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection()}>Save Personal Info</button> : null}
         </section>
 
         <section className={styles.profileDetailCard}>
@@ -665,7 +872,7 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
           {editableRow("Headquarters", "headquarters", "company")}
           {editableRow("Website", "website", "company")}
           {editableRow("Tax ID / EIN", "taxId", "company")}
-          {editingSection === "company" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection("company")}>Save Company Info</button> : null}
+          {editingSection === "company" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection()}>Save Company Info</button> : null}
         </section>
 
         <section className={styles.profileDetailCard}>
@@ -694,7 +901,7 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
           {editableRow("Alt. Phone", "altPhone", "contact")}
           {editableRow("Emergency Contact", "emergencyPhone", "contact")}
           {editableRow("Billing Email", "billingEmail", "contact")}
-          {editingSection === "contact" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection("contact")}>Save Contact Details</button> : null}
+          {editingSection === "contact" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection()}>Save Contact Details</button> : null}
         </section>
       </div>
 
@@ -727,7 +934,7 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
         <section className={styles.profileDetailCard}>
           <div className={styles.cardActionHeader}>
             <h3>Security & Password</h3>
-            <button className={styles.smallAction} type="button">Edit</button>
+            <button className={styles.smallAction} type="button" onClick={() => setEditingSection("contact")}>Edit</button>
           </div>
           <div className={styles.detailRow}><span>Password</span><strong>••••••••</strong></div>
           <div className={styles.detailRow}><span>Last changed</span><strong>May 24, 2024</strong></div>
@@ -742,7 +949,7 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
         <section className={styles.profileDetailCard}>
           <div className={styles.cardActionHeader}>
             <h3>Permissions Summary</h3>
-            <button className={styles.smallAction} type="button">View all</button>
+            <button className={styles.smallAction} type="button" onClick={() => router.push("/shipments")}>View all</button>
           </div>
           <div className={styles.permissionList}>
             {["View Shipments", "Track Orders", "Update Preferences", "View Invoices", "Manage Documents"].map((item) => (
@@ -765,7 +972,7 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
           <div className={styles.detailRow}><span>Account Manager Email</span><strong>{profile.managerEmail}</strong></div>
           <div className={styles.detailRow}><span>Support Email</span><strong>{profile.supportEmail}</strong></div>
           <div className={styles.detailRow}><span>Support Phone</span><strong>+1 (800) 555-0199</strong></div>
-          <button className={styles.primaryButton} type="button">Contact Support</button>
+          <button className={styles.primaryButton} type="button" onClick={contactSupport}>{supportLoading ? "Sending..." : "Contact Support"}</button>
         </section>
       </div>
     </Shell>

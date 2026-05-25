@@ -4,6 +4,15 @@
   gap: 22px;
 }
 
+.clientNotice {
+  background: #effbfa;
+  border: 1px solid #d4ece9;
+  border-radius: 14px;
+  color: #0f7f79;
+  font-weight: 700;
+  padding: 12px 14px;
+}
+
 .header {
   align-items: flex-start;
   display: flex;
@@ -588,7 +597,35 @@
   font-weight: 800;
   height: 118px;
   justify-content: center;
+  overflow: hidden;
   width: 118px;
+}
+
+.profilePhotoWrap {
+  position: relative;
+}
+
+.profilePhotoImage {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.photoEditBtn {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #dbe9e8;
+  border-radius: 999px;
+  bottom: 4px;
+  box-shadow: 0 10px 20px rgba(15, 64, 73, 0.12);
+  color: #118f87;
+  cursor: pointer;
+  display: flex;
+  height: 34px;
+  justify-content: center;
+  position: absolute;
+  right: 2px;
+  width: 34px;
 }
 
 .profileHeroInfo {
@@ -752,6 +789,11 @@
   color: #173042;
   padding: 10px 12px;
   width: 100%;
+}
+
+.modalField {
+  display: grid;
+  gap: 6px;
 }
 
 .toggleRow,
