@@ -554,7 +554,262 @@
   margin-bottom: 14px;
 }
 
+.profileHero {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1.2fr 1fr 0.7fr;
+}
+
+.profileHeroMain,
+.profileCompanyCard,
+.profileStatsCard,
+.profileDetailCard {
+  background: #fff;
+  border: 1px solid #dbe9e8;
+  border-radius: 22px;
+  box-shadow: 0 18px 48px rgba(15, 64, 73, 0.06);
+  padding: 18px 20px;
+}
+
+.profileHeroMain {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+}
+
+.profilePhoto {
+  align-items: center;
+  background: linear-gradient(135deg, #dfe8ef, #f7fafc);
+  border-radius: 999px;
+  color: #0f958d;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  height: 118px;
+  justify-content: center;
+  width: 118px;
+}
+
+.profileHeroInfo {
+  display: grid;
+  gap: 14px;
+}
+
+.profileHeroTop {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.profileHeroTop h2,
+.profileCompanyHeader h3 {
+  color: #10283a;
+  font-size: 1.95rem;
+  margin: 0;
+}
+
+.profileHeroTop p {
+  color: #66798a;
+  margin: 4px 0 0;
+}
+
+.profileMetaList {
+  color: #506474;
+  display: grid;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.profileCompanyCard {
+  display: grid;
+  gap: 18px;
+}
+
+.profileCompanyHeader {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.profileCompanyLogo {
+  align-items: center;
+  background: linear-gradient(135deg, #e3faf6, #d7f3ef);
+  border-radius: 999px;
+  display: flex;
+  font-size: 1.8rem;
+  height: 72px;
+  justify-content: center;
+  width: 72px;
+}
+
+.profileCompanyGrid {
+  display: grid;
+  gap: 14px 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.profileCompanyGrid span,
+.profileStat span,
+.detailRow span {
+  color: #69808d;
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.profileCompanyGrid strong,
+.profileStat strong,
+.detailRow strong {
+  color: #11293a;
+  font-size: 0.92rem;
+}
+
+.profileStatsCard {
+  display: grid;
+  gap: 12px;
+}
+
+.profileStat {
+  border-bottom: 1px solid #edf3f5;
+  padding-bottom: 10px;
+}
+
+.profileStat:last-of-type {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.secondaryButton {
+  background: #fff;
+  border: 1px solid #cfe2e2;
+  border-radius: 12px;
+  color: #118f87;
+  cursor: pointer;
+  font-weight: 700;
+  min-height: 42px;
+  padding: 10px 14px;
+}
+
+.profileCardsGrid,
+.profileBottomGrid {
+  display: grid;
+  gap: 18px;
+}
+
+.profileCardsGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.profileBottomGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cardActionHeader {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cardActionHeader h3 {
+  color: #10283a;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.smallAction {
+  background: #effbfa;
+  border: 1px solid #d9efed;
+  border-radius: 10px;
+  color: #118f87;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 7px 10px;
+}
+
+.detailRow {
+  align-items: start;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1.2fr;
+  padding: 8px 0;
+}
+
+.detailValueWrap {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profileInput {
+  background: #fbfdfd;
+  border: 1px solid #dcebec;
+  border-radius: 12px;
+  color: #173042;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.toggleRow,
+.permissionItem {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 0;
+}
+
+.toggleRow span,
+.permissionItem span {
+  color: #294351;
+  font-size: 0.9rem;
+}
+
+.toggleBtn {
+  align-items: center;
+  background: #e4eaef;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  height: 24px;
+  justify-content: flex-start;
+  padding: 3px;
+  transition: 0.2s ease;
+  width: 46px;
+}
+
+.toggleBtn span {
+  background: #fff;
+  border-radius: 999px;
+  height: 18px;
+  margin: 0;
+  width: 18px;
+}
+
+.toggleBtnOn {
+  background: #11a096;
+  justify-content: flex-end;
+}
+
+.inlineActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.permissionList {
+  display: grid;
+  gap: 8px;
+}
+
 @media (max-width: 1260px) {
+  .profileHero,
+  .profileCardsGrid,
+  .profileBottomGrid,
   .metricsGrid,
   .threeCol,
   .filterBar {
@@ -565,6 +820,9 @@
 @media (max-width: 1024px) {
   .header,
   .headerTools,
+  .profileHero,
+  .profileCardsGrid,
+  .profileBottomGrid,
   .metricsGrid,
   .twoCol,
   .threeCol,
@@ -581,5 +839,12 @@
   .statusPill,
   .profilePill {
     width: 100%;
+  }
+
+  .profileCompanyGrid,
+  .detailRow,
+  .inlineActions {
+    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }

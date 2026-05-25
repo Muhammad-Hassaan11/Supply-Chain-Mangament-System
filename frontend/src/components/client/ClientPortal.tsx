@@ -478,32 +478,295 @@ export function ClientInvoicesPage() {
 }
 
 export function ClientProfilePage({ accountName, userEmail }: { accountName: string | null; userEmail?: string | null }) {
+  const [copiedField, setCopiedField] = React.useState<string | null>(null);
+  const [editingSection, setEditingSection] = React.useState<"personal" | "company" | "contact" | null>(null);
+  const [profile, setProfile] = React.useState(() => {
+    const storedName = typeof window !== "undefined" ? localStorage.getItem("account_name") : null;
+    const storedCompany = typeof window !== "undefined" ? localStorage.getItem("company_name") : null;
+    const storedSupportEmail = typeof window !== "undefined" ? localStorage.getItem("settings:support_email") : null;
+    return {
+      fullName: storedName || "James Carter",
+      jobTitle: "Procurement Manager",
+      email: userEmail || "james.carter@apexretail.com",
+      phone: "+1 (212) 555-0148",
+      altPhone: "+1 (212) 555-0199",
+      emergencyPhone: "+1 (212) 555-0100",
+      location: "New York, NY, USA",
+      timezone: "(EST) Eastern Time (UTC-05:00)",
+      language: "English (US)",
+      companyName: storedCompany || accountName || "Apex Retail Ltd.",
+      legalName: `${storedCompany || accountName || "Apex Retail Ltd."}, LLC`,
+      headquarters: "New York, NY, USA",
+      website: "www.apexretail.com",
+      taxId: "47-1234567",
+      clientId: "CLT-10024",
+      clientType: "Client / Buyer",
+      accessLevel: "Standard Access",
+      assignedSince: "May 12, 2022",
+      supportEmail: storedSupportEmail || "support@apexretail.com",
+      billingEmail: storedSupportEmail ? storedSupportEmail.replace("support", "billing") : "billing@apexretail.com",
+      managerName: "Robert Johnson",
+      managerEmail: "robert.johnson@scm.com",
+      memberSince: "May 12, 2022",
+    };
+  });
+  const [toggles, setToggles] = React.useState(() => {
+    const emailAlerts = typeof window !== "undefined" ? localStorage.getItem("settings:email_alerts") : null;
+    const shipmentDelayAlerts = typeof window !== "undefined" ? localStorage.getItem("settings:shipment_delay_alerts") : null;
+    const weeklyReports = typeof window !== "undefined" ? localStorage.getItem("settings:weekly_reports") : null;
+    return {
+      emailAlerts: emailAlerts !== "false",
+      shipmentUpdates: shipmentDelayAlerts !== "false",
+      invoiceAlerts: true,
+      promotions: false,
+      weeklyReports: weeklyReports === "true",
+    };
+  });
+
+  const initials = React.useMemo(() => {
+    const parts = profile.fullName.split(" ").filter(Boolean);
+    return parts.slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "AR";
+  }, [profile.fullName]);
+
+  const setField = (field: keyof typeof profile, value: string) => {
+    setProfile((current) => ({ ...current, [field]: value }));
+  };
+
+  const saveSection = (section: "personal" | "company" | "contact") => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("account_name", profile.fullName);
+      localStorage.setItem("company_name", profile.companyName);
+      localStorage.setItem("settings:support_email", profile.supportEmail);
+      window.dispatchEvent(new Event("scm-settings-updated"));
+    }
+    setEditingSection(section === editingSection ? null : null);
+  };
+
+  const copyValue = async (label: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(label);
+      window.setTimeout(() => setCopiedField(null), 1500);
+    } catch {
+      setCopiedField(null);
+    }
+  };
+
+  const togglePref = (key: keyof typeof toggles) => {
+    setToggles((current) => {
+      const updated = { ...current, [key]: !current[key] };
+      if (typeof window !== "undefined") {
+        if (key === "emailAlerts") localStorage.setItem("settings:email_alerts", String(updated[key]));
+        if (key === "shipmentUpdates") localStorage.setItem("settings:shipment_delay_alerts", String(updated[key]));
+        if (key === "weeklyReports") localStorage.setItem("settings:weekly_reports", String(updated[key]));
+      }
+      return updated;
+    });
+  };
+
+  const editableRow = (
+    label: string,
+    field: keyof typeof profile,
+    section: "personal" | "company" | "contact",
+    extra?: React.ReactNode,
+  ) => (
+    <div className={styles.detailRow} key={label}>
+      <span>{label}</span>
+      {editingSection === section ? (
+        <input
+          className={styles.profileInput}
+          value={profile[field]}
+          onChange={(event) => setField(field, event.target.value)}
+        />
+      ) : (
+        <div className={styles.detailValueWrap}>
+          <strong>{profile[field]}</strong>
+          {extra}
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <Shell title="Profile" subtitle="Manage your buyer account details and support preferences.">
-      <div className={styles.twoCol}>
-        <Panel title="Company Profile">
-          <div className={styles.profileCard}>
-            <div className={styles.profileAvatarLarge}>AR</div>
-            <div>
-              <strong>{accountName || "Apex Retail Ltd."}</strong>
-              <div className={styles.pageSubtitle}>Verified Client / Buyer</div>
+    <Shell title="Profile" subtitle="Manage your buyer account details, preferences, and security settings.">
+      <div className={styles.profileHero}>
+        <div className={styles.profileHeroMain}>
+          <div className={styles.profilePhoto}>{initials}</div>
+          <div className={styles.profileHeroInfo}>
+            <div className={styles.profileHeroTop}>
+              <div>
+                <h2>{profile.fullName}</h2>
+                <p>{profile.jobTitle}</p>
+              </div>
+              <StatusBadge text="Primary Contact" kind="success" />
+            </div>
+            <div className={styles.profileMetaList}>
+              <span>{profile.email}</span>
+              <span>{profile.phone}</span>
+              <span>{profile.location}</span>
+              <span>Member since {profile.memberSince}</span>
             </div>
           </div>
-          <SummaryList items={[
-            { label: "Email", value: userEmail || "procurement@apexretail.com" },
-            { label: "Phone", value: "+1 (212) 555-0148" },
-            { label: "Location", value: "New York, USA" },
-            { label: "Client ID", value: "CLT-10024" },
-          ]} />
-        </Panel>
-        <Panel title="Preferences">
-          <SummaryList items={[
-            { label: "Email Alerts", value: "Enabled" },
-            { label: "Shipment Notifications", value: "Enabled" },
-            { label: "Weekly Reports", value: "Enabled" },
-            { label: "Support Contact", value: "support@supplychain.com" },
-          ]} />
-        </Panel>
+        </div>
+
+        <div className={styles.profileCompanyCard}>
+          <div className={styles.profileCompanyHeader}>
+            <div className={styles.profileCompanyLogo}>🏢</div>
+            <div>
+              <h3>{profile.companyName}</h3>
+              <StatusBadge text="Verified Client" kind="success" />
+            </div>
+          </div>
+          <div className={styles.profileCompanyGrid}>
+            <div><span>Client ID</span><strong>{profile.clientId}</strong></div>
+            <div><span>Client Type</span><strong>{profile.clientType}</strong></div>
+            <div><span>Onboarded On</span><strong>{profile.assignedSince}</strong></div>
+            <div><span>Status</span><strong>Active</strong></div>
+            <div><span>Region</span><strong>North America</strong></div>
+            <div><span>Tax ID / EIN</span><strong>{profile.taxId}</strong></div>
+          </div>
+        </div>
+
+        <div className={styles.profileStatsCard}>
+          <div className={styles.profileStat}><span>Total Shipments</span><strong>1,245</strong></div>
+          <div className={styles.profileStat}><span>On-Time Rate</span><strong>96.4%</strong></div>
+          <div className={styles.profileStat}><span>Invoices Paid</span><strong>1,182</strong></div>
+          <div className={styles.profileStat}><span>Avg. Lead Time</span><strong>2.4 Days</strong></div>
+          <button className={styles.secondaryButton} type="button">View Performance →</button>
+        </div>
+      </div>
+
+      <div className={styles.profileCardsGrid}>
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Personal Information</h3>
+            <button className={styles.smallAction} type="button" onClick={() => setEditingSection(editingSection === "personal" ? null : "personal")}>
+              {editingSection === "personal" ? "Close" : "Edit"}
+            </button>
+          </div>
+          {editableRow("Full Name", "fullName", "personal")}
+          {editableRow("Job Title", "jobTitle", "personal")}
+          {editableRow("Phone", "phone", "personal")}
+          {editableRow("Email", "email", "personal")}
+          {editableRow("Time Zone", "timezone", "personal")}
+          {editableRow("Language", "language", "personal")}
+          {editingSection === "personal" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection("personal")}>Save Personal Info</button> : null}
+        </section>
+
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Company Information</h3>
+            <button className={styles.smallAction} type="button" onClick={() => setEditingSection(editingSection === "company" ? null : "company")}>
+              {editingSection === "company" ? "Close" : "Edit"}
+            </button>
+          </div>
+          {editableRow("Company Name", "companyName", "company")}
+          {editableRow("Legal Name", "legalName", "company")}
+          {editableRow("Headquarters", "headquarters", "company")}
+          {editableRow("Website", "website", "company")}
+          {editableRow("Tax ID / EIN", "taxId", "company")}
+          {editingSection === "company" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection("company")}>Save Company Info</button> : null}
+        </section>
+
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Client ID & Role</h3>
+            <button className={styles.smallAction} type="button" onClick={() => copyValue("client-id", profile.clientId)}>
+              {copiedField === "client-id" ? "Copied" : "Copy ID"}
+            </button>
+          </div>
+          <div className={styles.detailRow}><span>Client ID</span><strong>{profile.clientId}</strong></div>
+          <div className={styles.detailRow}><span>Client Type</span><strong>{profile.clientType}</strong></div>
+          <div className={styles.detailRow}><span>Primary Role</span><strong>Buyer / Procurement</strong></div>
+          <div className={styles.detailRow}><span>Access Level</span><strong>{profile.accessLevel}</strong></div>
+          <div className={styles.detailRow}><span>Assigned Since</span><strong>{profile.assignedSince}</strong></div>
+        </section>
+
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Contact Details</h3>
+            <button className={styles.smallAction} type="button" onClick={() => setEditingSection(editingSection === "contact" ? null : "contact")}>
+              {editingSection === "contact" ? "Close" : "Edit"}
+            </button>
+          </div>
+          {editableRow("Primary Email", "email", "contact", <StatusBadge text="Primary" kind="success" />)}
+          {editableRow("Phone", "phone", "contact", <StatusBadge text="Primary" kind="success" />)}
+          {editableRow("Alt. Phone", "altPhone", "contact")}
+          {editableRow("Emergency Contact", "emergencyPhone", "contact")}
+          {editableRow("Billing Email", "billingEmail", "contact")}
+          {editingSection === "contact" ? <button className={styles.primaryButton} type="button" onClick={() => saveSection("contact")}>Save Contact Details</button> : null}
+        </section>
+      </div>
+
+      <div className={styles.profileBottomGrid}>
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Notification Preferences</h3>
+            <button className={styles.smallAction} type="button">Auto Saved</button>
+          </div>
+          {[
+            ["Shipment Assignments", "emailAlerts"],
+            ["Route Updates", "shipmentUpdates"],
+            ["Invoice Updates", "invoiceAlerts"],
+            ["Weekly Reports", "weeklyReports"],
+            ["Promotions & News", "promotions"],
+          ].map(([label, key]) => (
+            <div key={label} className={styles.toggleRow}>
+              <span>{label}</span>
+              <button
+                className={`${styles.toggleBtn} ${toggles[key as keyof typeof toggles] ? styles.toggleBtnOn : ""}`}
+                type="button"
+                onClick={() => togglePref(key as keyof typeof toggles)}
+              >
+                <span />
+              </button>
+            </div>
+          ))}
+        </section>
+
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Security & Password</h3>
+            <button className={styles.smallAction} type="button">Edit</button>
+          </div>
+          <div className={styles.detailRow}><span>Password</span><strong>••••••••</strong></div>
+          <div className={styles.detailRow}><span>Last changed</span><strong>May 24, 2024</strong></div>
+          <div className={styles.detailRow}><span>Two-Factor Authentication</span><strong>Enabled</strong></div>
+          <div className={styles.detailRow}><span>Login Email Alerts</span><strong>Enabled</strong></div>
+          <div className={styles.inlineActions}>
+            <button className={styles.secondaryButton} type="button">Change Password</button>
+            <button className={styles.secondaryButton} type="button">Manage 2FA</button>
+          </div>
+        </section>
+
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Permissions Summary</h3>
+            <button className={styles.smallAction} type="button">View all</button>
+          </div>
+          <div className={styles.permissionList}>
+            {["View Shipments", "Track Orders", "Update Preferences", "View Invoices", "Manage Documents"].map((item) => (
+              <div key={item} className={styles.permissionItem}>
+                <span>{item}</span>
+                <StatusBadge text="Allowed" kind="success" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.profileDetailCard}>
+          <div className={styles.cardActionHeader}>
+            <h3>Assigned Support Details</h3>
+            <button className={styles.smallAction} type="button" onClick={() => copyValue("support-email", profile.supportEmail)}>
+              {copiedField === "support-email" ? "Copied" : "Copy Email"}
+            </button>
+          </div>
+          <div className={styles.detailRow}><span>Account Manager</span><strong>{profile.managerName}</strong></div>
+          <div className={styles.detailRow}><span>Account Manager Email</span><strong>{profile.managerEmail}</strong></div>
+          <div className={styles.detailRow}><span>Support Email</span><strong>{profile.supportEmail}</strong></div>
+          <div className={styles.detailRow}><span>Support Phone</span><strong>+1 (800) 555-0199</strong></div>
+          <button className={styles.primaryButton} type="button">Contact Support</button>
+        </section>
       </div>
     </Shell>
   );
