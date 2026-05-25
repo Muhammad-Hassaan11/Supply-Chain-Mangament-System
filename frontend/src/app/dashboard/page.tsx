@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { ClientDashboardPage } from "@/components/client/ClientPortal";
 
 interface LowStockAlert {
   warehouse_name: string;
@@ -693,13 +694,8 @@ export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [accountType, setAccountType] = useState<string | null>(null);
-  const [accountName, setAccountName] = useState<string | null>(null);
-
-  useEffect(() => {
-    setAccountType(getStoredAccountType());
-    setAccountName(getStoredAccountName());
-  }, []);
+  const [accountType] = useState<string | null>(() => getStoredAccountType());
+  const [accountName] = useState<string | null>(() => getStoredAccountName());
 
   useEffect(() => {
     async function load() {
@@ -708,8 +704,8 @@ export default function Dashboard() {
         const response = await api.get<DashboardData>("/api/analytics/dashboard");
         setData(response);
         setError(null);
-      } catch (err: any) {
-        setError(err.message || "Failed to load dashboard.");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load dashboard.");
       } finally {
         setLoading(false);
       }
@@ -739,7 +735,7 @@ export default function Dashboard() {
   }
 
   if (accountType === "client") {
-    return <ClientDashboard data={data} accountName={accountName} />;
+    return <ClientDashboardPage data={data} accountName={accountName} />;
   }
 
   if (accountType === "logistics") {

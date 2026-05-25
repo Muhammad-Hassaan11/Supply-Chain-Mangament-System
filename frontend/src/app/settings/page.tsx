@@ -5,6 +5,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { ClientProfilePage } from "@/components/client/ClientPortal";
 
 type ThemeMode = "Light" | "Dark" | "System";
 type SessionTimeout = "15 minutes" | "30 minutes" | "1 hour" | "4 hours";
@@ -72,8 +73,8 @@ function applyVisualSettings(primaryColor: string, accentColor: string, themeMod
 
 export default function SettingsPage() {
   const { user, isAdmin } = useAuth();
-  const accountType = getStoredAccountType();
-  const accountName = getStoredAccountName();
+  const [accountType] = useState<string | null>(() => getStoredAccountType());
+  const [accountName] = useState<string | null>(() => getStoredAccountName());
 
   const [fullName, setFullName] = useState<string>("");
   const [supportEmail, setSupportEmail] = useState<string>("support@supplychain.com");
@@ -387,6 +388,10 @@ export default function SettingsPage() {
     ],
     [roleCounts]
   );
+
+  if (accountType === "client") {
+    return <ClientProfilePage accountName={accountName} userEmail={user?.email} />;
+  }
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "18px" }}>

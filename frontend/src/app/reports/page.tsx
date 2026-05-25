@@ -2,6 +2,8 @@
 
 import React from "react";
 import { api } from "@/lib/api";
+import { getStoredAccountType } from "@/lib/api";
+import { ClientReportsPage } from "@/components/client/ClientPortal";
 
 type ReportId =
   | "inventory-health"
@@ -163,6 +165,7 @@ function toCsv(columns: string[], rows: Record<string, unknown>[]) {
 }
 
 export default function ReportsPage() {
+  const [accountType] = React.useState<string | null>(() => getStoredAccountType());
   const [active, setActive] = React.useState<ReportDef | null>(null);
   const [result, setResult] = React.useState<QueryResult | null>(null);
   const [stats, setStats] = React.useState<DashboardStats | null>(null);
@@ -224,6 +227,10 @@ export default function ReportsPage() {
     link.click();
     URL.revokeObjectURL(url);
   };
+
+  if (accountType === "client") {
+    return <ClientReportsPage />;
+  }
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>

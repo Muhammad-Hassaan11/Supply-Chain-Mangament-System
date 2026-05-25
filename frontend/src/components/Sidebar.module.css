@@ -50,6 +50,12 @@
   min-width: 0;
 }
 
+.clientBrandLine {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
 .brandTitle {
   color: #084b4a;
   font-family: var(--font-heading), "Space Grotesk", Arial, sans-serif;
@@ -63,6 +69,18 @@
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.clientBrandSub {
+  color: #5f7384;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.15;
+  max-width: 110px;
+}
+
+.clientLogoIcon {
+  width: 48px;
 }
 
 .collapseBtn {
@@ -175,6 +193,72 @@
 .userSection {
   border-top: 1px solid var(--border-glass);
   padding: 18px 24px 24px;
+}
+
+.clientAccountCard {
+  background: linear-gradient(180deg, #fbfefe, #f4fbfa);
+  border: 1px solid #dbe9e8;
+  border-radius: 20px;
+  box-shadow: 0 16px 38px rgba(16, 39, 45, 0.05);
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.clientAccountBadge {
+  align-items: center;
+  background: #e5f7f2;
+  border: 1px solid #cfe8e2;
+  border-radius: 999px;
+  color: var(--accent-indigo);
+  display: flex;
+  font-size: 1.05rem;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.clientAccountTitle {
+  color: #10283a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.clientAccountId {
+  color: #6d8090;
+  font-size: 0.86rem;
+}
+
+.clientVerified {
+  background: #e6f8ee;
+  border-radius: 999px;
+  color: #149961;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 6px 10px;
+  width: fit-content;
+}
+
+.clientContactList {
+  border-top: 1px solid #e5eff0;
+  color: #607484;
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.clientContactList span {
+  font-size: 0.85rem;
+}
+
+.clientSupportBtn {
+  background: linear-gradient(135deg, #e9fbf8, #dff7f3);
+  border: 1px solid #c8ebe5;
+  border-radius: 12px;
+  color: #11998f;
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 40px;
 }
 
 .userInfo {

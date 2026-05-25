@@ -89,10 +89,11 @@ export default function Sidebar() {
   const { user, logout, isAdmin } = useAuth();
   const userEmail = user?.email || null;
   const userRole = user?.role || null;
+  const isClientAccount = accountType === "client";
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--sidebar-width", collapsed ? "84px" : "280px");
-  }, [collapsed]);
+    document.documentElement.style.setProperty("--sidebar-width", collapsed ? "84px" : isClientAccount ? "274px" : "280px");
+  }, [collapsed, isClientAccount]);
 
   useEffect(() => {
     const refreshAccount = () => {
@@ -173,12 +174,11 @@ export default function Sidebar() {
     if (accountType === "client") {
       return [
         buildNavItem("Dashboard", "/dashboard", "dashboard"),
-        buildNavItem("My Orders", "/reports", "reports"),
-        buildNavItem("Track Shipments", "/shipments", "shipments"),
         buildNavItem("Suppliers", "/suppliers", "suppliers"),
+        buildNavItem("Track My Shipments", "/shipments", "shipments"),
         buildNavItem("Reports", "/reports", "reports"),
-        buildNavItem("Invoices", "/reports", "reports"),
-        buildNavItem("Profile", "/settings", "settings"),
+        buildNavItem("Invoices", "/invoices", "reports"),
+        buildNavItem("Profile", "/settings", "users"),
         buildNavItem("Support", "/contact", "settings"),
       ];
     }
@@ -206,11 +206,11 @@ export default function Sidebar() {
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`} id="sidebar-nav">
       <div className={styles.brand}>
-        <div className={styles.logoIcon}>
+          <div className={`${styles.logoIcon} ${isClientAccount ? styles.clientLogoIcon : ""}`}>
           {logoDataUrl ? (
             <img src={logoDataUrl} alt="Company logo" className={styles.logoImage} />
           ) : (
-            <svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="url(#grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="url(#grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <defs>
                 <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="var(--accent-indigo)" />
@@ -224,20 +224,34 @@ export default function Sidebar() {
         </div>
         {!collapsed && (
           <div className={styles.brandText}>
-            <span className={styles.brandTitle}>{companyName ? companyName.slice(0, 18) : "SCM"}</span>
-            <span className={styles.brandSub}>{companyName || "Supply Chain Management"}</span>
+            {isClientAccount ? (
+              <>
+                <span className={styles.clientBrandLine}>
+                  <span className={styles.brandTitle}>SCM</span>
+                  <span className={styles.clientBrandSub}>SUPPLY CHAIN MANAGEMENT</span>
+                </span>
+                <span className={styles.brandSub}>Buyer workspace</span>
+              </>
+            ) : (
+              <>
+                <span className={styles.brandTitle}>{companyName ? companyName.slice(0, 18) : "SCM"}</span>
+                <span className={styles.brandSub}>{companyName || "Supply Chain Management"}</span>
+              </>
+            )}
           </div>
         )}
-        <button
-          className={styles.collapseBtn}
-          onClick={() => setCollapsed(!collapsed)}
-          id="sidebar-collapse-btn"
-          aria-label="Toggle sidebar"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {collapsed ? <polyline points="9 18 15 12 9 6" /> : <polyline points="15 18 9 12 15 6" />}
-          </svg>
-        </button>
+        {!isClientAccount ? (
+          <button
+            className={styles.collapseBtn}
+            onClick={() => setCollapsed(!collapsed)}
+            id="sidebar-collapse-btn"
+            aria-label="Toggle sidebar"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {collapsed ? <polyline points="9 18 15 12 9 6" /> : <polyline points="15 18 9 12 15 6" />}
+            </svg>
+          </button>
+        ) : null}
       </div>
 
       <nav className={styles.nav}>
@@ -273,7 +287,20 @@ export default function Sidebar() {
       </nav>
 
       <div className={styles.userSection}>
-        {userEmail ? (
+        {userEmail && isClientAccount && !collapsed ? (
+          <div className={styles.clientAccountCard}>
+            <div className={styles.clientAccountBadge}>🏢</div>
+            <div className={styles.clientAccountTitle}>{accountName || "Apex Retail Ltd."}</div>
+            <div className={styles.clientAccountId}>Client ID: CLT-10024</div>
+            <div className={styles.clientVerified}>Verified Client</div>
+            <div className={styles.clientContactList}>
+              <span>{userEmail}</span>
+              <span>+1 (212) 555-0148</span>
+              <span>New York, USA</span>
+            </div>
+            <button className={styles.clientSupportBtn} type="button">Contact Support</button>
+          </div>
+        ) : userEmail ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <div className={styles.userInfo}>
               <div className={styles.userAvatar}>

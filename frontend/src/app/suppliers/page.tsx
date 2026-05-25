@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { api } from "@/lib/api";
+import { api, getStoredAccountType } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { ClientSuppliersPage } from "@/components/client/ClientPortal";
 
 interface Supplier {
   supplier_id: number;
@@ -44,6 +45,7 @@ function buildStars(rating: number) {
 
 export default function SuppliersPage() {
   const { isAdmin } = useAuth();
+  const [accountType] = useState<string | null>(() => getStoredAccountType());
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,8 +71,8 @@ export default function SuppliersPage() {
         primeForm(data[0]);
       }
       setError(null);
-    } catch (err: any) {
-      setError(err.message || "Failed to load suppliers.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load suppliers.");
     } finally {
       setLoading(false);
     }
@@ -162,8 +164,8 @@ export default function SuppliersPage() {
 
       await fetchSuppliers();
       primeForm(null);
-    } catch (err: any) {
-      setFormError(err.message || "Unable to save supplier.");
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : "Unable to save supplier.");
     } finally {
       setIsSubmitting(false);
     }
@@ -209,6 +211,10 @@ export default function SuppliersPage() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  if (accountType === "client") {
+    return <ClientSuppliersPage />;
   }
 
   return (
