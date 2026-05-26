@@ -26,7 +26,7 @@ export default function AboutPage() {
                 SCM brings suppliers, warehouses, inventory, shipments, shipment logs, analytics, and invoices into a connected software product backed by SQL Server. It is designed for teams that need fast visibility without losing database discipline.
               </p>
             </div>
-            <img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=1100&q=80" alt="Logistics team managing warehouse operations" />
+            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1100&q=80" alt="Operations team reviewing supply chain planning data" />
           </div>
         </div>
       </section>
