@@ -45,9 +45,10 @@ export default function PublicNavbar() {
     <header
       id="pub-navbar"
       style={{
-        background: scrolled ? "rgba(255,255,255,0.94)" : "#ffffff",
-        borderBottom: "1px solid #d5ebe8",
-        boxShadow: scrolled ? "0 6px 24px rgba(16,39,45,0.06)" : "none",
+        backdropFilter: "blur(18px)",
+        background: scrolled ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.66)",
+        borderBottom: "1px solid rgba(207,233,226,0.86)",
+        boxShadow: scrolled ? "0 18px 42px rgba(8,38,47,0.08)" : "none",
         position: "sticky",
         top: 0,
         zIndex: 1000,
@@ -58,7 +59,7 @@ export default function PublicNavbar() {
           alignItems: "center",
           display: "flex",
           gap: "24px",
-          height: "72px",
+          height: "76px",
           justifyContent: "space-between",
           margin: "0 auto",
           maxWidth: "1280px",
@@ -75,8 +76,8 @@ export default function PublicNavbar() {
             style={{
               color: "#084b4a",
               fontFamily: "var(--font-heading)",
-              fontSize: "2rem",
-              fontWeight: 800,
+              fontSize: "1.65rem",
+              fontWeight: 900,
               lineHeight: 1,
             }}
           >
@@ -93,9 +94,9 @@ export default function PublicNavbar() {
               style={{
                 color: isActive(link.href) ? "#0f9a94" : "#10272d",
                 fontFamily: "var(--font-heading)",
-                fontSize: "0.95rem",
-                fontWeight: 800,
-                padding: "25px 0 22px",
+                fontSize: "0.9rem",
+                fontWeight: 850,
+                padding: "27px 0 24px",
                 position: "relative",
               }}
             >
@@ -183,9 +184,9 @@ export default function PublicNavbar() {
         <div
           id="pub-mobile-menu"
           style={{
-            background: "#ffffff",
+            background: "rgba(255,255,255,0.96)",
             borderTop: "1px solid #d5ebe8",
-            boxShadow: "0 12px 24px rgba(16,39,45,0.08)",
+            boxShadow: "0 18px 44px rgba(8,38,47,0.1)",
             display: "flex",
             flexDirection: "column",
             gap: "4px",

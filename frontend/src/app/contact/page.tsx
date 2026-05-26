@@ -2,130 +2,170 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import styles from "../login/login.module.css";
 
-const inquiryTypes = [
-  "Platform consultation",
-  "Supplier onboarding",
-  "Warehouse operations",
-  "Logistics partnership",
-  "Enterprise support",
+const supportCards = [
+  ["Sales", "Discuss onboarding, roles, and module fit for your organization."],
+  ["Support", "Get help with account access, dashboards, and operational workflows."],
+  ["Partnerships", "Coordinate supplier, logistics, warehouse, or buyer portal needs."],
+];
+
+const offices = [
+  ["North America", "Los Angeles Cargo Gateway", "la.ops@scm.local"],
+  ["Europe", "Rotterdam Gateway Hub", "eu.ops@scm.local"],
+  ["Asia Pacific", "Singapore Port Terminal", "apac.ops@scm.local"],
 ];
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    setSubmitted(true);
-  };
-
   return (
     <main className="pub-anim-fade-up">
-      <section className="pub-section-mint" style={{ borderBottom: "1px solid #d5ebe8", padding: "64px 0" }}>
+      <section className="pub-hero pub-section-mint">
         <div className="pub-container">
-          <div className="pub-grid-2" style={{ alignItems: "center", gap: "48px" }}>
+          <div className="contact-hero">
             <div>
-              <span className="pub-badge"><ShieldIcon /> End-to-End Supply Chain Intelligence</span>
-              <h1 className="pub-heading-xl" style={{ color: "#084b4a", margin: "22px 0 16px" }}>
-                Let us help optimize your supply chain
-              </h1>
-              <p className="pub-text-lead" style={{ margin: "0 0 26px" }}>
-                Talk to our operations team about supplier onboarding, warehouse visibility, shipment tracking, and enterprise-grade reporting.
+              <span className="pub-badge">Contact SCM</span>
+              <h1 className="pub-heading-xl">Talk to the team behind your supply chain workspace.</h1>
+              <p className="pub-text-lead">
+                Send a message about supplier onboarding, warehouse operations, client access, logistics partnerships, SQL reports, or dashboard support.
               </p>
-              <div style={{ display: "grid", gap: "16px" }}>
-                {[
-                  ["Real-time Visibility", "Track orders, inventory, and shipments across your entire network."],
-                  ["Trusted & Secure", "Protect partner data with controlled access and auditable activity."],
-                  ["Collaborate Seamlessly", "Bring suppliers, warehouses, clients, and logistics teams into one workflow."],
-                ].map(([title, text], index) => (
-                  <div className={styles.benefit} key={title}>
-                    <span className={styles.benefitIcon}>{index === 0 ? <ChartIcon /> : index === 1 ? <ShieldIcon /> : <NetworkIcon />}</span>
-                    <span>
-                      <span className={styles.benefitTitle}>{title}</span>
-                      <p className={styles.benefitText}>{text}</p>
-                    </span>
-                  </div>
-                ))}
+              <div className="pub-kicker-row">
+                <span className="pub-tag">Response within 1 business day</span>
+                <span className="pub-tag">Role-aware support</span>
               </div>
             </div>
-
-            <div className={styles.contactCard}>
-              <div className={styles.cardHeader}>
-                <div className={styles.headerIcon}><MailIcon /></div>
-                <div>
-                  <h2 className={styles.cardTitle}>Contact our team</h2>
-                  <p className={styles.cardSubtitle}>Share your details and we will route your request to the right specialist.</p>
-                </div>
-              </div>
-
-              <div className={styles.cardBody}>
-                {submitted ? (
-                  <div className={styles.successAlert}>
-                    <CheckIcon /> Thanks. Your request has been received and our team will contact you shortly.
-                  </div>
-                ) : (
-                  <form className={styles.form} onSubmit={handleSubmit}>
-                    <Field label="Full name">
-                      <input className={styles.input} placeholder="Enter your full name" required />
-                    </Field>
-                    <Field label="Business email">
-                      <input className={styles.input} placeholder="Enter your business email" required type="email" />
-                    </Field>
-                    <Field label="Company name">
-                      <input className={styles.input} placeholder="Enter your company name" required />
-                    </Field>
-                    <Field label="Phone number">
-                      <input className={styles.input} placeholder="(555) 123-4567" required />
-                    </Field>
-                    <Field label="Inquiry type">
-                      <select className={styles.select} required>
-                        <option value="">Select inquiry type</option>
-                        {inquiryTypes.map((item) => <option key={item}>{item}</option>)}
-                      </select>
-                    </Field>
-                    <Field label="Company size">
-                      <select className={styles.select} required>
-                        <option value="">Select company size</option>
-                        <option>1-50 employees</option>
-                        <option>51-250 employees</option>
-                        <option>251-1000 employees</option>
-                        <option>1000+ employees</option>
-                      </select>
-                    </Field>
-                    <div className={styles.fullSpan}>
-                      <label className={styles.label}>Message <span style={{ color: "#dc2626" }}>*</span></label>
-                      <textarea className={styles.textarea} placeholder="Tell us about your supply chain goals..." required />
-                    </div>
-                    <button className={styles.submitBtn} type="submit">Send Message</button>
-                    <p className={styles.terms}>
-                      Prefer account access? <Link href="/signup">Create your SCM account</Link>.
-                    </p>
-                  </form>
-                )}
-              </div>
-            </div>
+            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1100&q=80" alt="Modern operations office for logistics support" />
           </div>
         </div>
       </section>
+
+      <section className="pub-section pub-section-white">
+        <div className="pub-container">
+          <div className="contact-grid">
+            <form className="pub-card contact-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}>
+              <div>
+                <span className="pub-section-label">Message Us</span>
+                <h2 className="pub-heading-md">Route your request to the right operations team.</h2>
+              </div>
+              {submitted ? (
+                <div className="contact-success">Thanks. Your request has been received and routed to the SCM team.</div>
+              ) : (
+                <>
+                  <div className="contact-form-grid">
+                    <Field label="Full name"><input className="pub-input" required placeholder="Your name" /></Field>
+                    <Field label="Business email"><input className="pub-input" required type="email" placeholder="you@company.com" /></Field>
+                    <Field label="Company"><input className="pub-input" required placeholder="Company name" /></Field>
+                    <Field label="Inquiry type">
+                      <select className="pub-select" required>
+                        <option value="">Select inquiry</option>
+                        <option>Platform consultation</option>
+                        <option>Supplier onboarding</option>
+                        <option>Warehouse operations</option>
+                        <option>Logistics partnership</option>
+                        <option>SQL / reports support</option>
+                      </select>
+                    </Field>
+                  </div>
+                  <Field label="Message"><textarea className="pub-textarea" required placeholder="Tell us what you want to improve..." /></Field>
+                  <button className="pub-btn-primary" type="submit">Send Message</button>
+                </>
+              )}
+            </form>
+
+            <aside className="contact-side">
+              {supportCards.map(([title, desc]) => (
+                <article className="pub-card" key={title}>
+                  <span className="pub-tag">{title}</span>
+                  <p className="pub-text-body" style={{ margin: "14px 0 0" }}>{desc}</p>
+                </article>
+              ))}
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section className="pub-section pub-section-mint">
+        <div className="pub-container">
+          <div className="pub-section-head">
+            <div>
+              <span className="pub-section-label">Office Locations</span>
+              <h2 className="pub-heading-lg">Regional support close to logistics hubs.</h2>
+            </div>
+            <Link className="pub-btn-secondary" href="/locations">View network</Link>
+          </div>
+          <div className="pub-grid-3">
+            {offices.map(([region, office, email]) => (
+              <article className="pub-card" key={region}>
+                <span className="pub-tag">{region}</span>
+                <h3 className="pub-heading-sm" style={{ margin: "16px 0 8px" }}>{office}</h3>
+                <p className="pub-text-body" style={{ margin: 0 }}>{email}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <style>{`
+        .contact-hero,
+        .contact-grid {
+          align-items: center;
+          display: grid;
+          gap: 42px;
+          grid-template-columns: 1fr 1fr;
+        }
+        .contact-hero img {
+          border: 1px solid var(--pub-border);
+          border-radius: 34px;
+          box-shadow: var(--pub-shadow);
+          height: 500px;
+          object-fit: cover;
+          width: 100%;
+        }
+        .contact-form {
+          display: grid;
+          gap: 22px;
+        }
+        .contact-form-grid {
+          display: grid;
+          gap: 16px;
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .contact-side {
+          display: grid;
+          gap: 16px;
+        }
+        .contact-success {
+          background: var(--pub-mint-2);
+          border: 1px solid var(--pub-border);
+          border-radius: 18px;
+          color: var(--pub-teal-dark);
+          font-weight: 850;
+          padding: 18px;
+        }
+        @media (max-width: 900px) {
+          .contact-hero,
+          .contact-grid {
+            grid-template-columns: 1fr;
+          }
+          .contact-hero img {
+            height: 340px;
+          }
+        }
+        @media (max-width: 620px) {
+          .contact-form-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </main>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className={styles.formGroup}>
-      <label className={styles.label}>{label} <span style={{ color: "#dc2626" }}>*</span></label>
+    <label>
+      <span className="pub-label">{label}</span>
       {children}
-    </div>
+    </label>
   );
 }
-
-function Icon({ children }: { children: React.ReactNode }) {
-  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">{children}</svg>;
-}
-function ShieldIcon() { return <Icon><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3v8Z"/><path d="m9 12 2 2 4-5"/></Icon>; }
-function ChartIcon() { return <Icon><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/><path d="M19 9h-5"/></Icon>; }
-function NetworkIcon() { return <Icon><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v4"/><path d="m10.5 12-4 5"/><path d="m13.5 12 4 5"/></Icon>; }
-function MailIcon() { return <Icon><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></Icon>; }
-function CheckIcon() { return <Icon><path d="m20 6-11 11-5-5"/></Icon>; }

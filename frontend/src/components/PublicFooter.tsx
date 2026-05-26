@@ -17,19 +17,19 @@ export default function PublicFooter() {
     <footer
       id="pub-footer"
       style={{
-        background: "#ffffff",
-        borderTop: "1px solid #d5ebe8",
-        color: "#526777",
+        background: "linear-gradient(180deg, #ffffff, #f4fbf8)",
+        borderTop: "1px solid var(--pub-border)",
+        color: "var(--pub-muted)",
       }}
     >
       <div
         className="pub-container"
         style={{
           display: "grid",
-          gap: "28px",
+          gap: "32px",
           gridTemplateColumns: "1.6fr 0.8fr 0.9fr 1.2fr",
-          paddingBottom: "26px",
-          paddingTop: "26px",
+          paddingBottom: "38px",
+          paddingTop: "42px",
         }}
       >
         <div>
@@ -39,8 +39,8 @@ export default function PublicFooter() {
               SCM
             </span>
           </Link>
-          <p className="pub-text-sm" style={{ margin: "10px 0 0", maxWidth: "280px" }}>
-            Smart Supply Chain Solutions for a connected, efficient, and sustainable future.
+          <p className="pub-text-sm" style={{ margin: "12px 0 0", maxWidth: "310px" }}>
+            Premium SQL-powered supply chain software for suppliers, warehouses, buyers, logistics partners, and admins.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export default function PublicFooter() {
             Stay Connected
           </h4>
           <p className="pub-text-sm" style={{ margin: "0 0 12px" }}>
-            Subscribe for supply chain updates and insights.
+            Subscribe for logistics, inventory, and SQL-powered operations updates.
           </p>
           <form
             onSubmit={(event) => event.preventDefault()}
@@ -82,7 +82,7 @@ export default function PublicFooter() {
         </div>
       </div>
 
-      <div style={{ borderTop: "1px solid #edf4f5", padding: "12px 0" }}>
+      <div style={{ borderTop: "1px solid var(--pub-border)", padding: "14px 0" }}>
         <div className="pub-container" style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "space-between" }}>
           <span style={{ fontSize: "0.78rem" }}>(c) {new Date().getFullYear()} SCM. All rights reserved.</span>
           <div style={{ display: "flex", gap: "18px", fontSize: "0.78rem" }}>

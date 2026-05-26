@@ -1,292 +1,197 @@
-"use client";
+import React from "react";
 
-import React, { useState } from "react";
-
-const HUBS = [
-  {
-    name: "Rotterdam Gateway Hub",
-    region: "Europe",
-    status: "Operational",
-    capacity: "45,000 m²",
-    occupancy: "82%",
-    coord: "Rotterdam, Netherlands",
-    contact: "rotterdam@scmnexus.com",
-    features: ["Automated Ocean Unloading", "Railway Integration", "Custom Clearance Vaults"],
-  },
-  {
-    name: "Singapore Port Terminal",
-    region: "Asia Pacific",
-    status: "Operational",
-    capacity: "60,000 m²",
-    occupancy: "78%",
-    coord: "Keppel District, Singapore",
-    contact: "singapore@scmnexus.com",
-    features: ["Automated Sorting Cranes", "Climate Control Storage", "Bonded Cargo Staging"],
-  },
-  {
-    name: "Los Angeles Cargo Gateway",
-    region: "Americas",
-    status: "Operational",
-    capacity: "55,000 m²",
-    occupancy: "89%",
-    coord: "San Pedro Bay, CA, USA",
-    contact: "la@scmnexus.com",
-    features: ["Direct Highway Transits", "Cross-Dock Terminal", "Hazard Class Storage"],
-  },
-  {
-    name: "Houston Distribution Center",
-    region: "Americas",
-    status: "Operational",
-    capacity: "35,000 m²",
-    occupancy: "68%",
-    coord: "Houston Ship Channel, TX, USA",
-    contact: "houston@scmnexus.com",
-    features: ["Container Depot Staging", "Refrigerated Racks", "Bulk Inventory Zones"],
-  },
+const locations = [
+  ["Rotterdam Gateway Hub", "Europe", "Port operations, customs staging, rail freight", "82%", "https://images.unsplash.com/photo-1524522173746-f628baad3644?auto=format&fit=crop&w=900&q=80"],
+  ["Singapore Port Terminal", "Asia Pacific", "Ocean freight, climate storage, bonded cargo", "78%", "https://images.unsplash.com/photo-1566273970966-6abfd8c0c517?auto=format&fit=crop&w=900&q=80"],
+  ["Los Angeles Cargo Gateway", "North America", "Container intake, cross-dock, highway routing", "89%", "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=900&q=80"],
+  ["Houston Distribution Center", "North America", "Bulk inventory, refrigerated racks, regional dispatch", "68%", "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=80"],
+  ["Dubai Regional Hub", "Middle East", "Air freight, regional transfer, high-value storage", "74%", "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=900&q=80"],
+  ["Hamburg Warehouse Campus", "Europe", "Warehouse staging, inland freight, supplier consolidation", "71%", "https://images.unsplash.com/photo-1605902711622-cfb43c4437d0?auto=format&fit=crop&w=900&q=80"],
 ];
 
-const LOOKUP_REGIONS = [
-  { country: "United States", bestHub: "Los Angeles Cargo Gateway", transitEst: "1-2 Business Days" },
-  { country: "Canada", bestHub: "Los Angeles Cargo Gateway", transitEst: "2-4 Business Days" },
-  { country: "Netherlands", bestHub: "Rotterdam Gateway Hub", transitEst: "Same-Day Dispatch" },
-  { country: "Germany", bestHub: "Rotterdam Gateway Hub", transitEst: "1-2 Business Days" },
-  { country: "United Kingdom", bestHub: "Rotterdam Gateway Hub", transitEst: "2-3 Business Days" },
-  { country: "Singapore", bestHub: "Singapore Port Terminal", transitEst: "Immediate Pick-up" },
-  { country: "Australia", bestHub: "Singapore Port Terminal", transitEst: "3-5 Business Days" },
-  { country: "Japan", bestHub: "Singapore Port Terminal", transitEst: "2-4 Business Days" },
+const stats = [
+  ["30+", "Countries represented"],
+  ["85+", "Warehouses and hubs"],
+  ["14", "Regional freight lanes"],
+  ["24/7", "Tracking coverage"],
 ];
 
 export default function LocationsPage() {
-  const [selectedRegion, setSelectedRegion] = useState("All");
-  const [lookupCountry, setLookupCountry] = useState("United States");
-
-  const filteredHubs = HUBS.filter(
-    (hub) => selectedRegion === "All" || hub.region === selectedRegion
-  );
-
-  const matchedLookup = LOOKUP_REGIONS.find((l) => l.country === lookupCountry);
-  const matchedHubDetails = HUBS.find((h) => h.name === matchedLookup?.bestHub);
-
   return (
-    <div className="pub-anim-fade-up">
-      {/* Page Header */}
-      <section className="pub-section-sm pub-section-mint" style={{ borderBottom: "1px solid #ccfbf1" }}>
+    <main className="pub-anim-fade-up">
+      <section className="pub-hero pub-section-mint">
         <div className="pub-container">
-          <span className="pub-section-label">Global Infrastructure</span>
-          <h1 className="pub-heading-lg" style={{ margin: "8px 0 0 0" }}>
-            Operational Facility Network
-          </h1>
-          <p className="pub-text-lead" style={{ margin: "12px 0 0 0", maxWidth: "800px" }}>
-            SCM coordinates inventory across strategic global hubs, connecting marine sea lanes, rail freight depots, and inland cargo stations.
-          </p>
-        </div>
-      </section>
-
-      {/* Map Section */}
-      <section style={{ background: "#ffffff", padding: "48px 0", borderBottom: "1px solid #ccfbf1" }}>
-        <div className="pub-container" style={{ textAlign: "center" }}>
-          <div style={{ maxWidth: "880px", margin: "0 auto", padding: "20px", background: "#f4fcf9", borderRadius: "24px", border: "1px solid #ccfbf1" }}>
-            <svg viewBox="0 0 800 450" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "auto" }}>
-              {/* World outline vectors */}
-              <path d="M70 120 Q120 90 200 130 T280 100 T350 140 T420 100 T510 130 T600 90 T700 140 T750 120" stroke="rgba(13, 148, 136, 0.12)" strokeWidth="3" fill="none" />
-              <path d="M90 250 Q160 220 220 270 T300 240 T410 280 T520 240 T630 290 T720 250" stroke="rgba(13, 148, 136, 0.12)" strokeWidth="3" fill="none" />
-              
-              {/* Shipping lanes */}
-              <path d="M180 180 Q320 110 430 140" stroke="#99f6e4" strokeWidth="2" strokeDasharray="4,4" />
-              <path d="M430 140 Q520 210 610 290" stroke="#99f6e4" strokeWidth="2" strokeDasharray="4,4" />
-              <path d="M610 290 Q400 240 180 180" stroke="#99f6e4" strokeWidth="2.5" strokeDasharray="4,4" />
-
-              {/* Rotterdam Node */}
-              <g transform="translate(430, 140)">
-                <circle cx="0" cy="0" r="16" fill="rgba(13,148,136,0.15)" />
-                <circle cx="0" cy="0" r="7" fill="#0d9488" />
-                <text x="14" y="4" fill="#0f2e2a" fontFamily="'Space Grotesk'" fontSize="11" fontWeight="700">Rotterdam Hub</text>
-              </g>
-
-              {/* Singapore Node */}
-              <g transform="translate(610, 290)">
-                <circle cx="0" cy="0" r="16" fill="rgba(13,148,136,0.15)" />
-                <circle cx="0" cy="0" r="7" fill="#0ea5e9" />
-                <text x="14" y="4" fill="#0f2e2a" fontFamily="'Space Grotesk'" fontSize="11" fontWeight="700">Singapore Port</text>
-              </g>
-
-              {/* Los Angeles Node */}
-              <g transform="translate(180, 180)">
-                <circle cx="0" cy="0" r="16" fill="rgba(13,148,136,0.15)" />
-                <circle cx="0" cy="0" r="7" fill="#0d9488" />
-                <text x="-120" y="4" fill="#0f2e2a" fontFamily="'Space Grotesk'" fontSize="11" fontWeight="700">LA Gateway Hub</text>
-              </g>
-
-              {/* Houston Node */}
-              <g transform="translate(260, 210)">
-                <circle cx="0" cy="0" r="12" fill="rgba(13,148,136,0.12)" />
-                <circle cx="0" cy="0" r="5" fill="#0d9488" />
-                <text x="12" y="4" fill="#4b7a74" fontFamily="'Space Grotesk'" fontSize="9" fontWeight="600">Houston depot</text>
-              </g>
-            </svg>
-          </div>
-        </div>
-      </section>
-
-      {/* Lookup Facility Finder */}
-      <section className="pub-section pub-section-mint" style={{ borderBottom: "1px solid #ccfbf1" }}>
-        <div className="pub-container">
-          <div className="pub-grid-2" style={{ alignItems: "center", gap: "64px" }}>
+          <div className="locations-hero">
             <div>
-              <span className="pub-section-label">Interactive Lookup</span>
-              <h2 className="pub-heading-lg" style={{ margin: "8px 0 16px 0" }}>
-                Find Closest SCM Facility
-              </h2>
-              <p className="pub-text-body" style={{ margin: "0 0 24px 0" }}>
-                Select your dispatch country below to instantly calculate the closest distribution warehouse, estimated shipping transit lead times, and capacity tags.
+              <span className="pub-badge">Global Network</span>
+              <h1 className="pub-heading-xl">Map hubs, warehouses, and route visibility across regions.</h1>
+              <p className="pub-text-lead">
+                Use SCM to model global and regional logistics hubs with location cards, warehouse stats, capacity snapshots, and operational routing context.
               </p>
-
-              <div>
-                <label className="pub-label">Shipment Origin / Destination Country</label>
-                <select
-                  value={lookupCountry}
-                  onChange={(e) => setLookupCountry(e.target.value)}
-                  className="pub-select"
-                  style={{ maxWidth: "360px" }}
-                >
-                  {LOOKUP_REGIONS.map((l) => (
-                    <option key={l.country} value={l.country}>
-                      {l.country}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
-
-            {/* Lookup result display */}
-            <div>
-              {matchedLookup && matchedHubDetails && (
-                <div className="pub-card" style={{ background: "#ffffff", padding: "32px", display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span className="pub-badge">Primary Route Match</span>
-                    <span style={{ fontSize: "0.85rem", color: "#0ea5e9", fontWeight: 600 }}>Active link</span>
-                  </div>
-
-                  <div>
-                    <span style={{ fontSize: "0.8rem", color: "#7fb3ad", display: "block" }}>Closest Warehouse</span>
-                    <h3 className="pub-heading-sm" style={{ margin: "4px 0 0 0", color: "#0f2e2a" }}>
-                      {matchedHubDetails.name}
-                    </h3>
-                  </div>
-
-                  <div className="pub-grid-2" style={{ gap: "16px", borderTop: "1px solid #ccfbf1", borderBottom: "1px solid #ccfbf1", padding: "16px 0" }}>
-                    <div>
-                      <span style={{ fontSize: "0.8rem", color: "#7fb3ad", display: "block" }}>Transit Time (Est)</span>
-                      <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>{matchedLookup.transitEst}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: "0.8rem", color: "#7fb3ad", display: "block" }}>Storage Capacity</span>
-                      <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>{matchedHubDetails.capacity}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span style={{ fontSize: "0.8rem", color: "#7fb3ad", display: "block", marginBottom: "6px" }}>Hub Capability Tags</span>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                      {matchedHubDetails.features.map((f) => (
-                        <span key={f} className="pub-tag">
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Facilities Catalog */}
-      <section className="pub-section" style={{ background: "#ffffff" }}>
-        <div className="pub-container">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "40px", flexWrap: "wrap", gap: "16px" }}>
-            <div>
-              <span className="pub-section-label">Operational Network</span>
-              <h2 className="pub-heading-lg" style={{ margin: 0 }}>
-                Warehouse & Port Catalogs
-              </h2>
-            </div>
-
-            {/* Filter controls */}
-            <div style={{ display: "flex", gap: "8px" }}>
-              {["All", "Americas", "Europe", "Asia Pacific"].map((reg) => (
-                <button
-                  key={reg}
-                  onClick={() => setSelectedRegion(reg)}
-                  style={{
-                    background: selectedRegion === reg ? "#ccfbf1" : "transparent",
-                    border: selectedRegion === reg ? "1px solid #99f6e4" : "1px solid #e0f2ed",
-                    borderRadius: "9999px",
-                    color: selectedRegion === reg ? "#0d9488" : "#4b7a74",
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontWeight: 600,
-                    fontSize: "0.8rem",
-                    padding: "6px 14px",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    outline: "none",
-                  }}
-                >
-                  {reg}
-                </button>
+            <div className="locations-map-card">
+              <div className="locations-route route-a" />
+              <div className="locations-route route-b" />
+              {["LA", "Houston", "Rotterdam", "Dubai", "Singapore"].map((node, index) => (
+                <span className={`locations-node loc-${index + 1}`} key={node}>{node}</span>
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="pub-grid-2">
-            {filteredHubs.map((hub) => (
-              <div key={hub.name} className="pub-card" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
-                  <div>
-                    <h3 className="pub-heading-sm" style={{ margin: 0 }}>{hub.name}</h3>
-                    <span style={{ fontSize: "0.8rem", color: "#7fb3ad" }}>{hub.coord}</span>
-                  </div>
-                  <span
-                    className="pub-badge"
-                    style={{
-                      background: "#f0fdfb",
-                      borderColor: "#ccfbf1",
-                      color: "#0d9488",
-                      fontSize: "0.72rem",
-                    }}
-                  >
-                    🟢 {hub.status}
-                  </span>
-                </div>
-
-                <div className="pub-grid-3" style={{ background: "#f4fcf9", borderRadius: "10px", padding: "16px", border: "1px solid #ccfbf1" }}>
-                  <div>
-                    <span style={{ fontSize: "0.75rem", color: "#7fb3ad", display: "block" }}>Region</span>
-                    <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>{hub.region}</span>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "0.75rem", color: "#7fb3ad", display: "block" }}>Capacity</span>
-                    <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>{hub.capacity}</span>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "0.75rem", color: "#7fb3ad", display: "block" }}>Occupancy</span>
-                    <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>{hub.occupancy}</span>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                  {hub.features.map((feat) => (
-                    <span key={feat} className="pub-tag">
-                      {feat}
-                    </span>
-                  ))}
-                </div>
+      <section className="locations-stats-section">
+        <div className="pub-container">
+          <div className="home-stats pub-card">
+            {stats.map(([value, label]) => (
+              <div key={label}>
+                <strong className="pub-stat-value">{value}</strong>
+                <span className="pub-stat-label">{label}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
-    </div>
+
+      <section className="pub-section pub-section-white">
+        <div className="pub-container">
+          <div className="pub-section-head">
+            <div>
+              <span className="pub-section-label">Location Cards</span>
+              <h2 className="pub-heading-lg">Dummy hub data for a realistic logistics network.</h2>
+            </div>
+          </div>
+          <div className="locations-grid">
+            {locations.map(([name, region, desc, occupancy, image]) => (
+              <article className="pub-image-card" key={name}>
+                <img src={image} alt={`${name} logistics hub`} />
+                <div className="pub-image-card-body">
+                  <span className="pub-tag">{region}</span>
+                  <h3 className="pub-heading-sm" style={{ margin: "16px 0 10px" }}>{name}</h3>
+                  <p className="pub-text-body" style={{ margin: "0 0 16px" }}>{desc}</p>
+                  <div className="locations-capacity">
+                    <span>Occupancy</span>
+                    <strong>{occupancy}</strong>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <style>{`
+        .locations-hero {
+          align-items: center;
+          display: grid;
+          gap: 44px;
+          grid-template-columns: .95fr 1.05fr;
+        }
+        .locations-map-card {
+          background:
+            linear-gradient(rgba(12,154,143,.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(12,154,143,.08) 1px, transparent 1px),
+            radial-gradient(circle at 40% 40%, rgba(17,184,127,.16), transparent 30%),
+            #ffffff;
+          background-size: 42px 42px, 42px 42px, auto, auto;
+          border: 1px solid var(--pub-border);
+          border-radius: 34px;
+          box-shadow: var(--pub-shadow);
+          height: 480px;
+          overflow: hidden;
+          position: relative;
+        }
+        .locations-route {
+          border-top: 3px dashed rgba(12,154,143,.42);
+          position: absolute;
+          width: 70%;
+        }
+        .route-a {
+          left: 10%;
+          top: 50%;
+          transform: rotate(-12deg);
+        }
+        .route-b {
+          left: 22%;
+          top: 48%;
+          transform: rotate(22deg);
+        }
+        .locations-node {
+          align-items: center;
+          background: var(--pub-teal);
+          border: 8px solid #dff7ef;
+          border-radius: 50%;
+          color: #fff;
+          display: flex;
+          font-size: .72rem;
+          font-weight: 900;
+          height: 58px;
+          justify-content: center;
+          position: absolute;
+          width: 58px;
+        }
+        .loc-1 { left: 11%; top: 48%; }
+        .loc-2 { left: 23%; top: 62%; }
+        .loc-3 { left: 49%; top: 31%; }
+        .loc-4 { left: 63%; top: 53%; }
+        .loc-5 { left: 78%; top: 67%; }
+        .locations-stats-section {
+          margin-top: -34px;
+          position: relative;
+          z-index: 2;
+        }
+        .home-stats {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          padding: 0;
+        }
+        .home-stats > div {
+          border-right: 1px solid var(--pub-border);
+          padding: 26px;
+        }
+        .home-stats > div:last-child {
+          border-right: 0;
+        }
+        .locations-grid {
+          display: grid;
+          gap: 22px;
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .locations-capacity {
+          align-items: center;
+          background: var(--pub-mint-2);
+          border: 1px solid var(--pub-border);
+          border-radius: 16px;
+          display: flex;
+          justify-content: space-between;
+          padding: 13px 14px;
+        }
+        .locations-capacity span {
+          color: var(--pub-muted);
+          font-weight: 800;
+        }
+        .locations-capacity strong {
+          color: var(--pub-teal);
+        }
+        @media (max-width: 1000px) {
+          .locations-hero,
+          .locations-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        @media (max-width: 680px) {
+          .locations-map-card {
+            height: 340px;
+          }
+          .home-stats {
+            grid-template-columns: 1fr;
+          }
+          .home-stats > div {
+            border-bottom: 1px solid var(--pub-border);
+            border-right: 0;
+          }
+        }
+      `}</style>
+    </main>
   );
 }
