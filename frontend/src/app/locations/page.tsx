@@ -6,7 +6,7 @@ const locations = [
   ["Los Angeles Cargo Gateway", "North America", "Container intake, cross-dock, highway routing", "89%", "https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=900&q=80"],
   ["Houston Distribution Center", "North America", "Bulk inventory, refrigerated racks, regional dispatch", "68%", "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=80"],
   ["Dubai Regional Hub", "Middle East", "Air freight, regional transfer, high-value storage", "74%", "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=900&q=80"],
-  ["Hamburg Warehouse Campus", "Europe", "Warehouse staging, inland freight, supplier consolidation", "71%", "https://images.unsplash.com/photo-1586528116493-9a8f2b3c9f71?auto=format&fit=crop&w=900&q=80"],
+  ["Hamburg Warehouse Campus", "Europe", "Warehouse staging, inland freight, supplier consolidation", "71%", "https://images.pexels.com/photos/4481326/pexels-photo-4481326.jpeg?auto=compress&cs=tinysrgb&w=900"],
 ];
 
 const stats = [
