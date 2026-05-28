@@ -361,15 +361,15 @@ export default function HomePage() {
       <style>{`
         .pub-hero > .pub-container {
           max-width: 1500px;
-          padding-left: 48px;
-          padding-right: 48px;
+          padding-left: 24px;
+          padding-right: 24px;
         }
         .home-hero-grid {
           align-items: center;
           display: grid;
           gap: 36px;
           grid-template-columns: minmax(0, .48fr) minmax(0, .52fr);
-          min-height: 700px;
+          min-height: 560px;
         }
         .home-hero-copy {
           display: flex;

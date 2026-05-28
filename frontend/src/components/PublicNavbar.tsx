@@ -6,10 +6,11 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
-  { label: "Features", href: "/services" },
-  { label: "Solutions", href: "/industries" },
-  { label: "Resources", href: "/query-lab" },
-  { label: "Pricing", href: "/invoices" },
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/services" },
+  { label: "Industries", href: "/industries" },
+  { label: "Locations", href: "/locations" },
+  { label: "Contact", href: "/contact" },
   { label: "About", href: "/about" },
 ];
 
@@ -64,8 +65,8 @@ export default function PublicNavbar() {
           height: "76px",
           justifyContent: "space-between",
           margin: "0 auto",
-          maxWidth: "1280px",
-          padding: "0 32px",
+          maxWidth: "1440px",
+          padding: "0 var(--pub-page-gutter)",
         }}
       >
         <Link
@@ -107,7 +108,7 @@ export default function PublicNavbar() {
             </span>
         </Link>
 
-        <nav id="pub-desktop-nav" style={{ alignItems: "center", display: "flex", gap: "34px" }}>
+        <nav id="pub-desktop-nav" style={{ alignItems: "center", display: "flex", gap: "24px" }}>
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -116,7 +117,7 @@ export default function PublicNavbar() {
               style={{
                 color: isActive(link.href) ? "#0f9a94" : "#10272d",
                 fontFamily: "var(--font-heading)",
-                fontSize: "0.95rem",
+                fontSize: "0.9rem",
                 fontWeight: 800,
                 letterSpacing: 0,
                 padding: "27px 0 24px",
@@ -257,8 +258,8 @@ export default function PublicNavbar() {
             display: flex !important;
           }
           #pub-navbar > div {
-            padding-left: 18px !important;
-            padding-right: 18px !important;
+            padding-left: 14px !important;
+            padding-right: 14px !important;
           }
         }
       `}</style>

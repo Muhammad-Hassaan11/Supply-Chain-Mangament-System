@@ -24,6 +24,7 @@
   --pub-radius-lg: 32px;
   --pub-transition: 180ms ease;
   --pub-nav-height: 76px;
+  --pub-page-gutter: clamp(14px, 1.7vw, 22px);
 }
 
 .public-theme {
@@ -50,8 +51,8 @@
 
 .pub-container {
   margin: 0 auto;
-  max-width: 1220px;
-  padding: 0 28px;
+  max-width: 1420px;
+  padding: 0 var(--pub-page-gutter);
 }
 
 .pub-section {
@@ -74,7 +75,7 @@
 
 .pub-hero {
   overflow: hidden;
-  padding: 76px 0 54px;
+  padding: 34px 0 46px;
   position: relative;
 }
 
@@ -455,7 +456,7 @@
 
 @media (max-width: 760px) {
   .pub-container {
-    padding: 0 18px;
+    padding: 0 14px;
   }
 
   .pub-section {
@@ -472,7 +473,7 @@
   }
 
   .pub-hero {
-    padding: 52px 0 36px;
+    padding: 28px 0 34px;
   }
 
   .pub-cta-banner {
