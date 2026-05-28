@@ -6,12 +6,11 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 const NAV_LINKS = [
-  { label: "Home", href: "/" },
+  { label: "Features", href: "/services" },
+  { label: "Solutions", href: "/industries" },
+  { label: "Resources", href: "/query-lab" },
+  { label: "Pricing", href: "/invoices" },
   { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Industries", href: "/industries" },
-  { label: "Locations", href: "/locations" },
-  { label: "Contact", href: "/contact" },
 ];
 
 function CubeLogo({ size = 34 }: { size?: number }) {
@@ -32,10 +31,13 @@ export default function PublicNavbar() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const mountFrame = window.requestAnimationFrame(() => setMounted(true));
     const onScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.cancelAnimationFrame(mountFrame);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   const isActive = (href: string) =>
@@ -46,9 +48,9 @@ export default function PublicNavbar() {
       id="pub-navbar"
       style={{
         backdropFilter: "blur(18px)",
-        background: scrolled ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.66)",
-        borderBottom: "1px solid rgba(207,233,226,0.86)",
-        boxShadow: scrolled ? "0 18px 42px rgba(8,38,47,0.08)" : "none",
+        background: scrolled ? "rgba(255,255,255,0.94)" : "rgba(255,255,255,0.9)",
+        borderBottom: "1px solid rgba(207,219,226,0.82)",
+        boxShadow: scrolled ? "0 14px 38px rgba(8,38,47,0.06)" : "none",
         position: "sticky",
         top: 0,
         zIndex: 1000,
@@ -72,17 +74,37 @@ export default function PublicNavbar() {
           style={{ alignItems: "center", display: "flex", flexShrink: 0, gap: "10px" }}
         >
           <CubeLogo />
-          <span
-            style={{
-              color: "#084b4a",
-              fontFamily: "var(--font-heading)",
-              fontSize: "1.65rem",
-              fontWeight: 900,
-              lineHeight: 1,
-            }}
-          >
-            SCM
-          </span>
+            <span
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "3px",
+              }}
+            >
+              <strong
+                style={{
+                  color: "#071d35",
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "1.55rem",
+                  fontWeight: 950,
+                  letterSpacing: 0,
+                  lineHeight: 1,
+                }}
+              >
+                SCMS
+              </strong>
+              <small
+                style={{
+                  color: "#607782",
+                  fontSize: "0.82rem",
+                  fontWeight: 700,
+                  letterSpacing: 0,
+                  lineHeight: 1,
+                }}
+              >
+                Supply Chain Management System
+              </small>
+            </span>
         </Link>
 
         <nav id="pub-desktop-nav" style={{ alignItems: "center", display: "flex", gap: "34px" }}>
@@ -94,8 +116,9 @@ export default function PublicNavbar() {
               style={{
                 color: isActive(link.href) ? "#0f9a94" : "#10272d",
                 fontFamily: "var(--font-heading)",
-                fontSize: "0.9rem",
-                fontWeight: 850,
+                fontSize: "0.95rem",
+                fontWeight: 800,
+                letterSpacing: 0,
                 padding: "27px 0 24px",
                 position: "relative",
               }}
@@ -136,10 +159,10 @@ export default function PublicNavbar() {
           ) : (
             <>
               <Link className="pub-btn-secondary" href="/login" id="pub-nav-login" style={{ minHeight: "38px", padding: "9px 22px" }}>
-                Login
+                Log in
               </Link>
               <Link className="pub-btn-primary" href="/signup" id="pub-nav-signup" style={{ minHeight: "38px", padding: "9px 22px" }}>
-                Sign Up
+                Get Started
               </Link>
             </>
           )}
@@ -211,10 +234,10 @@ export default function PublicNavbar() {
           {mounted && !user && (
             <div style={{ display: "grid", gap: "10px", gridTemplateColumns: "1fr 1fr", marginTop: "10px" }}>
               <Link className="pub-btn-secondary" href="/login">
-                Login
+                Log in
               </Link>
               <Link className="pub-btn-primary" href="/signup">
-                Sign Up
+                Get Started
               </Link>
             </div>
           )}
