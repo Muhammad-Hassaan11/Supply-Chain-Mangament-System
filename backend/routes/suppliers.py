@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from database import execute_query
+from database import ensure_supplier_profile_columns, execute_query
 from models import Supplier, SupplierCreate
 from typing import List
 from auth import require_write_access
@@ -12,7 +12,12 @@ def get_suppliers():
     Retrieves all suppliers from the database using raw SQL.
     """
     try:
-        query = "SELECT supplier_id, contact_id, rating, contact_email FROM Suppliers ORDER BY supplier_id DESC"
+        ensure_supplier_profile_columns()
+        query = """
+            SELECT supplier_id, contact_id, supplier_name, rating, contact_email, phone, status
+            FROM Suppliers
+            ORDER BY supplier_id DESC
+        """
         result = execute_query(query, fetch=True)
         return result or []
     except Exception as e:
@@ -27,7 +32,12 @@ def get_supplier(supplier_id: int):
     Retrieves a single supplier by ID using raw SQL.
     """
     try:
-        query = "SELECT supplier_id, contact_id, rating, contact_email FROM Suppliers WHERE supplier_id = ?"
+        ensure_supplier_profile_columns()
+        query = """
+            SELECT supplier_id, contact_id, supplier_name, rating, contact_email, phone, status
+            FROM Suppliers
+            WHERE supplier_id = ?
+        """
         result = execute_query(query, (supplier_id,), fetch_one=True)
         if not result:
             raise HTTPException(
@@ -49,6 +59,7 @@ def create_supplier(supplier: SupplierCreate, current_user = Depends(require_wri
     Creates a new supplier using raw SQL.
     """
     try:
+        ensure_supplier_profile_columns()
         # Validate rating in application layer (as double insurance)
         if not (1 <= supplier.rating <= 5):
             raise HTTPException(
@@ -57,15 +68,22 @@ def create_supplier(supplier: SupplierCreate, current_user = Depends(require_wri
             )
 
         query = """
-            INSERT INTO Suppliers (contact_id, rating, contact_email)
-            VALUES (?, ?, ?)
+            INSERT INTO Suppliers (contact_id, supplier_name, rating, contact_email, phone, status)
+            VALUES (?, ?, ?, ?, ?, ?)
         """
-        params = (supplier.contact_id, supplier.rating, supplier.contact_email)
+        params = (
+            supplier.contact_id,
+            supplier.supplier_name,
+            supplier.rating,
+            supplier.contact_email,
+            supplier.phone,
+            supplier.status,
+        )
         execute_query(query, params)
 
         result = execute_query(
             """
-            SELECT TOP 1 supplier_id, contact_id, rating, contact_email
+            SELECT TOP 1 supplier_id, contact_id, supplier_name, rating, contact_email, phone, status
             FROM Suppliers
             WHERE contact_id = ? AND contact_email = ?
             ORDER BY supplier_id DESC
@@ -106,6 +124,7 @@ def update_supplier(supplier_id: int, supplier: SupplierCreate, current_user = D
     Updates an existing supplier using raw SQL.
     """
     try:
+        ensure_supplier_profile_columns()
         # First verify supplier exists
         check_query = "SELECT supplier_id FROM Suppliers WHERE supplier_id = ?"
         exists = execute_query(check_query, (supplier_id,), fetch_one=True)
@@ -123,18 +142,29 @@ def update_supplier(supplier_id: int, supplier: SupplierCreate, current_user = D
 
         query = """
             UPDATE Suppliers
-            SET contact_id = ?, rating = ?, contact_email = ?
+            SET contact_id = ?, supplier_name = ?, rating = ?, contact_email = ?, phone = ?, status = ?
             WHERE supplier_id = ?
         """
-        params = (supplier.contact_id, supplier.rating, supplier.contact_email, supplier_id)
+        params = (
+            supplier.contact_id,
+            supplier.supplier_name,
+            supplier.rating,
+            supplier.contact_email,
+            supplier.phone,
+            supplier.status,
+            supplier_id,
+        )
         execute_query(query, params)
 
         # Return updated supplier
         return {
             "supplier_id": supplier_id,
             "contact_id": supplier.contact_id,
+            "supplier_name": supplier.supplier_name,
             "rating": supplier.rating,
-            "contact_email": supplier.contact_email
+            "contact_email": supplier.contact_email,
+            "phone": supplier.phone,
+            "status": supplier.status,
         }
     except HTTPException:
         raise
@@ -162,6 +192,7 @@ def delete_supplier(supplier_id: int, current_user = Depends(require_write_acces
     Enforces application-level restriction against cascading deletes if dependent Products exist.
     """
     try:
+        ensure_supplier_profile_columns()
         # First verify supplier exists
         check_query = "SELECT supplier_id FROM Suppliers WHERE supplier_id = ?"
         exists = execute_query(check_query, (supplier_id,), fetch_one=True)

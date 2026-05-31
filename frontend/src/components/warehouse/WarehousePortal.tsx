@@ -937,6 +937,7 @@ export function WarehouseProfilePage() {
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
+    const timer = window.setTimeout(() => {
     setAvatar(localStorage.getItem("warehouse_avatar"));
     setName(localStorage.getItem("warehouse_manager_name") || "Michael Anderson");
     setEmail(localStorage.getItem("warehouse_manager_email") || "michael.anderson@logisticsco.com");
@@ -952,6 +953,8 @@ export function WarehouseProfilePage() {
         localStorage.removeItem("warehouse_manager_toggles");
       }
     }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const saveProfile = () => {

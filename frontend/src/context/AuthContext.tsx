@@ -26,6 +26,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const PUBLIC_ROUTES = ["/", "/about", "/services", "/industries", "/locations", "/contact", "/login", "/signup"];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -33,33 +34,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const PUBLIC_ROUTES = ["/", "/about", "/services", "/industries", "/locations", "/contact", "/login", "/signup"];
-
   useEffect(() => {
-    // Read user from localStorage on mount
-    const email = getStoredEmail();
-    const role = getStoredRole() as "Admin" | "Viewer" | null;
-    const token = localStorage.getItem("access_token");
+    const timer = window.setTimeout(() => {
+      // Read user from localStorage on mount
+      const email = getStoredEmail();
+      const role = getStoredRole() as "Admin" | "Viewer" | null;
+      const token = localStorage.getItem("access_token");
 
-    const isPublic = PUBLIC_ROUTES.some(
-      (r) => pathname === r || pathname.startsWith(r + "/")
-    );
+      const isPublic = PUBLIC_ROUTES.some(
+        (r) => pathname === r || pathname.startsWith(r + "/")
+      );
 
-    if (token && email && role) {
-      setUser({ email, role });
-      if (pathname === "/login" || pathname === "/signup") {
-        router.push("/dashboard");
+      if (token && email && role) {
+        setUser({ email, role });
+        if (pathname === "/login" || pathname === "/signup") {
+          router.push("/dashboard");
+        }
+      } else {
+        // Clear any partial/stale auth state
+        clearAuthToken();
+        setUser(null);
+        if (!isPublic) {
+          router.push("/login");
+        }
       }
-    } else {
-      // Clear any partial/stale auth state
-      clearAuthToken();
-      setUser(null);
-      if (!isPublic) {
-        router.push("/login");
-      }
-    }
-    setLoading(false);
-  }, [pathname]);
+      setLoading(false);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [pathname, router]);
 
   const login = async (email: string, password: string) => {
     try {

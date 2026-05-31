@@ -21,17 +21,17 @@ INSERT INTO Users (email, password_hash, role, full_name, account_type, status) 
 ('raj@pacwest-log.com', '$2b$12$J2zLC8JLah/2xW9DXObVJ.W96zWp5ytO7WuMaDMA98Zk5jxpvQamW', 'Viewer', 'Raj Patel', 'logistics', 'Active');
 
 -- 3. Seed Suppliers (10 rows)
-INSERT INTO Suppliers (contact_id, rating, contact_email) VALUES
-(1001, 5, 'info@apexlogistics.com'),
-(1002, 4, 'sales@quantumparts.com'),
-(1003, 3, 'contact@globalsteel.co'),
-(1004, 5, 'support@electrosource.net'),
-(1005, 4, 'orders@bio-medsupply.com'),
-(1006, 2, 'help@chemsolutions.org'),
-(1007, 5, 'admin@valueline.in'),
-(1008, 4, 'wholesale@texfabric.com'),
-(1009, 3, 'delivery@evergreenparts.com'),
-(1010, 5, 'partner@titaniumforge.com');
+INSERT INTO Suppliers (contact_id, supplier_name, rating, contact_email, phone, status) VALUES
+(1001, 'Apex Logistics', 5, 'info@apexlogistics.com', '+1 (404) 555-0112', 'Active'),
+(1002, 'Quantum Parts', 4, 'sales@quantumparts.com', '+1 (312) 555-0188', 'Active'),
+(1003, 'Global Steel Co.', 3, 'contact@globalsteel.co', '+1 (214) 555-0199', 'Inactive'),
+(1004, 'ElectroSource', 5, 'support@electrosource.net', '+1 (404) 555-0112', 'Active'),
+(1005, 'Bio-Med Supply', 4, 'orders@bio-medsupply.com', '+1 (408) 555-0109', 'Active'),
+(1006, 'Chem Solutions', 2, 'help@chemsolutions.org', '+1 (619) 555-0123', 'Inactive'),
+(1007, 'ValueLine Industrial', 5, 'admin@valueline.in', '+1 (414) 555-0155', 'Active'),
+(1008, 'TexFabric Wholesale', 4, 'wholesale@texfabric.com', '+1 (540) 555-0177', 'Active'),
+(1009, 'Evergreen Parts', 3, 'delivery@evergreenparts.com', '+1 (206) 555-0166', 'Inactive'),
+(1010, 'Titanium Forge', 5, 'partner@titaniumforge.com', '+1 (678) 555-0147', 'Active');
 
 -- 4. Seed Products (25 rows)
 -- Note: supplier_id references Suppliers. IDENTITY starts at 1, increments by 1.

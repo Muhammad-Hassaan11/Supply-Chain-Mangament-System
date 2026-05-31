@@ -5,8 +5,11 @@
 CREATE TABLE Suppliers (
     supplier_id INT IDENTITY(1,1) PRIMARY KEY,
     contact_id INT NOT NULL,
+    supplier_name VARCHAR(120) NOT NULL,
     rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    contact_email VARCHAR(100) NOT NULL CHECK (contact_email LIKE '%_@__%._%')
+    contact_email VARCHAR(100) NOT NULL CHECK (contact_email LIKE '%_@__%._%'),
+    phone VARCHAR(40) NOT NULL,
+    status VARCHAR(20) NOT NULL CHECK (status IN ('Active', 'Inactive'))
 );
 
 -- 2. Product Table

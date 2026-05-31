@@ -20,14 +20,14 @@ CATALOG = [
         "title": "Domain Email Search",
         "description": "Finds all suppliers using an 'example.com' email address.",
         "category": "CRUD",
-        "sql": "SELECT supplier_id, contact_id, rating, contact_email\nFROM Suppliers\nWHERE contact_email LIKE '%@example.com';"
+        "sql": "SELECT supplier_id, contact_id, supplier_name, rating, contact_email, phone, status\nFROM Suppliers\nWHERE contact_email LIKE '%@example.com';"
     },
     {
         "id": "join-1",
         "title": "Products with Supplier Details",
         "description": "Joins the Product and Suppliers tables to show products alongside their vendor contact emails and ratings.",
         "category": "JOIN",
-        "sql": "SELECT p.product_id, p.product_name, p.unit_price, s.rating, s.contact_email\nFROM Product p\nINNER JOIN Suppliers s ON p.supplier_id = s.supplier_id;"
+        "sql": "SELECT p.product_id, p.product_name, p.unit_price, s.supplier_name, s.rating, s.contact_email\nFROM Product p\nINNER JOIN Suppliers s ON p.supplier_id = s.supplier_id;"
     },
     {
         "id": "join-2",

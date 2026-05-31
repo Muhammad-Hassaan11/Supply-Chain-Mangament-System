@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
@@ -14,7 +14,7 @@ interface QueryCatalogItem {
 
 interface QueryResult {
   columns: string[];
-  rows: any[];
+  rows: Record<string, unknown>[];
   row_count: number;
 }
 
@@ -31,11 +31,14 @@ export default function QueryLabPage() {
   const [result, setResult] = useState<QueryResult | null>(null);
   const [executionError, setExecutionError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadCatalog();
+  const handleSelectQuery = useCallback((query: QueryCatalogItem) => {
+    setActiveQuery(query);
+    setCustomSql(query.sql);
+    setResult(null);
+    setExecutionError(null);
   }, []);
 
-  const loadCatalog = async () => {
+  const loadCatalog = useCallback(async () => {
     try {
       setLoading(true);
       const data = await api.get<QueryCatalogItem[]>("/api/queries/catalog");
@@ -44,20 +47,20 @@ export default function QueryLabPage() {
         handleSelectQuery(data[0]);
       }
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to load SQL query catalog.");
+      setError(err instanceof Error ? err.message : "Failed to load SQL query catalog.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [handleSelectQuery]);
 
-  const handleSelectQuery = (query: QueryCatalogItem) => {
-    setActiveQuery(query);
-    setCustomSql(query.sql);
-    setResult(null);
-    setExecutionError(null);
-  };
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      loadCatalog();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadCatalog]);
 
   const handleNewCustomQuery = () => {
     setActiveQuery(null);
@@ -80,9 +83,9 @@ export default function QueryLabPage() {
       
       setResult(response);
       console.log(`Query executed in ${(end - start).toFixed(2)}ms`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setExecutionError(err.message || "Query execution failed.");
+      setExecutionError(err instanceof Error ? err.message : "Query execution failed.");
     } finally {
       setIsExecuting(false);
     }

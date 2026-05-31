@@ -17,7 +17,7 @@ ORDER BY product_name ASC;
 -- 1.2 SELECT with LIKE pattern matching
 -- Title: Domain Email Search
 -- Description: Finds all suppliers using an 'example.com' email address.
-SELECT supplier_id, contact_id, rating, contact_email
+SELECT supplier_id, contact_id, supplier_name, rating, contact_email, phone, status
 FROM Suppliers
 WHERE contact_email LIKE '%@example.com';
 
@@ -25,8 +25,8 @@ WHERE contact_email LIKE '%@example.com';
 -- Title: Insert New Supplier
 -- Description: Demonstrates inserting a new record into the Suppliers table. (Requires Admin privileges)
 -- NOTE: In the live playground, this is a read-only demonstration, but serves as the backend logic template.
-INSERT INTO Suppliers (contact_id, rating, contact_email)
-VALUES (999, 5, 'new.vendor@supplychain.net');
+INSERT INTO Suppliers (contact_id, supplier_name, rating, contact_email, phone, status)
+VALUES (999, 'New Vendor Supplies', 5, 'new.vendor@supplychain.net', '+1 (470) 555-0190', 'Active');
 
 -- 1.4 UPDATE Statement
 -- Title: Update Inventory Location

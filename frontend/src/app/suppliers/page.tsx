@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { ClientSuppliersPage } from "@/components/client/ClientPortal";
@@ -9,35 +9,12 @@ import { useStoredAccountState } from "@/lib/useStoredAccountState";
 interface Supplier {
   supplier_id: number;
   contact_id: number;
+  supplier_name: string;
   rating: number;
   contact_email: string;
+  phone: string;
+  status: "Active" | "Inactive";
 }
-
-const supplierNames = [
-  "Global Tech Supplies",
-  "Metro Components Inc.",
-  "NorthStar Logistics",
-  "Prime Industrial Goods",
-  "Eastern Auto Parts",
-  "Vector Supply Chain",
-  "Blue Ridge Materials",
-  "Summit Packaging",
-  "Pacific Machinery",
-  "Alpha Electronics",
-];
-
-const supplierPhones = [
-  "+1 (404) 555-0112",
-  "+1 (312) 555-0188",
-  "+1 (214) 555-0199",
-  "+1 (713) 555-0134",
-  "+1 (678) 555-0147",
-  "+1 (206) 555-0166",
-  "+1 (540) 555-0177",
-  "+1 (414) 555-0155",
-  "+1 (619) 555-0123",
-  "+1 (408) 555-0109",
-];
 
 function buildStars(rating: number) {
   const rounded = Math.round(rating);
@@ -53,22 +30,21 @@ export default function SuppliersPage() {
   const [search, setSearch] = useState("");
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [contactId, setContactId] = useState("");
+  const [supplierName, setSupplierName] = useState("");
   const [rating, setRating] = useState("4");
   const [contactEmail, setContactEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [status, setStatus] = useState<"Active" | "Inactive">("Active");
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
-
-  async function fetchSuppliers() {
+  const fetchSuppliers = useCallback(async (options?: { primeFirst?: boolean }) => {
     try {
       setLoading(true);
       const data = await api.get<Supplier[]>("/api/suppliers/");
       setSuppliers(data);
-      if (data[0] && !editingSupplier) {
+      if (options?.primeFirst && data[0]) {
         primeForm(data[0]);
       }
       setError(null);
@@ -77,41 +53,52 @@ export default function SuppliersPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      fetchSuppliers({ primeFirst: true });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchSuppliers]);
 
   function primeForm(supplier?: Supplier | null) {
     if (!supplier) {
       setEditingSupplier(null);
       setContactId("");
+      setSupplierName("");
       setRating("4");
       setContactEmail("");
+      setPhone("");
+      setStatus("Active");
       setFormError(null);
       return;
     }
 
     setEditingSupplier(supplier);
     setContactId(String(supplier.contact_id));
+    setSupplierName(supplier.supplier_name);
     setRating(String(supplier.rating));
     setContactEmail(supplier.contact_email);
+    setPhone(supplier.phone);
+    setStatus(supplier.status);
     setFormError(null);
   }
 
   const decoratedSuppliers = useMemo(() => {
-    return suppliers.map((supplier, index) => {
+    return suppliers.map((supplier) => {
       const number = supplier.supplier_id.toString().padStart(4, "0");
       return {
         ...supplier,
         displayId: `SUP-${number}`,
         displayContactId: `CON-${String(supplier.contact_id).padStart(4, "0")}`,
-        displayName: supplierNames[index % supplierNames.length],
-        phone: supplierPhones[index % supplierPhones.length],
-        status: supplier.rating >= 4 ? "Active" : "Inactive",
+        displayName: supplier.supplier_name,
       };
     });
   }, [suppliers]);
 
   const filteredSuppliers = decoratedSuppliers.filter((supplier) => {
-    const matchesSearch = [supplier.displayId, supplier.displayName, supplier.contact_email]
+    const matchesSearch = [supplier.displayId, supplier.displayName, supplier.contact_email, supplier.phone]
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase());
@@ -144,8 +131,16 @@ export default function SuppliersPage() {
       setFormError("Contact ID must be a positive number.");
       return;
     }
+    if (!supplierName.trim()) {
+      setFormError("Supplier name is required.");
+      return;
+    }
     if (!contactEmail.includes("@")) {
       setFormError("Enter a valid contact email.");
+      return;
+    }
+    if (!phone.trim()) {
+      setFormError("Phone number is required.");
       return;
     }
     if (ratingValue < 1 || ratingValue > 5) {
@@ -157,8 +152,11 @@ export default function SuppliersPage() {
       setIsSubmitting(true);
       const payload = {
         contact_id: contactValue,
+        supplier_name: supplierName.trim(),
         rating: ratingValue,
         contact_email: contactEmail,
+        phone: phone.trim(),
+        status,
       };
 
       if (editingSupplier) {
@@ -361,8 +359,8 @@ export default function SuppliersPage() {
               <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Supplier Name</label>
               <input
                 className="glass-input"
-                value={editingSupplier ? supplierNames[suppliers.findIndex((item) => item.supplier_id === editingSupplier.supplier_id) % supplierNames.length] : "New Horizon Supplies"}
-                disabled
+                value={supplierName}
+                onChange={(event) => setSupplierName(event.target.value)}
               />
             </div>
             <div>
@@ -375,11 +373,14 @@ export default function SuppliersPage() {
             </div>
             <div>
               <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Phone</label>
-              <input className="glass-input" value="+1 (470) 555-0190" disabled />
+              <input className="glass-input" value={phone} onChange={(event) => setPhone(event.target.value)} />
             </div>
             <div>
               <label style={{ display: "block", fontSize: "0.86rem", marginBottom: "6px" }}>Status</label>
-              <input className="glass-input" value={Number(rating) >= 4 ? "Active" : "Inactive"} disabled />
+              <select className="glass-input" value={status} onChange={(event) => setStatus(event.target.value as "Active" | "Inactive")}>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
             </div>
             <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
               <button className="glass-btn glass-btn-primary" disabled={!isAdmin || isSubmitting} type="submit">

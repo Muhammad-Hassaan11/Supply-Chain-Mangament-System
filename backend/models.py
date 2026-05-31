@@ -117,8 +117,17 @@ class AdminUserUpdate(BaseModel):
 
 class SupplierBase(BaseModel):
     contact_id: int = Field(..., gt=0, description="Contact ID must be a positive integer")
+    supplier_name: str = Field(..., min_length=1, max_length=120, description="Supplier name cannot be empty")
     rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
     contact_email: EmailStr = Field(..., description="Valid contact email address")
+    phone: str = Field("", max_length=40, description="Supplier phone number")
+    status: str = Field("Active", description="Active or Inactive")
+
+    @validator('status')
+    def validate_supplier_status(cls, v):
+        if v not in ('Active', 'Inactive'):
+            raise ValueError("status must be 'Active' or 'Inactive'")
+        return v
 
 class SupplierCreate(SupplierBase):
     pass

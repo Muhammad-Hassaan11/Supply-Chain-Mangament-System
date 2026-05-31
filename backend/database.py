@@ -168,3 +168,60 @@ def ensure_user_profile_columns():
 
     for statement in statements:
         execute_query(statement)
+
+def ensure_supplier_profile_columns():
+    """
+    Upgrades older demo databases so supplier profile fields can be edited
+    without requiring a full schema rebuild.
+    """
+    statements = [
+        """
+        IF COL_LENGTH('Suppliers', 'supplier_name') IS NULL
+            ALTER TABLE Suppliers ADD supplier_name VARCHAR(120) NOT NULL
+            CONSTRAINT DF_Suppliers_supplier_name DEFAULT 'Unnamed Supplier'
+        """,
+        """
+        IF COL_LENGTH('Suppliers', 'phone') IS NULL
+            ALTER TABLE Suppliers ADD phone VARCHAR(40) NOT NULL
+            CONSTRAINT DF_Suppliers_phone DEFAULT ''
+        """,
+        """
+        IF COL_LENGTH('Suppliers', 'status') IS NULL
+            ALTER TABLE Suppliers ADD status VARCHAR(20) NOT NULL
+            CONSTRAINT DF_Suppliers_status DEFAULT 'Active'
+        """,
+        """
+        UPDATE Suppliers
+        SET supplier_name = CASE contact_id
+            WHEN 1001 THEN 'Apex Logistics'
+            WHEN 1002 THEN 'Quantum Parts'
+            WHEN 1003 THEN 'Global Steel Co.'
+            WHEN 1004 THEN 'ElectroSource'
+            WHEN 1005 THEN 'Bio-Med Supply'
+            WHEN 1006 THEN 'Chem Solutions'
+            WHEN 1007 THEN 'ValueLine Industrial'
+            WHEN 1008 THEN 'TexFabric Wholesale'
+            WHEN 1009 THEN 'Evergreen Parts'
+            WHEN 1010 THEN 'Titanium Forge'
+            ELSE supplier_name
+        END,
+        phone = CASE contact_id
+            WHEN 1001 THEN '+1 (404) 555-0112'
+            WHEN 1002 THEN '+1 (312) 555-0188'
+            WHEN 1003 THEN '+1 (214) 555-0199'
+            WHEN 1004 THEN '+1 (404) 555-0112'
+            WHEN 1005 THEN '+1 (408) 555-0109'
+            WHEN 1006 THEN '+1 (619) 555-0123'
+            WHEN 1007 THEN '+1 (414) 555-0155'
+            WHEN 1008 THEN '+1 (540) 555-0177'
+            WHEN 1009 THEN '+1 (206) 555-0166'
+            WHEN 1010 THEN '+1 (678) 555-0147'
+            ELSE phone
+        END,
+        status = CASE WHEN rating >= 4 THEN 'Active' ELSE 'Inactive' END
+        WHERE supplier_name = 'Unnamed Supplier' OR phone = ''
+        """,
+    ]
+
+    for statement in statements:
+        execute_query(statement)

@@ -9,9 +9,13 @@ export function useStoredAccountState() {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setAccountType(getStoredAccountType());
-    setAccountName(getStoredAccountName());
-    setIsHydrated(true);
+    const timer = window.setTimeout(() => {
+      setAccountType(getStoredAccountType());
+      setAccountName(getStoredAccountName());
+      setIsHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   return { accountType, accountName, isHydrated };

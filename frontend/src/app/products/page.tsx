@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import DataTable from "@/components/DataTable";
 import Modal from "@/components/Modal";
@@ -40,11 +40,7 @@ export default function ProductsPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [prodsData, suppsData] = await Promise.all([
@@ -54,13 +50,20 @@ export default function ProductsPage() {
       setProducts(prodsData);
       setSuppliers(suppsData);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to load database records.");
+      setError(err instanceof Error ? err.message : "Failed to load database records.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      loadData();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadData]);
 
   const canWrite = isAdmin;
 
@@ -100,9 +103,9 @@ export default function ProductsPage() {
     try {
       await api.delete(`/api/products/${product.product_id}`);
       loadData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      alert(err.message || "Failed to delete product.");
+      alert(err instanceof Error ? err.message : "Failed to delete product.");
     }
   };
 
@@ -149,9 +152,9 @@ export default function ProductsPage() {
       setIsModalOpen(false);
       resetForm();
       loadData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setFormError(err.message || "An error occurred while saving product.");
+      setFormError(err instanceof Error ? err.message : "An error occurred while saving product.");
     } finally {
       setIsSubmitting(false);
     }
