@@ -359,12 +359,12 @@ export function WarehouseDashboardPage() {
       </div>
       <div className={styles.grid3}>
         <Card title="Today's Movements"><div className={styles.grid2}><Metric icon="IN" label="Inbound" value="8" sub="2,345 Units" /><Metric icon="OUT" label="Outbound" value="12" sub="3,876 Units" /></div></Card>
-        <Card title="Recent Shipment Activity" action={<button className={styles.linkBtn} onClick={() => router.push("/incoming-shipments")}>View all</button>}><Table headers={["ID", "Partner", "Time", "Units", "Status"]} rows={incomingRows.slice(0, 5).map((row) => [row.id, row.supplier, row.eta, formatNumber(row.units), "Received"])} detailsTitle="Shipment Activity" /></Card>
-        <Card title="Warehouse Summary" action={<button className={styles.linkBtn} onClick={() => router.push("/warehouses")}>Open</button>}><Summary /></Card>
+        <Card title="Recent Shipment Activity" action={<button className={styles.linkBtn} onClick={() => router.push("/warehouse/incoming-shipments")}>View all</button>}><Table headers={["ID", "Partner", "Time", "Units", "Status"]} rows={incomingRows.slice(0, 5).map((row) => [row.id, row.supplier, row.eta, formatNumber(row.units), "Received"])} detailsTitle="Shipment Activity" /></Card>
+        <Card title="Warehouse Summary" action={<button className={styles.linkBtn} onClick={() => router.push("/warehouse/my-warehouse")}>Open</button>}><Summary /></Card>
       </div>
       <div className={styles.grid2}>
-        <Card title="Top Inventory (By Value)" action={<button className={styles.linkBtn} onClick={() => router.push("/inventory")}>View all inventory</button>}><Table headers={["SKU", "Item", "On Hand", "Available", "Reserved", "Status"]} rows={inventoryRows.slice(0, 5).map((row) => [row.sku, row.item, formatNumber(row.onHand), formatNumber(row.available), formatNumber(row.reserved), row.status])} detailsTitle="Inventory Details" /></Card>
-        <Card title="Low Stock Alerts" action={<button className={styles.linkBtn} onClick={() => router.push("/low-stock-alerts")}>View all alerts</button>}><Table headers={["SKU", "Item", "On Hand", "Reorder", "Status"]} rows={lowStockRows.map((row) => [row.sku, row.item, formatNumber(row.onHand), formatNumber(row.reorderLevel), row.severity])} detailsTitle="Low Stock Detail" /></Card>
+        <Card title="Top Inventory (By Value)" action={<button className={styles.linkBtn} onClick={() => router.push("/warehouse/inventory")}>View all inventory</button>}><Table headers={["SKU", "Item", "On Hand", "Available", "Reserved", "Status"]} rows={inventoryRows.slice(0, 5).map((row) => [row.sku, row.item, formatNumber(row.onHand), formatNumber(row.available), formatNumber(row.reserved), row.status])} detailsTitle="Inventory Details" /></Card>
+        <Card title="Low Stock Alerts" action={<button className={styles.linkBtn} onClick={() => router.push("/warehouse/low-stock-alerts")}>View all alerts</button>}><Table headers={["SKU", "Item", "On Hand", "Reorder", "Status"]} rows={lowStockRows.map((row) => [row.sku, row.item, formatNumber(row.onHand), formatNumber(row.reorderLevel), row.severity])} detailsTitle="Low Stock Detail" /></Card>
       </div>
     </main>
   );
@@ -389,7 +389,7 @@ export function LegacyWarehouseFacilityPage() {
       <div className={styles.grid3}>
         <Card title="Warehouse Layout / Zones Overview"><LayoutMap /></Card>
         <Card title="Facility Details"><Summary rows={[["Temperature Range", "15°C - 25°C"], ["Forklifts", "18"], ["Racks / Positions", "1,450"], ["Utilization", "68%"], ["Operational Status", "Operational"], ["Inbound Accuracy", "99.4%"]]} /></Card>
-        <Card title="Recent Operational Activity" action={<button className={styles.linkBtn} onClick={() => router.push("/incoming-shipments")}>View all</button>}><Activity /></Card>
+        <Card title="Recent Operational Activity" action={<button className={styles.linkBtn} onClick={() => router.push("/warehouse/incoming-shipments")}>View all</button>}><Activity /></Card>
       </div>
     </main>
   );

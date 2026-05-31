@@ -113,10 +113,10 @@ function AdminDashboard({ data }: { data: DashboardData }) {
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "flex-end" }}>
-        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/suppliers")}>Add Supplier</button>
-        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/products")}>Add Product</button>
-        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/warehouses")}>Add Warehouse</button>
-        <button className="glass-btn glass-btn-primary" onClick={() => router.push("/query-lab")}>Run SQL Query</button>
+        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/admin/suppliers")}>Add Supplier</button>
+        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/admin/products")}>Add Product</button>
+        <button className="glass-btn glass-btn-secondary" onClick={() => router.push("/admin/warehouses")}>Add Warehouse</button>
+        <button className="glass-btn glass-btn-primary" onClick={() => router.push("/admin/query-lab")}>Run SQL Query</button>
       </div>
 
       <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "1.15fr 1fr" }} className="dashboard-grid">

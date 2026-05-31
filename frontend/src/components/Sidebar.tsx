@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { getStoredAccountName, getStoredAccountType } from "@/lib/api";
+import { portalPath } from "@/lib/portalRoutes";
 import styles from "./Sidebar.module.css";
 
 interface NavItem {
@@ -90,6 +91,7 @@ export default function Sidebar() {
   const userEmail = user?.email || null;
   const userRole = user?.role || null;
   const isClientAccount = accountType === "client";
+  const scopedPath = (path: string) => portalPath(accountType, userRole, path);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--sidebar-width", collapsed ? "84px" : isClientAccount ? "274px" : "280px");
@@ -129,79 +131,79 @@ export default function Sidebar() {
   const navItems = useMemo(() => {
     if (isAdmin) {
       return [
-        buildNavItem("Dashboard", "/dashboard", "dashboard"),
-        buildNavItem("Suppliers", "/suppliers", "suppliers"),
-        buildNavItem("Products", "/products", "products"),
-        buildNavItem("Warehouses", "/warehouses", "warehouses"),
-        buildNavItem("Inventory", "/inventory", "inventory"),
-        buildNavItem("Shipments", "/shipments", "shipments", [
-          { label: "All Shipments", href: "/shipments" },
-          { label: "Create Shipment", href: "/shipments/create" },
-          { label: "Shipment Logs", href: "/shipments/logs" },
+        buildNavItem("Dashboard", scopedPath("/dashboard"), "dashboard"),
+        buildNavItem("Suppliers", scopedPath("/suppliers"), "suppliers"),
+        buildNavItem("Products", scopedPath("/products"), "products"),
+        buildNavItem("Warehouses", scopedPath("/warehouses"), "warehouses"),
+        buildNavItem("Inventory", scopedPath("/inventory"), "inventory"),
+        buildNavItem("Shipments", scopedPath("/shipments"), "shipments", [
+          { label: "All Shipments", href: scopedPath("/shipments") },
+          { label: "Create Shipment", href: scopedPath("/shipments/create") },
+          { label: "Shipment Logs", href: scopedPath("/shipments/logs") },
         ]),
-        buildNavItem("Query Lab", "/query-lab", "query"),
-        buildNavItem("Reports", "/reports", "reports"),
-        buildNavItem("Users", "/users", "users"),
-        buildNavItem("Settings", "/settings", "settings"),
+        buildNavItem("Query Lab", scopedPath("/query-lab"), "query"),
+        buildNavItem("Reports", scopedPath("/reports"), "reports"),
+        buildNavItem("Users", scopedPath("/users"), "users"),
+        buildNavItem("Settings", scopedPath("/settings"), "settings"),
       ];
     }
 
     if (accountType === "supplier") {
       return [
-        buildNavItem("Dashboard", "/dashboard", "dashboard"),
-        buildNavItem("My Products", "/products", "products"),
-        buildNavItem("My Orders", "/reports", "reports"),
-        buildNavItem("My Shipments", "/shipments", "shipments"),
-        buildNavItem("Analytics", "/reports", "reports"),
-        buildNavItem("Profile", "/settings", "settings"),
+        buildNavItem("Dashboard", scopedPath("/dashboard"), "dashboard"),
+        buildNavItem("My Products", scopedPath("/products"), "products"),
+        buildNavItem("My Orders", scopedPath("/orders"), "reports"),
+        buildNavItem("My Shipments", scopedPath("/shipments"), "shipments"),
+        buildNavItem("Analytics", scopedPath("/analytics"), "reports"),
+        buildNavItem("Profile", scopedPath("/profile"), "settings"),
         buildNavItem("Support", "/contact", "settings"),
       ];
     }
 
     if (accountType === "warehouse") {
       return [
-        buildNavItem("Dashboard", "/dashboard", "dashboard"),
-        buildNavItem("My Warehouse", "/warehouses", "warehouses"),
-        buildNavItem("Inventory", "/inventory", "inventory"),
-        buildNavItem("Incoming Shipments", "/incoming-shipments", "shipments"),
-        buildNavItem("Outgoing Shipments", "/outgoing-shipments", "shipments"),
-        buildNavItem("Low Stock Alerts", "/low-stock-alerts", "inventory"),
-        buildNavItem("Reports", "/reports", "reports"),
-        buildNavItem("Profile", "/settings", "settings"),
+        buildNavItem("Dashboard", scopedPath("/dashboard"), "dashboard"),
+        buildNavItem("My Warehouse", scopedPath("/my-warehouse"), "warehouses"),
+        buildNavItem("Inventory", scopedPath("/inventory"), "inventory"),
+        buildNavItem("Incoming Shipments", scopedPath("/incoming-shipments"), "shipments"),
+        buildNavItem("Outgoing Shipments", scopedPath("/outgoing-shipments"), "shipments"),
+        buildNavItem("Low Stock Alerts", scopedPath("/low-stock-alerts"), "inventory"),
+        buildNavItem("Reports", scopedPath("/reports"), "reports"),
+        buildNavItem("Profile", scopedPath("/profile"), "settings"),
       ];
     }
 
     if (accountType === "client") {
       return [
-        buildNavItem("Dashboard", "/dashboard", "dashboard"),
-        buildNavItem("Suppliers", "/suppliers", "suppliers"),
-        buildNavItem("Track My Shipments", "/shipments", "shipments"),
-        buildNavItem("Reports", "/reports", "reports"),
-        buildNavItem("Invoices", "/invoices", "reports"),
-        buildNavItem("Profile", "/settings", "users"),
+        buildNavItem("Dashboard", scopedPath("/dashboard"), "dashboard"),
+        buildNavItem("Suppliers", scopedPath("/suppliers"), "suppliers"),
+        buildNavItem("Track My Shipments", scopedPath("/shipments"), "shipments"),
+        buildNavItem("Reports", scopedPath("/reports"), "reports"),
+        buildNavItem("Invoices", scopedPath("/invoices"), "reports"),
+        buildNavItem("Profile", scopedPath("/profile"), "users"),
         buildNavItem("Support", "/contact", "settings"),
       ];
     }
 
     if (accountType === "logistics") {
       return [
-        buildNavItem("Dashboard", "/dashboard", "dashboard"),
-        buildNavItem("Assigned Shipments", "/shipments", "shipments"),
-        buildNavItem("Delivery Routes", "/shipments", "shipments"),
-        buildNavItem("Tracking Logs", "/shipments", "shipments"),
-        buildNavItem("Fleet", "/reports", "reports"),
-        buildNavItem("Performance", "/reports", "reports"),
-        buildNavItem("Profile", "/settings", "settings"),
+        buildNavItem("Dashboard", scopedPath("/dashboard"), "dashboard"),
+        buildNavItem("Assigned Shipments", scopedPath("/assigned-shipments"), "shipments"),
+        buildNavItem("Delivery Routes", scopedPath("/routes"), "shipments"),
+        buildNavItem("Tracking Logs", scopedPath("/tracking-logs"), "shipments"),
+        buildNavItem("Fleet", scopedPath("/fleet"), "reports"),
+        buildNavItem("Performance", scopedPath("/performance"), "reports"),
+        buildNavItem("Profile", scopedPath("/profile"), "settings"),
         buildNavItem("Support", "/contact", "settings"),
       ];
     }
 
     return [
-      buildNavItem("Dashboard", "/dashboard", "dashboard"),
-      buildNavItem("Reports", "/reports", "reports"),
-      buildNavItem("Profile", "/settings", "settings"),
+      buildNavItem("Dashboard", scopedPath("/dashboard"), "dashboard"),
+      buildNavItem("Reports", scopedPath("/reports"), "reports"),
+      buildNavItem("Profile", scopedPath("/profile"), "settings"),
     ];
-  }, [accountType, isAdmin]);
+  }, [accountType, isAdmin, userRole]);
 
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`} id="sidebar-nav">

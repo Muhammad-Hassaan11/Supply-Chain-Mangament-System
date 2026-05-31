@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { api, setAuthToken, clearAuthToken, getStoredEmail, getStoredRole } from "@/lib/api";
+import { getPortalDashboardPath } from "@/lib/portalRoutes";
 
 interface User {
   email: string;
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (token && email && role) {
         setUser({ email, role });
         if (pathname === "/login" || pathname === "/signup") {
-          router.push("/dashboard");
+          router.push(getPortalDashboardPath(localStorage.getItem("account_type"), role));
         }
       } else {
         // Clear any partial/stale auth state
@@ -81,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("account_type");
       localStorage.removeItem("account_name");
       localStorage.removeItem("company_name");
+      let nextAccountType = response.account_type || (response.role === "Admin" ? "admin" : null);
       if (response.account_type) {
         localStorage.setItem("account_type", response.account_type);
       }
@@ -95,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           companyName?: string;
         };
         if (parsedProfile.accountType) {
+          nextAccountType = parsedProfile.accountType;
           localStorage.setItem("account_type", parsedProfile.accountType);
         }
         if (parsedProfile.accountName) {
@@ -108,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser({ email: response.email, role: response.role });
       
       // Navigate to dashboard
-      router.push("/dashboard");
+      router.push(getPortalDashboardPath(nextAccountType, response.role));
     } catch (error) {
       throw error;
     }
@@ -147,6 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("account_type");
       localStorage.removeItem("account_name");
       localStorage.removeItem("company_name");
+      let nextAccountType = response.account_type || options?.accountType || (response.role === "Admin" ? "admin" : null);
       if (response.account_type) {
         localStorage.setItem("account_type", response.account_type);
       }
@@ -161,6 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           companyName?: string;
         };
         if (parsedProfile.accountType) {
+          nextAccountType = parsedProfile.accountType;
           localStorage.setItem("account_type", parsedProfile.accountType);
         }
         if (parsedProfile.accountName) {
@@ -174,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser({ email: response.email, role: response.role });
       
       // Navigate to dashboard
-      router.push("/dashboard");
+      router.push(getPortalDashboardPath(nextAccountType, response.role));
     } catch (error) {
       throw error;
     }

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { getStoredAccountType } from "@/lib/api";
+import { getPortalDashboardPath } from "@/lib/portalRoutes";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -30,6 +32,7 @@ export default function PublicNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const portalHref = getPortalDashboardPath(mounted ? getStoredAccountType() : null, user?.role);
 
   useEffect(() => {
     const mountFrame = window.requestAnimationFrame(() => setMounted(true));
@@ -144,7 +147,7 @@ export default function PublicNavbar() {
         <div style={{ alignItems: "center", display: "flex", flexShrink: 0, gap: "10px" }}>
           {mounted && user ? (
             <>
-              <Link className="pub-btn-primary" href="/dashboard" id="pub-nav-portal">
+              <Link className="pub-btn-primary" href={portalHref} id="pub-nav-portal">
                 Dashboard
               </Link>
               <button

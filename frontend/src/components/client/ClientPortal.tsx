@@ -176,7 +176,7 @@ export function ClientDashboardPage({ data, accountName }: { data: DashboardData
       </div>
 
       <div className={styles.twoCol}>
-        <Panel title="My Orders" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/reports")}>View all orders →</button>}>
+        <Panel title="My Orders" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/client/reports")}>View all orders →</button>}>
           <DataTable
             headers={["Order #", "Supplier", "Order Date", "Status", "Order Value", "ETA / Required Date"]}
             rows={[
@@ -189,7 +189,7 @@ export function ClientDashboardPage({ data, accountName }: { data: DashboardData
           />
         </Panel>
 
-        <Panel title="Shipment Tracking" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/shipments")}>Track all shipments →</button>}>
+        <Panel title="Shipment Tracking" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/client/shipments")}>Track all shipments →</button>}>
           <div className={styles.stackList}>
             {[
               ["SHP-250518-0001", "Global Textiles Inc.", "Los Angeles, USA → New York, USA", "In Transit", "ETA: May 24, 2025"],
@@ -215,7 +215,7 @@ export function ClientDashboardPage({ data, accountName }: { data: DashboardData
       </div>
 
       <div className={styles.threeCol}>
-        <Panel title="Supplier Performance (Top 5)" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/reports")}>View full report →</button>}>
+        <Panel title="Supplier Performance (Top 5)" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/client/reports")}>View full report →</button>}>
           <DataTable
             headers={["Supplier", "On-Time Delivery", "Quality", "Responsiveness", "Overall"]}
             rows={[
@@ -401,7 +401,7 @@ export function ClientSuppliersPage() {
               </div>
             </div>
           </Panel>
-          <Panel title="Preferred Supplier Categories" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/suppliers")}>View all</button>}>
+          <Panel title="Preferred Supplier Categories" action={<button className={styles.linkAction} type="button" onClick={() => router.push("/client/suppliers")}>View all</button>}>
             <SummaryList items={[
               { label: "Packaging", value: "6" },
               { label: "Textiles", value: "4" },
@@ -949,7 +949,7 @@ export function ClientProfilePage({ accountName, userEmail }: { accountName: str
         <section className={styles.profileDetailCard}>
           <div className={styles.cardActionHeader}>
             <h3>Permissions Summary</h3>
-            <button className={styles.smallAction} type="button" onClick={() => router.push("/shipments")}>View all</button>
+            <button className={styles.smallAction} type="button" onClick={() => router.push("/client/shipments")}>View all</button>
           </div>
           <div className={styles.permissionList}>
             {["View Shipments", "Track Orders", "Update Preferences", "View Invoices", "Manage Documents"].map((item) => (
