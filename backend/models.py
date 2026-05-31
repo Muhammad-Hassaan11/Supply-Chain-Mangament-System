@@ -37,6 +37,8 @@ class Token(BaseModel):
     token_type: str
     role: str
     email: str
+    full_name: Optional[str] = None
+    account_type: Optional[str] = None
 
 # ==========================================
 # ADMIN USER MANAGEMENT SCHEMAS

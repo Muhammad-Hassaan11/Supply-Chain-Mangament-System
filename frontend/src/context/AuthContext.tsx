@@ -71,11 +71,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         token_type: string;
         role: "Admin" | "Viewer";
         email: string;
+        full_name?: string | null;
+        account_type?: string | null;
       }>("/api/auth/login", { email, password });
 
       setAuthToken(response.access_token);
       localStorage.setItem("user_email", response.email);
       localStorage.setItem("user_role", response.role);
+      localStorage.removeItem("account_type");
+      localStorage.removeItem("account_name");
+      localStorage.removeItem("company_name");
+      if (response.account_type) {
+        localStorage.setItem("account_type", response.account_type);
+      }
+      if (response.full_name) {
+        localStorage.setItem("account_name", response.full_name);
+      }
       const savedProfile = localStorage.getItem(`profile:${response.email.toLowerCase()}`);
       if (savedProfile) {
         const parsedProfile = JSON.parse(savedProfile) as {
@@ -116,6 +127,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         token_type: string;
         role: "Admin" | "Viewer";
         email: string;
+        full_name?: string | null;
+        account_type?: string | null;
       }>(
         "/api/auth/register",
         {
@@ -131,6 +144,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuthToken(response.access_token);
       localStorage.setItem("user_email", response.email);
       localStorage.setItem("user_role", response.role);
+      localStorage.removeItem("account_type");
+      localStorage.removeItem("account_name");
+      localStorage.removeItem("company_name");
+      if (response.account_type) {
+        localStorage.setItem("account_type", response.account_type);
+      }
+      if (response.full_name) {
+        localStorage.setItem("account_name", response.full_name);
+      }
       const savedProfile = localStorage.getItem(`profile:${response.email.toLowerCase()}`);
       if (savedProfile) {
         const parsedProfile = JSON.parse(savedProfile) as {

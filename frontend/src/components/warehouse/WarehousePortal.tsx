@@ -3,6 +3,8 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
+import { useAuth } from "@/context/AuthContext";
+import { api, getStoredAccountName, getStoredAccountType } from "@/lib/api";
 import styles from "./WarehousePortal.module.css";
 
 type StatusKind = "good" | "info" | "warn" | "danger";
@@ -393,7 +395,312 @@ export function LegacyWarehouseFacilityPage() {
   );
 }
 
+type WarehouseRecord = {
+  warehouse_id: number;
+  warehouse_name: string;
+  capacity: number;
+  product_id: number;
+  product_name?: string | null;
+  current_stock?: number | null;
+};
+
+type WarehouseFormState = {
+  warehouse_id: string;
+  warehouse_name: string;
+  capacity: string;
+  product_id: string;
+};
+
+const emptyWarehouseForm: WarehouseFormState = {
+  warehouse_id: "",
+  warehouse_name: "",
+  capacity: "",
+  product_id: "",
+};
+
+function parseProductId(value: string) {
+  const match = value.match(/\d+/);
+  return match ? Number(match[0]) : Number.NaN;
+}
+
+function warehouseLocation(warehouse: WarehouseRecord) {
+  const locations = ["Chicago, IL", "New York, NY", "Los Angeles, CA", "Houston, TX", "Omaha, NE", "Seattle, WA", "Atlanta, GA", "Denver, CO"];
+  return locations[(warehouse.warehouse_id - 1) % locations.length] || "Assigned location";
+}
+
+function initialsFromName(value: string) {
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] || "A";
+  const second = parts[1]?.[0] || "U";
+  return `${first}${second}`.toUpperCase();
+}
+
 export function WarehouseFacilityPage() {
+  const { user, loading: authLoading, isAdmin } = useAuth();
+  const [accountType, setAccountType] = React.useState<string | null>(null);
+  const [accountName, setAccountName] = React.useState("Admin User");
+  const [warehouses, setWarehouses] = React.useState<WarehouseRecord[]>([]);
+  const [selectedWarehouseId, setSelectedWarehouseId] = React.useState<number | null>(null);
+  const [notice, setNotice] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
+  const [saving, setSaving] = React.useState(false);
+  const [form, setForm] = React.useState<WarehouseFormState>(emptyWarehouseForm);
+
+  React.useEffect(() => {
+    setAccountType(getStoredAccountType());
+    setAccountName(getStoredAccountName() || (isAdmin ? "Admin User" : "Warehouse Manager"));
+  }, [isAdmin, user?.email]);
+
+  const loadWarehouses = React.useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const rows = await api.get<WarehouseRecord[]>("/api/warehouses/");
+      setWarehouses(rows);
+      setSelectedWarehouseId((current) => current ?? rows[0]?.warehouse_id ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load warehouses.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (accountType === "warehouse" && !isAdmin) return;
+    void loadWarehouses();
+  }, [accountType, isAdmin, loadWarehouses]);
+
+  if (authLoading || !user) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.notice}>Checking warehouse access...</div>
+      </main>
+    );
+  }
+
+  if (accountType === "warehouse" && !isAdmin) {
+    return <LegacyWarehouseFacilityPage />;
+  }
+
+  const selectedWarehouse = warehouses.find((warehouse) => warehouse.warehouse_id === selectedWarehouseId) || warehouses[0];
+  const totalCapacity = warehouses.reduce((sum, warehouse) => sum + warehouse.capacity, 0);
+  const totalStock = warehouses.reduce((sum, warehouse) => sum + (warehouse.current_stock || 0), 0);
+  const utilizationRate = totalCapacity ? Math.min(100, Math.round((totalStock / totalCapacity) * 100)) : 0;
+  const linkedProducts = new Set(warehouses.map((warehouse) => warehouse.product_id)).size;
+
+  const updateForm = (key: keyof WarehouseFormState, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const startNewWarehouse = () => {
+    setSelectedWarehouseId(null);
+    setForm(emptyWarehouseForm);
+    setNotice("Warehouse form is ready for a new entry.");
+  };
+
+  const fillFromWarehouse = (warehouseId: number) => {
+    const warehouse = warehouses.find((item) => item.warehouse_id === warehouseId);
+    if (!warehouse) return;
+    setSelectedWarehouseId(warehouseId);
+    setForm({
+      warehouse_id: String(warehouse.warehouse_id),
+      warehouse_name: warehouse.warehouse_name,
+      capacity: String(warehouse.capacity),
+      product_id: String(warehouse.product_id),
+    });
+    setNotice(`${warehouse.warehouse_name} loaded into the form.`);
+  };
+
+  const saveWarehouse = async () => {
+    const warehouseName = form.warehouse_name.trim();
+    const capacity = Number(form.capacity);
+    const productId = parseProductId(form.product_id);
+    if (!warehouseName || !Number.isFinite(capacity) || capacity < 0 || !Number.isInteger(productId) || productId <= 0) {
+      setNotice("Please enter warehouse name, non-negative capacity, and a valid product ID.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    try {
+      const payload = { warehouse_name: warehouseName, capacity, product_id: productId };
+      if (form.warehouse_id) {
+        await api.put(`/api/warehouses/${form.warehouse_id}`, payload);
+        setNotice(`${warehouseName} updated in SQL Server.`);
+      } else {
+        const created = await api.post<WarehouseRecord>("/api/warehouses/", payload);
+        setSelectedWarehouseId(created.warehouse_id);
+        setForm((current) => ({ ...current, warehouse_id: String(created.warehouse_id) }));
+        setNotice(`${warehouseName} added to SQL Server.`);
+      }
+      await loadWarehouses();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save warehouse.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteWarehouse = async (warehouse: WarehouseRecord) => {
+    if (!window.confirm(`Delete warehouse "${warehouse.warehouse_name}"?`)) return;
+    setSaving(true);
+    setError("");
+    try {
+      await api.delete(`/api/warehouses/${warehouse.warehouse_id}`);
+      setNotice(`${warehouse.warehouse_name} deleted from SQL Server.`);
+      setForm(emptyWarehouseForm);
+      setSelectedWarehouseId(null);
+      await loadWarehouses();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete warehouse.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const utilization = warehouses.slice(0, 6).map((warehouse) => ({
+    name: warehouse.warehouse_name,
+    value: warehouse.capacity ? Math.min(100, Math.round(((warehouse.current_stock || 0) / warehouse.capacity) * 100)) : 0,
+  }));
+
+  return (
+    <main className={styles.page}>
+      <section className={styles.warehouseTopbar}>
+        <div className={styles.searchShell}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input className={styles.searchInput} placeholder="Search warehouses..." />
+          <span className={styles.shortcutKey}>Ctrl /</span>
+        </div>
+        <div className={styles.topbarActions}>
+          <div className={styles.profileChip}>
+            <span className={styles.profileAvatar}>{initialsFromName(accountName)}</span>
+            <div>
+              <strong>{accountName}</strong>
+              <span>{isAdmin ? "Administrator" : "Team Member"}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.warehouseHero}>
+        <div className={styles.heroCopy}>
+          <div>
+            <h1 className={styles.heroTitle}>Warehouses <span>Management</span></h1>
+            <p className={styles.heroText}>
+              Admin portal for all warehouse locations, capacity, and linked product records stored in SQL Server.
+            </p>
+          </div>
+          <button className={styles.heroButton} type="button" onClick={startNewWarehouse}>
+            <span>+</span>
+            Add Warehouse
+          </button>
+        </div>
+        <div className={styles.heroVisual}>
+          <div className={styles.visualGround} />
+          <div className={styles.visualWarehouse}>
+            <div className={styles.visualRoof} />
+            <div className={styles.visualBody}><span /><span /><span /></div>
+          </div>
+          <div className={styles.visualChart}><div /><div /><div /><div /></div>
+          <div className={styles.visualBoxes}><span /><span /><span /></div>
+        </div>
+      </section>
+
+      {notice ? <div className={styles.notice}>{notice}</div> : null}
+      {error ? <div className={styles.notice}>{error}</div> : null}
+
+      <section className={styles.statsGrid}>
+        <article className={styles.statCard}><div className={styles.statIcon}>WH</div><div><p>Total Warehouses</p><strong>{warehouses.length}</strong><span>Warehouses</span></div></article>
+        <article className={styles.statCard}><div className={styles.statIcon}>CP</div><div><p>Total Capacity</p><strong>{totalCapacity.toLocaleString()}</strong><span>Units</span></div></article>
+        <article className={styles.statCard}><div className={styles.statIcon}>UT</div><div><p>Utilization Rate</p><strong>{utilizationRate}%</strong><span>Average</span></div></article>
+        <article className={styles.statCard}><div className={styles.statIcon}>PR</div><div><p>Linked Products</p><strong>{linkedProducts}</strong><span>Products</span></div></article>
+      </section>
+
+      <section className={styles.managementCard}>
+        <div className={styles.tableWrap}>
+          <table className={styles.managementTable}>
+            <thead>
+              <tr>
+                <th>warehouse_id</th>
+                <th>warehouse_name</th>
+                <th>city/location</th>
+                <th>capacity</th>
+                <th>linked_product_id</th>
+                <th>linked_product</th>
+                <th>status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={8}>Loading warehouses from SQL Server...</td></tr>
+              ) : warehouses.length === 0 ? (
+                <tr><td colSpan={8}>No warehouses found.</td></tr>
+              ) : warehouses.map((warehouse) => (
+                <tr key={warehouse.warehouse_id}>
+                  <td className={styles.idCell}>{warehouse.warehouse_id}</td>
+                  <td>{warehouse.warehouse_name}</td>
+                  <td>{warehouseLocation(warehouse)}</td>
+                  <td>{warehouse.capacity.toLocaleString()}</td>
+                  <td>{warehouse.product_id}</td>
+                  <td>{warehouse.product_name || "-"}</td>
+                  <td><span className={`${styles.statusPill} ${warehouse.capacity && (warehouse.current_stock || 0) / warehouse.capacity > 0.9 ? styles.statusWarn : styles.statusActive}`}>{warehouse.capacity && (warehouse.current_stock || 0) / warehouse.capacity > 0.9 ? "Near Capacity" : "Active"}</span></td>
+                  <td>
+                    <div className={styles.rowActions}>
+                      <button type="button" className={styles.rowAction} onClick={() => setNotice(`Viewing ${warehouse.warehouse_name}.`)}>View</button>
+                      <button type="button" className={styles.rowAction} onClick={() => fillFromWarehouse(warehouse.warehouse_id)}>Edit</button>
+                      <button type="button" className={`${styles.rowAction} ${styles.rowDelete}`} onClick={() => deleteWarehouse(warehouse)}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className={styles.tableFooter}><span>Showing {warehouses.length} SQL Server entries</span></div>
+        </div>
+      </section>
+
+      <section className={styles.bottomGrid}>
+        <div className={styles.managementCard}>
+          <div className={styles.sectionHeader}><h2>Warehouse Form</h2></div>
+          <div className={styles.formGrid}>
+            <label className={styles.formField}><span>warehouse_id</span><input value={form.warehouse_id || "Auto-generated"} readOnly /></label>
+            <label className={styles.formField}><span>warehouse_name *</span><input value={form.warehouse_name} onChange={(e) => updateForm("warehouse_name", e.target.value)} /></label>
+            <label className={styles.formField}><span>capacity *</span><input value={form.capacity} onChange={(e) => updateForm("capacity", e.target.value)} /></label>
+            <label className={styles.formField}><span>product_id *</span><input value={form.product_id} onChange={(e) => updateForm("product_id", e.target.value)} placeholder="Example: 1" /></label>
+          </div>
+          <div className={styles.formActions}>
+            <button className={styles.heroButton} type="button" onClick={saveWarehouse} disabled={saving}><span>{saving ? "Saving" : "Save"}</span>Warehouse</button>
+            <button className={styles.resetButton} type="button" onClick={() => selectedWarehouse ? fillFromWarehouse(selectedWarehouse.warehouse_id) : startNewWarehouse()}>Reset</button>
+          </div>
+        </div>
+
+        <div className={styles.managementCard}>
+          <div className={styles.sectionHeader}><h2>Warehouse Utilization</h2></div>
+          <div className={styles.utilizationList}>
+            {utilization.length ? utilization.map((item) => (
+              <div key={item.name} className={styles.utilizationRow}>
+                <div className={styles.utilizationHead}><span>{item.name}</span><strong>{item.value}%</strong></div>
+                <div className={styles.utilizationTrack}><div className={`${styles.utilizationFill} ${item.value < 70 ? styles.utilizationMedium : ""}`} style={{ width: `${item.value}%` }} /></div>
+              </div>
+            )) : <div className={styles.subtitle}>No warehouse utilization data yet.</div>}
+          </div>
+          <div className={styles.legend}>
+            <span><i className={styles.legendHigh} /> High (&gt;= 70%)</span>
+            <span><i className={styles.legendMedium} /> Medium (40% - 69%)</span>
+            <span><i className={styles.legendLow} /> Low (&lt; 40%)</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function AdminWarehouseFacilityPage() {
   const warehouses = [
     { id: 1, name: "Northside Warehouse", city: "New York, NY", capacity: 2500, productId: 101, manager: "John Anderson", status: "Active" },
     { id: 2, name: "West Coast Hub", city: "Los Angeles, CA", capacity: 3200, productId: 105, manager: "Sarah Johnson", status: "Active" },

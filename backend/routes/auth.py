@@ -54,7 +54,9 @@ def register(register_data: UserRegister):
         "access_token": access_token,
         "token_type": "bearer",
         "role": register_data.role,
-        "email": register_data.email
+        "email": register_data.email,
+        "full_name": full_name,
+        "account_type": account_type,
     }
 
 @router.post("/login", response_model=Token)
@@ -64,7 +66,7 @@ def login(login_data: UserLogin):
     Returns signed JWT access token on success.
     """
     # 1. Fetch user
-    query = "SELECT email, password_hash, role FROM Users WHERE email = ?"
+    query = "SELECT email, password_hash, role, full_name, account_type FROM Users WHERE email = ?"
     user = execute_query(query, (login_data.email,), fetch_one=True)
     if not user:
         raise HTTPException(
@@ -87,5 +89,7 @@ def login(login_data: UserLogin):
         "access_token": access_token,
         "token_type": "bearer",
         "role": user["role"],
-        "email": user["email"]
+        "email": user["email"],
+        "full_name": user.get("full_name"),
+        "account_type": user.get("account_type"),
     }
