@@ -5,6 +5,8 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { ClientShipmentsPage } from "@/components/client/ClientPortal";
 import { useStoredAccountState } from "@/lib/useStoredAccountState";
+import { useAuth } from "@/context/AuthContext";
+import { portalPath } from "@/lib/portalRoutes";
 
 interface Shipment {
   shipment_id: number;
@@ -24,6 +26,7 @@ interface ShipmentLog {
 }
 
 export default function ShipmentsPage() {
+  const { isAdmin } = useAuth();
   const { accountType, isHydrated } = useStoredAccountState();
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [logs, setLogs] = useState<ShipmentLog[]>([]);
@@ -83,7 +86,7 @@ export default function ShipmentsPage() {
     return <div className="glass-card">Loading logistics dashboard...</div>;
   }
 
-  if (accountType === "client") {
+  if (!isAdmin && accountType === "client") {
     return <ClientShipmentsPage />;
   }
 
@@ -99,6 +102,8 @@ export default function ShipmentsPage() {
   const deliveredToday = Math.min(shipments.length, Math.max(6, Math.floor(shipments.length / 2)));
   const inTransit = Math.max(1, shipments.length - deliveredToday);
   const onTimeRate = `${Math.max(92, 100 - logs.length)}%`;
+  const routeRole = isAdmin ? "admin" : accountType;
+  const shipmentLogsPath = isAdmin ? portalPath(routeRole, "Admin", "/shipments/logs") : accountType === "logistics" ? portalPath(routeRole, "Viewer", "/tracking-logs") : "/shipments/logs";
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -106,7 +111,7 @@ export default function ShipmentsPage() {
         <div>
           <h1 style={{ fontSize: "2.2rem", marginBottom: "4px" }}>Dashboard</h1>
           <p style={{ color: "var(--text-secondary)" }}>
-            Welcome back. Here&apos;s an overview of your logistics operations.
+            {isAdmin ? "Admin portal view for all shipment records and tracking activity." : "Welcome back. Here's an overview of your logistics operations."}
           </p>
         </div>
         <div className="glass-badge glass-badge-success" style={{ padding: "10px 14px" }}>
@@ -142,7 +147,7 @@ export default function ShipmentsPage() {
         <div className="glass-card">
           <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "18px" }}>
             <h2 style={{ fontSize: "1.45rem" }}>Active Deliveries</h2>
-            <Link href="/shipments/logs" style={{ color: "var(--accent-indigo)", fontSize: "0.9rem", fontWeight: 700 }}>
+            <Link href={shipmentLogsPath} style={{ color: "var(--accent-indigo)", fontSize: "0.9rem", fontWeight: 700 }}>
               View all shipment logs -&gt;
             </Link>
           </div>
@@ -221,7 +226,7 @@ export default function ShipmentsPage() {
             <div style={{ right: "32px", position: "absolute", top: "28px" }}>📍</div>
           </div>
           <Link
-            href={selectedShipment ? `/shipments/${selectedShipment.shipment_id}` : "/shipments/logs"}
+            href={selectedShipment && isAdmin ? `/admin/shipments/${selectedShipment.shipment_id}` : selectedShipment ? `/shipments/${selectedShipment.shipment_id}` : shipmentLogsPath}
             style={{ color: "var(--accent-indigo)", fontSize: "0.92rem", fontWeight: 700 }}
           >
             View full tracking details -&gt;

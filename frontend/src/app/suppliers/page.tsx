@@ -216,7 +216,7 @@ export default function SuppliersPage() {
     URL.revokeObjectURL(url);
   }
 
-  if (accountType === "client") {
+  if (!isAdmin && accountType === "client") {
     return <ClientSuppliersPage />;
   }
 

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import { ClientReportsPage } from "@/components/client/ClientPortal";
 import { WarehouseReportsPage } from "@/components/warehouse/WarehousePortal";
 import { useStoredAccountState } from "@/lib/useStoredAccountState";
@@ -166,6 +167,7 @@ function toCsv(columns: string[], rows: Record<string, unknown>[]) {
 }
 
 export default function ReportsPage() {
+  const { isAdmin } = useAuth();
   const { accountType, isHydrated } = useStoredAccountState();
   const [active, setActive] = React.useState<ReportDef | null>(null);
   const [result, setResult] = React.useState<QueryResult | null>(null);
@@ -233,11 +235,11 @@ export default function ReportsPage() {
     return <div className="glass-card">Loading reports...</div>;
   }
 
-  if (accountType === "client") {
+  if (!isAdmin && accountType === "client") {
     return <ClientReportsPage />;
   }
 
-  if (accountType === "warehouse") {
+  if (!isAdmin && accountType === "warehouse") {
     return <WarehouseReportsPage />;
   }
 

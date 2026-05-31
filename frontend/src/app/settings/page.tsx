@@ -394,11 +394,11 @@ export default function SettingsPage() {
     return <div className="glass-card">Loading settings...</div>;
   }
 
-  if (accountType === "client") {
+  if (!isAdmin && accountType === "client") {
     return <ClientProfilePage accountName={accountName} userEmail={user?.email} />;
   }
 
-  if (accountType === "warehouse") {
+  if (!isAdmin && accountType === "warehouse") {
     return <WarehouseProfilePage />;
   }
 

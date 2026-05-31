@@ -1,1 +1,7 @@
-export { default } from "../../warehouses/page";
+"use client";
+
+import { LegacyWarehouseFacilityPage } from "@/components/warehouse/WarehousePortal";
+
+export default function WarehouseMyWarehousePage() {
+  return <LegacyWarehouseFacilityPage />;
+}
